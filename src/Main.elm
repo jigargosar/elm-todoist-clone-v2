@@ -26,15 +26,18 @@ createTodo id title =
     Todo id title False
 
 
+initialTodoList =
+    [ createTodo "1" "Get Milk!!"
+    , createTodo "2" "Submit assignment"
+    , createTodo "3" "Check Facebook"
+    , createTodo "4" "Go to movies"
+    , createTodo "5" "Get Milk!!"
+    ]
+
+
 init : Flags -> ( Model, Cmd msg )
 init _ =
-    ( { todoList =
-            [ createTodo "1" "Get Milk!!"
-            , createTodo "2" "Submit assignment"
-            , createTodo "3" "Check Facebook"
-            , createTodo "4" "Go to movies"
-            , createTodo "5" "Get Milk!!"
-            ]
+    ( { todoList = initialTodoList
       }
     , Cmd.none
     )
