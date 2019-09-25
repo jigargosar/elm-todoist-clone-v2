@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (div, text)
+import Html exposing (Html, div, text)
 
 
 type alias Flags =
@@ -42,16 +42,19 @@ subscriptions _ =
     Sub.none
 
 
+view : Model -> Html.Html Msg
 view model =
     div []
         [ viewTodoList model.todoList
         ]
 
 
+viewTodoList : List Todo -> Html Msg
 viewTodoList list =
     div [] (List.map viewTodo list)
 
 
+viewTodo : Todo -> Html Msg
 viewTodo todo =
     div []
         [ text todo.title
