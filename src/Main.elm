@@ -199,7 +199,7 @@ type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
     | AddTodoClicked
-    | SetAddTodoForm AddTodoForm
+    | AddTodoFormMsg AddTodoForm
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -230,7 +230,7 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        SetAddTodoForm addTodo ->
+        AddTodoFormMsg addTodo ->
             let
                 newModel =
                     { model | addTodo = addTodo }
@@ -266,17 +266,17 @@ viewTodo todo =
 
 addTodoFormClicked : AddTodoForm -> Msg
 addTodoFormClicked { fields } =
-    AddTodoForm fields True |> SetAddTodoForm
+    AddTodoForm fields True |> AddTodoFormMsg
 
 
 patchAddTodoTitle : AddTodoForm -> String -> Msg
 patchAddTodoTitle { fields, isOpen } title =
     AddTodoForm { fields | title = title } isOpen
-        |> SetAddTodoForm
+        |> AddTodoFormMsg
 
 
 closeAddTodoForm { fields } =
-    AddTodoForm fields False |> SetAddTodoForm
+    AddTodoForm fields False |> AddTodoFormMsg
 
 
 viewAddTodo : AddTodoForm -> Html Msg
