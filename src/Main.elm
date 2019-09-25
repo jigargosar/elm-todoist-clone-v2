@@ -7,6 +7,7 @@ import Html.Events as E
 import Json.Decode as JD
 import Json.Decode.Pipeline as JD exposing (optional, required, resolve)
 import Json.Encode as JE exposing (Value)
+import List.Extra as LX
 
 
 type alias Flags =
@@ -117,7 +118,17 @@ port setCache : String -> Cmd msg
 
 type Msg
     = NoOp
-    | DoneChecked Bool
+    | DoneChecked String Bool
+
+
+eq_ : a -> a -> Bool
+eq_ =
+    (==)
+
+
+findById : a -> List { b | id : a } -> Maybe { b | id : a }
+findById todoId =
+    LX.find (.id >> eq_ todoId)
 
 
 update msg model =
@@ -125,8 +136,20 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        DoneChecked bool ->
-            ( model, Cmd.none )
+        DoneChecked todoId bool ->
+            let
+                todoList =
+                    model.todoList
+                        |> List.map
+                            (\todo ->
+                                if todo.id == todoId then
+                                    { todo | isDone = bool }
+
+                                else
+                                    todo
+                            )
+            in
+            ( { model | todoList = todoList }, Cmd.none )
 
 
 subscriptions _ =
@@ -148,7 +171,7 @@ viewTodoList list =
 viewTodo : Todo -> Html Msg
 viewTodo todo =
     div []
-        [ input [ type_ "checkbox", E.onCheck DoneChecked ] []
+        [ input [ type_ "checkbox", E.onCheck (DoneChecked todo.id) ] []
         , text todo.title
         ]
 
