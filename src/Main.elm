@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Browser
 import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (type_)
+import Html.Events as E
 import Json.Decode as JD
 import Json.Decode.Pipeline as JD exposing (optional, required, resolve)
 import Json.Encode as JE exposing (Value)
@@ -116,11 +117,15 @@ port setCache : String -> Cmd msg
 
 type Msg
     = NoOp
+    | DoneChecked Bool
 
 
 update msg model =
     case msg of
         NoOp ->
+            ( model, Cmd.none )
+
+        DoneChecked bool ->
             ( model, Cmd.none )
 
 
@@ -143,7 +148,7 @@ viewTodoList list =
 viewTodo : Todo -> Html Msg
 viewTodo todo =
     div []
-        [ input [ type_ "checkbox" ] []
+        [ input [ type_ "checkbox", E.onCheck DoneChecked ] []
         , text todo.title
         ]
 
