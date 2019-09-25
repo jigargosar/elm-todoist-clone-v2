@@ -56,7 +56,7 @@ cacheDecoder =
                 |> required "isDone" JD.bool
     in
     JD.succeed Cache
-        |> optional "todoList" (JD.list todoDecoder) []
+        |> optional "todoList" (JD.list todoDecoder) initialTodoList
 
 
 init : Flags -> ( Model, Cmd msg )
