@@ -5,21 +5,22 @@ import Html exposing (text)
 
 
 type alias Model =
-    ()
+    {}
 
 
 init _ =
-    ( (), Cmd.none )
+    ( {}, Cmd.none )
 
 
 type Msg
     = NoOp
 
 
+update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
         NoOp ->
-            ( (), Cmd.none )
+            ( model, Cmd.none )
 
 
 subscriptions _ =
