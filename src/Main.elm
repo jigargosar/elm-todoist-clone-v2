@@ -22,6 +22,10 @@ init : Flags -> ( Model, Cmd msg )
 init _ =
     ( { todoList =
             [ Todo "1" "Get Milk!!"
+            , Todo "2" "Submit assignment"
+            , Todo "3" "Check Facebook"
+            , Todo "4" "Go to movies"
+            , Todo "5" "Get bread"
             ]
       }
     , Cmd.none
