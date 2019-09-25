@@ -15,7 +15,8 @@ type alias Todo =
 
 
 type alias Model =
-    { todoList : List Todo }
+    { todoList : List Todo
+    }
 
 
 init : Flags -> ( Model, Cmd msg )
