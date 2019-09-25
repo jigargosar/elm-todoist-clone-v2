@@ -67,8 +67,8 @@ cacheDecoder =
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
 
 
-cacheEncoder : Cache -> Value
-cacheEncoder cache =
+cacheModel : Model -> Cmd msg
+cacheModel { todoList } =
     let
         todoEncoder todo =
             JE.object
@@ -76,10 +76,13 @@ cacheEncoder cache =
                 , ( "title", JE.string todo.title )
                 , ( "isDone", JE.bool todo.isDone )
                 ]
+
+        encodedModel =
+            JE.object
+                [ ( "todoList", JE.list todoEncoder todoList )
+                ]
     in
-    JE.object
-        [ ( "todoList", JE.list todoEncoder cache.todoList )
-        ]
+    setCache <| JE.encode 0 encodedModel
 
 
 stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
@@ -106,10 +109,13 @@ init flags =
             flags.cache
                 |> JD.decodeValue (stringOrValueDecoder cacheDecoder)
                 |> Result.withDefault defaultCacheValue
+
+        model =
+            { todoList = cache.todoList
+            }
     in
-    ( { todoList = cache.todoList
-      }
-    , setCache (JE.encode 0 (cacheEncoder cache))
+    ( model
+    , cacheModel model
     )
 
 
@@ -132,7 +138,7 @@ findById todoId =
 
 
 update msg model =
-    case msg of
+    (case msg of
         NoOp ->
             ( model, Cmd.none )
 
@@ -150,6 +156,8 @@ update msg model =
                             )
             in
             ( { model | todoList = todoList }, Cmd.none )
+    )
+        |> (\( m, c ) -> ( m, Cmd.batch [ c, cacheModel m ] ))
 
 
 subscriptions _ =
