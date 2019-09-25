@@ -272,7 +272,8 @@ addTodoFormClicked { fields } =
 
 patchAddTodoTitle : AddTodoForm -> String -> Msg
 patchAddTodoTitle { fields, isOpen } title =
-    SetAddTodoForm (AddTodoForm { fields | title = title } isOpen)
+    AddTodoForm { fields | title = title } isOpen
+        |> SetAddTodoForm
 
 
 viewAddTodo : AddTodoForm -> Html Msg
