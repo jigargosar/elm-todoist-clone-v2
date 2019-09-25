@@ -1,19 +1,31 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (text)
+import Html exposing (div, text)
 
 
 type alias Flags =
     {}
 
 
+type alias Todo =
+    { id : String
+    , title : String
+    }
+
+
 type alias Model =
-    { title : String }
+    { todoList : List Todo }
 
 
+init : Flags -> ( Model, Cmd msg )
 init _ =
-    ( { title = "" }, Cmd.none )
+    ( { todoList =
+            [ Todo "1" "Get Milk!!"
+            ]
+      }
+    , Cmd.none
+    )
 
 
 type Msg
@@ -30,8 +42,20 @@ subscriptions _ =
     Sub.none
 
 
-view _ =
-    text "hi"
+view model =
+    div []
+        [ viewTodoList model.todoList
+        ]
+
+
+viewTodoList list =
+    div [] (List.map viewTodo list)
+
+
+viewTodo todo =
+    div []
+        [ text todo.title
+        ]
 
 
 main : Program Flags Model Msg
