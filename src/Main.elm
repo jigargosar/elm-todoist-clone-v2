@@ -3,6 +3,8 @@ module Main exposing (main)
 import Browser
 import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (type_)
+import Json.Decode as JD
+import Json.Decode.Pipeline as JD exposing (optional, required, resolve)
 import Json.Encode exposing (Value)
 
 
@@ -43,9 +45,44 @@ type alias Cache =
     }
 
 
+cacheDecoder : JD.Decoder Cache
+cacheDecoder =
+    let
+        todoDecoder : JD.Decoder Todo
+        todoDecoder =
+            JD.succeed Todo
+                |> required "id" JD.string
+                |> required "title" JD.string
+                |> required "isDone" JD.bool
+    in
+    JD.succeed Cache
+        |> optional "todoList" (JD.list todoDecoder) []
+
+
 init : Flags -> ( Model, Cmd msg )
-init _ =
-    ( { todoList = initialTodoList
+init flags =
+    let
+        stringToCacheDecoder : JD.Decoder Cache
+        stringToCacheDecoder =
+            JD.oneOf
+                [ cacheDecoder
+                , JD.string
+                    |> JD.andThen
+                        (\str ->
+                            case JD.decodeString cacheDecoder str of
+                                Err err ->
+                                    JD.fail <| JD.errorToString err
+
+                                Ok cache ->
+                                    JD.succeed cache
+                        )
+                ]
+
+        { todoList } =
+            JD.decodeValue stringToCacheDecoder flags.cache
+                |> Result.withDefault { todoList = initialTodoList }
+    in
+    ( { todoList = todoList
       }
     , Cmd.none
     )
