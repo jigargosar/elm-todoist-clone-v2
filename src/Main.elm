@@ -1,7 +1,7 @@
 port module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, input, text)
+import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (type_)
 import Html.Events as E
 import Json.Decode as JD
@@ -181,6 +181,7 @@ mapTodo todoId fn model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
+    | AddTodoClicked
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -198,6 +199,16 @@ update msg model =
             let
                 newModel =
                     mapTodo todoId (patchTodo todoPatch) model
+            in
+            ( newModel, cacheModel newModel )
+
+        AddTodoClicked ->
+            let
+                addTodo =
+                    model.addTodo
+
+                newModel =
+                    { model | addTodo = { addTodo | isOpen = True } }
             in
             ( newModel, cacheModel newModel )
 
@@ -235,7 +246,7 @@ viewAddTodo { fields, isOpen } =
             []
 
     else
-        div [] []
+        button [ E.onClick AddTodoClicked ] [ text "add todo" ]
 
 
 main : Program Flags Model Msg
