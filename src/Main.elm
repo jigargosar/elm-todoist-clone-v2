@@ -289,8 +289,8 @@ viewAddTodo ({ fields, isOpen } as form) =
                 ]
                 []
             , div []
-                [ button [ E.onClick closeAddTodoForm ] [ text "Save" ]
-                , button [ E.onClick closeAddTodoForm ] [ text "Cancel" ]
+                [ button [ E.onClick (closeAddTodoForm form) ] [ text "Save" ]
+                , button [ E.onClick (closeAddTodoForm form) ] [ text "Cancel" ]
                 ]
             ]
 
