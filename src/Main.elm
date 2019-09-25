@@ -119,8 +119,12 @@ type TodoPatch
 
 type Msg
     = NoOp
-    | DoneChecked String Bool
     | PatchTodo TodoId TodoPatch
+
+
+doneChecked : TodoId -> Bool -> Msg
+doneChecked todoId isDone =
+    PatchTodo todoId (SetDone isDone)
 
 
 eq_ : a -> a -> Bool
@@ -137,13 +141,6 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
-
-        DoneChecked todoId bool ->
-            let
-                newModel =
-                    mapTodo todoId (\todo -> { todo | isDone = bool }) model
-            in
-            ( newModel, cacheModel newModel )
 
         PatchTodo todoId todoPatch ->
             let
@@ -193,7 +190,7 @@ viewTodoList list =
 viewTodo : Todo -> Html Msg
 viewTodo todo =
     div []
-        [ input [ type_ "checkbox", E.onCheck (DoneChecked todo.id) ] []
+        [ input [ type_ "checkbox", E.onCheck (doneChecked todo.id) ] []
         , text todo.title
         ]
 
