@@ -125,26 +125,33 @@ findById todoId =
 
 
 update msg model =
-    (case msg of
+    case msg of
         NoOp ->
             ( model, Cmd.none )
 
         DoneChecked todoId bool ->
             let
-                todoList =
-                    model.todoList
-                        |> List.map
-                            (\todo ->
-                                if todo.id == todoId then
-                                    { todo | isDone = bool }
-
-                                else
-                                    todo
-                            )
+                newModel =
+                    mapTodo todoId (\todo -> { todo | isDone = bool }) model
             in
-            ( { model | todoList = todoList }, Cmd.none )
-    )
-        |> (\( m, c ) -> ( m, Cmd.batch [ c, cacheModel m ] ))
+            ( newModel
+            , cacheModel newModel
+            )
+
+
+mapTodo todoId fn model =
+    { model
+        | todoList =
+            model.todoList
+                |> List.map
+                    (\todo ->
+                        if todo.id == todoId then
+                            fn todo
+
+                        else
+                            todo
+                    )
+    }
 
 
 subscriptions _ =
