@@ -131,6 +131,7 @@ type alias Flags =
 
 type alias Model =
     { todoList : List Todo
+    , addTodoForm : { title : String }
     }
 
 
@@ -204,6 +205,7 @@ view : Model -> Html.Html Msg
 view model =
     div []
         [ viewTodoList model.todoList
+        , viewAddTodo model.addTodoForm
         ]
 
 
@@ -218,6 +220,10 @@ viewTodo todo =
         [ input [ type_ "checkbox", E.onCheck (doneChecked todo.id) ] []
         , text todo.title
         ]
+
+
+viewAddTodo form =
+    div [] []
 
 
 main : Program Flags Model Msg
