@@ -81,8 +81,9 @@ cacheDecoder =
 
 
 cacheModel : Model -> Cmd msg
-cacheModel { todoList } =
+cacheModel { todoList, addTodo } =
     let
+        todoEncoder : Todo -> Value
         todoEncoder { id, title, isDone } =
             let
                 unwrapId (TodoId v) =
@@ -94,9 +95,21 @@ cacheModel { todoList } =
                 , ( "isDone", JE.bool isDone )
                 ]
 
+        addTodoEncoder : AddTodoForm -> Value
+        addTodoEncoder { isOpen, fields } =
+            let
+                fieldsEncoder { title } =
+                    object [ ( "title", JE.string title ) ]
+            in
+            object
+                [ ( "isOpen", JE.bool isOpen )
+                , ( "fields", fieldsEncoder fields )
+                ]
+
         encoded =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
+                , ( "addTodo", addTodoEncoder addTodo )
                 ]
     in
     setCache (encode 0 encoded)
