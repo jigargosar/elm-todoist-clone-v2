@@ -266,14 +266,17 @@ viewTodo todo =
 
 addTodoFormClicked : AddTodoForm -> Msg
 addTodoFormClicked { fields } =
-    AddTodoForm fields True
-        |> SetAddTodoForm
+    AddTodoForm fields True |> SetAddTodoForm
 
 
 patchAddTodoTitle : AddTodoForm -> String -> Msg
 patchAddTodoTitle { fields, isOpen } title =
     AddTodoForm { fields | title = title } isOpen
         |> SetAddTodoForm
+
+
+closeAddTodoForm { fields } =
+    AddTodoForm fields False |> SetAddTodoForm
 
 
 viewAddTodo : AddTodoForm -> Html Msg
@@ -286,8 +289,8 @@ viewAddTodo ({ fields, isOpen } as form) =
                 ]
                 []
             , div []
-                [ button [] [ text "Save" ]
-                , button [] [ text "Cancel" ]
+                [ button [ E.onClick closeAddTodoForm ] [ text "Save" ]
+                , button [ E.onClick closeAddTodoForm ] [ text "Cancel" ]
                 ]
             ]
 
