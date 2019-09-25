@@ -1,7 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, text)
+import Html exposing (Html, div, input, text)
+import Html.Attributes exposing (type_)
 
 
 type alias Flags =
@@ -62,7 +63,8 @@ viewTodoList list =
 viewTodo : Todo -> Html Msg
 viewTodo todo =
     div []
-        [ text todo.title
+        [ input [ type_ "checkbox" ] []
+        , text todo.title
         ]
 
 
