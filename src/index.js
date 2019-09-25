@@ -9,6 +9,9 @@ const app = Elm.Main.init({
   node: document.getElementById('root'),
 })
 
-app.ports.setCache.subscribe(cacheString =>
-  localStorage.setItem('elm-todoist-clone-v2-cache', cacheString),
-)
+app.ports.setCache.subscribe(cacheString => {
+  localStorage.setItem(
+    'elm-todoist-clone-v2-cache',
+    JSON.stringify(cacheString),
+  )
+})

@@ -69,20 +69,7 @@ cacheDecoder =
 
 cacheModel : Model -> Cmd msg
 cacheModel { todoList } =
-    let
-        todoEncoder todo =
-            JE.object
-                [ ( "id", JE.string todo.id )
-                , ( "title", JE.string todo.title )
-                , ( "isDone", JE.bool todo.isDone )
-                ]
-
-        encodedModel =
-            JE.object
-                [ ( "todoList", JE.list todoEncoder todoList )
-                ]
-    in
-    setCache <| JE.encode 0 encodedModel
+    setCache (Cache todoList)
 
 
 stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
@@ -119,7 +106,7 @@ init flags =
     )
 
 
-port setCache : String -> Cmd msg
+port setCache : Cache -> Cmd msg
 
 
 type Msg
