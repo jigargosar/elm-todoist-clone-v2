@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, input, text)
-import Html.Attributes exposing (type_)
+import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD
 import Json.Decode.Pipeline exposing (optional, required)
@@ -199,6 +199,7 @@ type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
     | AddTodoClicked
+    | SetAddTodoForm AddTodoForm
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -226,6 +227,13 @@ update msg model =
 
                 newModel =
                     { model | addTodo = { addTodo | isOpen = True } }
+            in
+            ( newModel, cacheModel newModel )
+
+        SetAddTodoForm addTodo ->
+            let
+                newModel =
+                    { model | addTodo = addTodo }
             in
             ( newModel, cacheModel newModel )
 
@@ -260,10 +268,18 @@ viewAddTodo : AddTodoForm -> Html Msg
 viewAddTodo { fields, isOpen } =
     if isOpen then
         div []
-            []
+            [ input
+                [ value fields.title
+                , E.onInput
+                    (\title ->
+                        SetAddTodoForm (AddTodoForm { fields | title = title } isOpen)
+                    )
+                ]
+                []
+            ]
 
     else
-        button [ E.onClick AddTodoClicked ] [ text "add todo" ]
+        button [ E.onClick (SetAddTodoForm (AddTodoForm fields True)) ] [ text "add todo" ]
 
 
 main : Program Flags Model Msg
