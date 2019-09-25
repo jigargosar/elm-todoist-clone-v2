@@ -151,6 +151,22 @@ init flags =
     )
 
 
+mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
+mapTodo todoId fn model =
+    { model
+        | todoList =
+            model.todoList
+                |> List.map
+                    (\todo ->
+                        if todo.id == todoId then
+                            fn todo
+
+                        else
+                            todo
+                    )
+    }
+
+
 
 -- UPDATE
 
@@ -177,22 +193,6 @@ update msg model =
                     mapTodo todoId (patchTodo todoPatch) model
             in
             ( newModel, cacheModel newModel )
-
-
-mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
-mapTodo todoId fn model =
-    { model
-        | todoList =
-            model.todoList
-                |> List.map
-                    (\todo ->
-                        if todo.id == todoId then
-                            fn todo
-
-                        else
-                            todo
-                    )
-    }
 
 
 subscriptions : Model -> Sub msg
