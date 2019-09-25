@@ -12,7 +12,6 @@ type alias Model =
     { title : String }
 
 
-init : Flags -> ( Model, Cmd msg )
 init _ =
     ( { title = "" }, Cmd.none )
 
@@ -21,7 +20,6 @@ type Msg
     = NoOp
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
         NoOp ->
