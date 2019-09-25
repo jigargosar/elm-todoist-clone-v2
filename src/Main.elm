@@ -134,9 +134,7 @@ update msg model =
                 newModel =
                     mapTodo todoId (\todo -> { todo | isDone = bool }) model
             in
-            ( newModel
-            , cacheModel newModel
-            )
+            ( newModel, cacheModel newModel )
 
 
 mapTodo todoId fn model =
