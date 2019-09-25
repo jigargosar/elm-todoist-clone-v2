@@ -157,6 +157,7 @@ patchTodo patch todo =
             { todo | isDone = isDone }
 
 
+mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
 mapTodo todoId fn model =
     { model
         | todoList =
