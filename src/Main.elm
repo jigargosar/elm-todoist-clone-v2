@@ -64,27 +64,28 @@ cacheDecoder =
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
 
 
+valueOrStringDecoder : JD.Decoder a -> JD.Decoder a
+valueOrStringDecoder decoder =
+    JD.oneOf
+        [ decoder
+        , JD.string
+            |> JD.andThen
+                (\str ->
+                    case JD.decodeString decoder str of
+                        Err err ->
+                            JD.fail <| JD.errorToString err
+
+                        Ok cache ->
+                            JD.succeed cache
+                )
+        ]
+
+
 init : Flags -> ( Model, Cmd msg )
 init flags =
     let
-        stringToCacheDecoder : JD.Decoder Cache
-        stringToCacheDecoder =
-            JD.oneOf
-                [ cacheDecoder
-                , JD.string
-                    |> JD.andThen
-                        (\str ->
-                            case JD.decodeString cacheDecoder str of
-                                Err err ->
-                                    JD.fail <| JD.errorToString err
-
-                                Ok cache ->
-                                    JD.succeed cache
-                        )
-                ]
-
         { todoList } =
-            JD.decodeValue stringToCacheDecoder flags.cache
+            JD.decodeValue (valueOrStringDecoder cacheDecoder) flags.cache
                 |> Result.withDefault defaultCacheValue
     in
     ( { todoList = todoList
