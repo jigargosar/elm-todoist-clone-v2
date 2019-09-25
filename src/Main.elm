@@ -112,6 +112,10 @@ stringOrValueDecoder decoder =
         ]
 
 
+
+-- MODEL
+
+
 type alias Flags =
     { cache : Value
     , now : Int
