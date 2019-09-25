@@ -129,9 +129,13 @@ type alias Flags =
     }
 
 
+type alias AddTodoForm =
+    { fields : { title : String }, isOpen : Bool }
+
+
 type alias Model =
     { todoList : List Todo
-    , addTodoForm : { title : String }
+    , addTodo : AddTodoForm
     }
 
 
@@ -143,8 +147,10 @@ init flags =
                 |> JD.decodeValue (stringOrValueDecoder cacheDecoder)
                 |> Result.withDefault defaultCacheValue
 
+        model : Model
         model =
             { todoList = cache.todoList
+            , addTodo = { fields = { title = "" }, isOpen = False }
             }
     in
     ( model
@@ -205,7 +211,7 @@ view : Model -> Html.Html Msg
 view model =
     div []
         [ viewTodoList model.todoList
-        , viewAddTodo model.addTodoForm
+        , viewAddTodo model.addTodo
         ]
 
 
@@ -222,8 +228,14 @@ viewTodo todo =
         ]
 
 
-viewAddTodo form =
-    div [] []
+viewAddTodo : AddTodoForm -> Html Msg
+viewAddTodo { fields, isOpen } =
+    if isOpen then
+        div []
+            []
+
+    else
+        div [] []
 
 
 main : Program Flags Model Msg
