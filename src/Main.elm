@@ -113,10 +113,10 @@ cacheModel model =
                 , ( "addTodo", addTodoEncoder addTodo )
                 ]
 
-        encodedModel =
+        modelValue =
             modelEncoder model
     in
-    setCache <| encode 0 encodedModel
+    setCache <| encode 0 modelValue
 
 
 stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
