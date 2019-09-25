@@ -150,6 +150,7 @@ update msg model =
             ( newModel, cacheModel newModel )
 
 
+patchTodo : TodoPatch -> Todo -> Todo
 patchTodo patch todo =
     case patch of
         SetDone isDone ->
