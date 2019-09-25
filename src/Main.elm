@@ -5,9 +5,8 @@ import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (type_)
 import Html.Events as E
 import Json.Decode as JD
-import Json.Decode.Pipeline as JD exposing (optional, required, resolve)
-import Json.Encode as JE exposing (Value)
-import List.Extra as LX
+import Json.Decode.Pipeline exposing (optional, required)
+import Json.Encode as JE exposing (Value, encode, object)
 
 
 type alias Flags =
@@ -16,8 +15,12 @@ type alias Flags =
     }
 
 
+type TodoId
+    = TodoId String
+
+
 type alias Todo =
-    { id : String
+    { id : TodoId
     , title : String
     , isDone : Bool
     }
@@ -30,7 +33,7 @@ type alias Model =
 
 createTodo : String -> String -> Todo
 createTodo id title =
-    Todo id title False
+    Todo (TodoId id) title False
 
 
 initialTodoList =
@@ -59,7 +62,7 @@ cacheDecoder =
         todoDecoder : JD.Decoder Todo
         todoDecoder =
             JD.succeed Todo
-                |> required "id" JD.string
+                |> required "id" (JD.string |> JD.map TodoId)
                 |> required "title" JD.string
                 |> required "isDone" JD.bool
     in
@@ -69,7 +72,24 @@ cacheDecoder =
 
 cacheModel : Model -> Cmd msg
 cacheModel { todoList } =
-    setCache (Cache todoList)
+    let
+        todoEncoder { id, title, isDone } =
+            let
+                unwrapId (TodoId v) =
+                    v
+            in
+            object
+                [ ( "id", JE.string <| unwrapId id )
+                , ( "title", JE.string title )
+                , ( "isDone", JE.bool isDone )
+                ]
+
+        encoded =
+            object
+                [ ( "todoList", JE.list todoEncoder todoList )
+                ]
+    in
+    setCache (encode 0 encoded)
 
 
 stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
@@ -106,11 +126,7 @@ init flags =
     )
 
 
-port setCache : Cache -> Cmd msg
-
-
-type alias TodoId =
-    String
+port setCache : String -> Cmd msg
 
 
 type TodoPatch
@@ -127,16 +143,7 @@ doneChecked todoId isDone =
     PatchTodo todoId (SetDone isDone)
 
 
-eq_ : a -> a -> Bool
-eq_ =
-    (==)
-
-
-findById : a -> List { b | id : a } -> Maybe { b | id : a }
-findById todoId =
-    LX.find (.id >> eq_ todoId)
-
-
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
@@ -173,6 +180,7 @@ mapTodo todoId fn model =
     }
 
 
+subscriptions : Model -> Sub msg
 subscriptions _ =
     Sub.none
 
