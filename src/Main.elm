@@ -79,11 +79,10 @@ cacheEncoder cache =
         ]
 
 
-valueOrStringDecoder : JD.Decoder a -> JD.Decoder a
-valueOrStringDecoder decoder =
+stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
+stringOrValueDecoder decoder =
     JD.oneOf
-        [ decoder
-        , JD.string
+        [ JD.string
             |> JD.andThen
                 (\str ->
                     case JD.decodeString decoder str of
@@ -93,6 +92,7 @@ valueOrStringDecoder decoder =
                         Ok cache ->
                             JD.succeed cache
                 )
+        , decoder
         ]
 
 
@@ -101,7 +101,7 @@ init flags =
     let
         cache =
             flags.cache
-                |> JD.decodeValue (valueOrStringDecoder cacheDecoder)
+                |> JD.decodeValue (stringOrValueDecoder cacheDecoder)
                 |> Result.withDefault defaultCacheValue
     in
     ( { todoList = cache.todoList
