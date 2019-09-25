@@ -85,7 +85,8 @@ init : Flags -> ( Model, Cmd msg )
 init flags =
     let
         { todoList } =
-            JD.decodeValue (valueOrStringDecoder cacheDecoder) flags.cache
+            flags.cache
+                |> JD.decodeValue (valueOrStringDecoder cacheDecoder)
                 |> Result.withDefault defaultCacheValue
     in
     ( { todoList = todoList
