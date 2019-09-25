@@ -110,7 +110,14 @@ cacheModel model =
         modelEncoder { todoList, addTodo } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
-                , ( "addTodo", addTodoEncoder addTodo )
+                , ( "addTodo"
+                  , case addTodo of
+                        On form ->
+                            addTodoEncoder form
+
+                        Off ->
+                            JE.null
+                  )
                 ]
 
         modelValue =
@@ -150,9 +157,14 @@ type alias AddTodoForm =
     { fields : { title : String }, isOpen : Bool }
 
 
+type Toggle a
+    = On a
+    | Off
+
+
 type alias Model =
     { todoList : List Todo
-    , addTodo : AddTodoForm
+    , addTodo : Toggle AddTodoForm
     }
 
 
@@ -167,7 +179,7 @@ init flags =
         model : Model
         model =
             { todoList = cache.todoList
-            , addTodo = { fields = { title = "" }, isOpen = False }
+            , addTodo = Off
             }
     in
     ( model
@@ -222,7 +234,7 @@ update msg model =
         PatchAddTodoForm addTodo ->
             let
                 newModel =
-                    { model | addTodo = addTodo }
+                    { model | addTodo = On addTodo }
             in
             ( newModel, cacheModel newModel )
 
@@ -253,9 +265,9 @@ viewTodo todo =
         ]
 
 
-addTodoFormClicked : AddTodoForm -> Msg
-addTodoFormClicked { fields } =
-    AddTodoForm fields True |> PatchAddTodoForm
+addTodoFormClicked : Msg
+addTodoFormClicked =
+    AddTodoForm { title = "" } True |> PatchAddTodoForm
 
 
 patchAddTodoTitle : AddTodoForm -> String -> Msg
@@ -268,28 +280,29 @@ closeAddTodoForm { fields } =
     AddTodoForm fields False |> PatchAddTodoForm
 
 
-viewAddTodo : AddTodoForm -> Html Msg
-viewAddTodo ({ fields, isOpen } as form) =
-    if isOpen then
-        div []
-            [ input
-                [ value fields.title
-                , E.onInput (patchAddTodoTitle form)
+viewAddTodo : Toggle AddTodoForm -> Html Msg
+viewAddTodo addTodo =
+    case addTodo of
+        On ({ fields, isOpen } as form) ->
+            div []
+                [ input
+                    [ value fields.title
+                    , E.onInput (patchAddTodoTitle form)
+                    ]
+                    []
+                , div []
+                    [ button [ E.onClick (closeAddTodoForm form) ] [ text "Save" ]
+                    , button [ E.onClick (closeAddTodoForm form) ] [ text "Cancel" ]
+                    ]
                 ]
-                []
-            , div []
-                [ button [ E.onClick (closeAddTodoForm form) ] [ text "Save" ]
-                , button [ E.onClick (closeAddTodoForm form) ] [ text "Cancel" ]
-                ]
-            ]
 
-    else
-        div []
-            [ button
-                [ E.onClick (addTodoFormClicked form)
+        Off ->
+            div []
+                [ button
+                    [ E.onClick addTodoFormClicked
+                    ]
+                    [ text "add todo" ]
                 ]
-                [ text "add todo" ]
-            ]
 
 
 main : Program Flags Model Msg
