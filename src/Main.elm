@@ -9,12 +9,6 @@ import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 
 
-type alias Flags =
-    { cache : Value
-    , now : Int
-    }
-
-
 type TodoId
     = TodoId String
 
@@ -26,9 +20,8 @@ type alias Todo =
     }
 
 
-type alias Model =
-    { todoList : List Todo
-    }
+type TodoPatch
+    = SetDone Bool
 
 
 createTodo : String -> String -> Todo
@@ -108,6 +101,17 @@ stringOrValueDecoder decoder =
         ]
 
 
+type alias Flags =
+    { cache : Value
+    , now : Int
+    }
+
+
+type alias Model =
+    { todoList : List Todo
+    }
+
+
 init : Flags -> ( Model, Cmd msg )
 init flags =
     let
@@ -126,10 +130,6 @@ init flags =
 
 
 port setCache : String -> Cmd msg
-
-
-type TodoPatch
-    = SetDone Bool
 
 
 type Msg
