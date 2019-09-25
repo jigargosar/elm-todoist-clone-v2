@@ -45,6 +45,11 @@ type alias Cache =
     }
 
 
+defaultCacheValue : Cache
+defaultCacheValue =
+    { todoList = initialTodoList }
+
+
 cacheDecoder : JD.Decoder Cache
 cacheDecoder =
     let
@@ -80,7 +85,7 @@ init flags =
 
         { todoList } =
             JD.decodeValue stringToCacheDecoder flags.cache
-                |> Result.withDefault { todoList = initialTodoList }
+                |> Result.withDefault defaultCacheValue
     in
     ( { todoList = todoList
       }
