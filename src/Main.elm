@@ -9,6 +9,10 @@ import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 
 
+
+-- TODO_
+
+
 type TodoId
     = TodoId String
 
@@ -36,6 +40,10 @@ initialTodoList =
     , createTodo "4" "Go to movies"
     , createTodo "5" "Get Milk!!"
     ]
+
+
+
+-- CACHE
 
 
 port setCache : String -> Cmd msg
