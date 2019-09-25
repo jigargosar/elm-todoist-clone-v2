@@ -38,6 +38,9 @@ initialTodoList =
     ]
 
 
+port setCache : String -> Cmd msg
+
+
 type alias Cache =
     { todoList : List Todo
     }
@@ -127,9 +130,6 @@ init flags =
     ( model
     , cacheModel model
     )
-
-
-port setCache : String -> Cmd msg
 
 
 type Msg
