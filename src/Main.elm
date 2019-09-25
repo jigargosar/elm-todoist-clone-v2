@@ -106,14 +106,17 @@ cacheModel model =
                 , ( "fields", fieldsEncoder fields )
                 ]
 
-        encodeModel : Model -> Value
-        encodeModel { todoList, addTodo } =
+        modelEncoder : Model -> Value
+        modelEncoder { todoList, addTodo } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
                 , ( "addTodo", addTodoEncoder addTodo )
                 ]
+
+        encodedModel =
+            modelEncoder model
     in
-    setCache <| encode 0 <| encodeModel model
+    setCache <| encode 0 encodedModel
 
 
 stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
