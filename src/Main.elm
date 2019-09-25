@@ -285,6 +285,10 @@ viewAddTodo ({ fields, isOpen } as form) =
                 , E.onInput (patchAddTodoTitle form)
                 ]
                 []
+            , div []
+                [ button [] [ text "Save" ]
+                , button [] [ text "Cancel" ]
+                ]
             ]
 
     else
