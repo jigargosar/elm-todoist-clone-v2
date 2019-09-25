@@ -1,11 +1,11 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (type_)
 import Json.Decode as JD
 import Json.Decode.Pipeline as JD exposing (optional, required, resolve)
-import Json.Encode exposing (Value)
+import Json.Encode as JE exposing (Value)
 
 
 type alias Flags =
@@ -64,6 +64,21 @@ cacheDecoder =
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
 
 
+cacheEncoder : Cache -> Value
+cacheEncoder cache =
+    let
+        todoEncoder todo =
+            JE.object
+                [ ( "id", JE.string todo.id )
+                , ( "title", JE.string todo.title )
+                , ( "isDone", JE.bool todo.isDone )
+                ]
+    in
+    JE.object
+        [ ( "todoList", JE.list todoEncoder cache.todoList )
+        ]
+
+
 valueOrStringDecoder : JD.Decoder a -> JD.Decoder a
 valueOrStringDecoder decoder =
     JD.oneOf
@@ -84,15 +99,18 @@ valueOrStringDecoder decoder =
 init : Flags -> ( Model, Cmd msg )
 init flags =
     let
-        { todoList } =
+        cache =
             flags.cache
                 |> JD.decodeValue (valueOrStringDecoder cacheDecoder)
                 |> Result.withDefault defaultCacheValue
     in
-    ( { todoList = todoList
+    ( { todoList = cache.todoList
       }
-    , Cmd.none
+    , setCache (JE.encode 0 (cacheEncoder cache))
     )
+
+
+port setCache : String -> Cmd msg
 
 
 type Msg
