@@ -12,6 +12,7 @@ type alias Flags =
 type alias Todo =
     { id : String
     , title : String
+    , isDone : Bool
     }
 
 
@@ -20,14 +21,19 @@ type alias Model =
     }
 
 
+createTodo : String -> String -> Todo
+createTodo id title =
+    Todo id title False
+
+
 init : Flags -> ( Model, Cmd msg )
 init _ =
     ( { todoList =
-            [ Todo "1" "Get Milk!!"
-            , Todo "2" "Submit assignment"
-            , Todo "3" "Check Facebook"
-            , Todo "4" "Go to movies"
-            , Todo "5" "Get Milk!!"
+            [ createTodo "1" "Get Milk!!"
+            , createTodo "2" "Submit assignment"
+            , createTodo "3" "Check Facebook"
+            , createTodo "4" "Go to movies"
+            , createTodo "5" "Get Milk!!"
             ]
       }
     , Cmd.none
