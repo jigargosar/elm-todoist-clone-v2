@@ -39,10 +39,9 @@ createTodo id title =
 initialTodoList =
     [ createTodo "1" "Get Milk!!"
     , createTodo "2" "Submit assignment"
-
-    --    , createTodo "3" "Check Facebook"
-    --    , createTodo "4" "Go to movies"
-    --    , createTodo "5" "Get Milk!!"
+    , createTodo "3" "Check Facebook"
+    , createTodo "4" "Go to movies"
+    , createTodo "5" "Get Milk!!"
     ]
 
 
