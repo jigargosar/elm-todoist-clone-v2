@@ -81,7 +81,7 @@ cacheDecoder =
 
 
 cacheModel : Model -> Cmd msg
-cacheModel { todoList, addTodo } =
+cacheModel model =
     let
         todoEncoder : Todo -> Value
         todoEncoder { id, title, isDone } =
@@ -106,13 +106,14 @@ cacheModel { todoList, addTodo } =
                 , ( "fields", fieldsEncoder fields )
                 ]
 
-        encoded =
+        encodeModel : Model -> Value
+        encodeModel { todoList, addTodo } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
                 , ( "addTodo", addTodoEncoder addTodo )
                 ]
     in
-    setCache (encode 0 encoded)
+    setCache <| encode 0 <| encodeModel model
 
 
 stringOrValueDecoder : JD.Decoder a -> JD.Decoder a
