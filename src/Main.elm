@@ -109,9 +109,18 @@ init flags =
 port setCache : Cache -> Cmd msg
 
 
+type alias TodoId =
+    String
+
+
+type TodoPatch
+    = SetDone Bool
+
+
 type Msg
     = NoOp
     | DoneChecked String Bool
+    | PatchTodo TodoId TodoPatch
 
 
 eq_ : a -> a -> Bool
@@ -135,6 +144,19 @@ update msg model =
                     mapTodo todoId (\todo -> { todo | isDone = bool }) model
             in
             ( newModel, cacheModel newModel )
+
+        PatchTodo todoId todoPatch ->
+            let
+                newModel =
+                    mapTodo todoId (patchTodo todoPatch) model
+            in
+            ( newModel, cacheModel newModel )
+
+
+patchTodo patch todo =
+    case patch of
+        SetDone isDone ->
+            { todo | isDone = isDone }
 
 
 mapTodo todoId fn model =
