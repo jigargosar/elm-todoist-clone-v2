@@ -55,7 +55,7 @@ module.exports = {
       warnings: true,
       errors: true,
     },
-    hot: false,
+    hot: true,
     // hotOnly: true,
   },
 }
