@@ -295,10 +295,12 @@ viewAddTodo ({ fields, isOpen } as form) =
             ]
 
     else
-        button
-            [ E.onClick (addTodoFormClicked form)
+        div []
+            [ button
+                [ E.onClick (addTodoFormClicked form)
+                ]
+                [ text "add todo" ]
             ]
-            [ text "add todo" ]
 
 
 main : Program Flags Model Msg
