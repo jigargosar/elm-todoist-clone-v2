@@ -279,7 +279,10 @@ viewAddTodo { fields, isOpen } =
             ]
 
     else
-        button [ E.onClick (SetAddTodoForm (AddTodoForm fields True)) ] [ text "add todo" ]
+        button
+            [ E.onClick (SetAddTodoForm (AddTodoForm fields True))
+            ]
+            [ text "add todo" ]
 
 
 main : Program Flags Model Msg
