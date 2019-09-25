@@ -6,7 +6,9 @@ import Html.Attributes exposing (type_)
 
 
 type alias Flags =
-    {}
+    { cache : Cache
+    , epoch : Int
+    }
 
 
 type alias Todo =
@@ -33,6 +35,11 @@ initialTodoList =
     , createTodo "4" "Go to movies"
     , createTodo "5" "Get Milk!!"
     ]
+
+
+type alias Cache =
+    { todoList : List Todo
+    }
 
 
 init : Flags -> ( Model, Cmd msg )
