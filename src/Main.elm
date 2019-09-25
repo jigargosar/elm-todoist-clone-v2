@@ -24,10 +24,6 @@ type alias Todo =
     }
 
 
-type TodoPatch
-    = SetDone Bool
-
-
 createTodo : String -> String -> Todo
 createTodo id title =
     Todo (TodoId id) title False
@@ -40,6 +36,17 @@ initialTodoList =
     , createTodo "4" "Go to movies"
     , createTodo "5" "Get Milk!!"
     ]
+
+
+type TodoPatch
+    = SetDone Bool
+
+
+patchTodo : TodoPatch -> Todo -> Todo
+patchTodo patch todo =
+    case patch of
+        SetDone isDone ->
+            { todo | isDone = isDone }
 
 
 
@@ -144,6 +151,10 @@ init flags =
     )
 
 
+
+-- UPDATE
+
+
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
@@ -166,13 +177,6 @@ update msg model =
                     mapTodo todoId (patchTodo todoPatch) model
             in
             ( newModel, cacheModel newModel )
-
-
-patchTodo : TodoPatch -> Todo -> Todo
-patchTodo patch todo =
-    case patch of
-        SetDone isDone ->
-            { todo | isDone = isDone }
 
 
 mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
