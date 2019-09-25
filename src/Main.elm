@@ -198,7 +198,6 @@ mapTodo todoId fn model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | AddTodoClicked
     | AddTodoFormMsg AddTodoForm
 
 
@@ -217,16 +216,6 @@ update msg model =
             let
                 newModel =
                     mapTodo todoId (patchTodo todoPatch) model
-            in
-            ( newModel, cacheModel newModel )
-
-        AddTodoClicked ->
-            let
-                addTodo =
-                    model.addTodo
-
-                newModel =
-                    { model | addTodo = { addTodo | isOpen = True } }
             in
             ( newModel, cacheModel newModel )
 
