@@ -4,12 +4,17 @@ import Browser
 import Html exposing (text)
 
 
-type alias Model =
+type alias Flags =
     {}
 
 
+type alias Model =
+    { title : String }
+
+
+init : Flags -> ( Model, Cmd msg )
 init _ =
-    ( {}, Cmd.none )
+    ( { title = "" }, Cmd.none )
 
 
 type Msg
@@ -31,7 +36,7 @@ view _ =
     text "hi"
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
