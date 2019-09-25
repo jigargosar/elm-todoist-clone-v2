@@ -264,23 +264,31 @@ viewTodo todo =
         ]
 
 
+addTodoFormClicked : AddTodoForm -> Msg
+addTodoFormClicked { fields } =
+    AddTodoForm fields True
+        |> SetAddTodoForm
+
+
+patchAddTodoTitle : AddTodoForm -> String -> Msg
+patchAddTodoTitle { fields, isOpen } title =
+    SetAddTodoForm (AddTodoForm { fields | title = title } isOpen)
+
+
 viewAddTodo : AddTodoForm -> Html Msg
-viewAddTodo { fields, isOpen } =
+viewAddTodo ({ fields, isOpen } as form) =
     if isOpen then
         div []
             [ input
                 [ value fields.title
-                , E.onInput
-                    (\title ->
-                        SetAddTodoForm (AddTodoForm { fields | title = title } isOpen)
-                    )
+                , E.onInput (patchAddTodoTitle form)
                 ]
                 []
             ]
 
     else
         button
-            [ E.onClick (SetAddTodoForm (AddTodoForm fields True))
+            [ E.onClick (addTodoFormClicked form)
             ]
             [ text "add todo" ]
 
