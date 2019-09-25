@@ -25,7 +25,7 @@ init _ =
             , Todo "2" "Submit assignment"
             , Todo "3" "Check Facebook"
             , Todo "4" "Go to movies"
-            , Todo "5" "Get bread"
+            , Todo "5" "Get Milk!!"
             ]
       }
     , Cmd.none
