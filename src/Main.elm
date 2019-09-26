@@ -2,8 +2,10 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (boolIpt, btn3, class, col, el, rootEl, row, strIpt, txt)
 import Html
+import Html.Styled as H exposing (div)
+import Html.Styled.Attributes as A
+import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
@@ -301,24 +303,35 @@ subscriptions _ =
 
 view : Model -> Html.Html Msg
 view model =
-    rootEl
-        [ viewTodoList model.todoList
-        , viewAddTodo model.addTodo
-        ]
-
-
-viewTodoList list =
-    col (List.map viewTodo list)
-
-
-viewTodo todo =
-    row
-        [ class "pa1"
-        , el
-            [ class "ph1"
-            , boolIpt todo.isDone (doneChecked todo.id) [ class "sz-24" ]
+    H.toUnstyled <|
+        H.div []
+            [ viewTodoList model.todoList
+            , viewAddTodo model.addTodo
             ]
-        , el [ class "ph1 flex-grow-1", el [ txt todo.title ] ]
+
+
+col : List (H.Attribute msg) -> List (H.Html msg) -> H.Html msg
+col attrs =
+    H.div (A.class "flex flex-column" :: attrs)
+
+
+row : List (H.Attribute msg) -> List (H.Html msg) -> H.Html msg
+row attrs =
+    H.div (A.class "flex flex-row" :: attrs)
+
+
+viewTodoList : List Todo -> H.Html Msg
+viewTodoList list =
+    col [] (List.map viewTodo list)
+
+
+viewTodo : Todo -> H.Html Msg
+viewTodo todo =
+    row [ A.class "pa1" ]
+        [ H.div [ A.class "ph1" ]
+            [ H.input [ A.checked todo.isDone, E.onCheck (doneChecked todo.id), A.class "sz-24" ] []
+            ]
+        , H.div [ A.class "ph1 flex-grow-1" ] [ H.text todo.title ]
         ]
 
 
@@ -332,17 +345,24 @@ patchAddTodoTitle { fields } title =
     AddTodoForm { fields | title = title } |> setAddTodoForm
 
 
+btn3 : String -> msg -> H.Html msg
+btn3 title msg =
+    H.button [] []
+
+
+viewAddTodo : Toggle AddTodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
-            col
-                [ class "ph2 pv1"
-                , col [ class "pv1", strIpt fields.title (patchAddTodoTitle form) [] ]
-                , row [ btn3 "Save" Save [], btn3 "Cancel" closeForm [] ]
+            col [ A.class "ph2 pv1" ]
+                [ col [ A.class "pv1" ]
+                    [ H.input [ A.value fields.title, E.onInput (patchAddTodoTitle form) ] []
+                    ]
+                , row [] [ btn3 "Save" Save, btn3 "Cancel" closeForm ]
                 ]
 
         Off ->
-            row [ class "pa1", btn3 "add todo" addTodoFormClicked [] ]
+            row [ A.class "pa1" ] [ btn3 "add todo" addTodoFormClicked ]
 
 
 main : Program Flags Model Msg
