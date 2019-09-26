@@ -1,6 +1,7 @@
-module El exposing (Prop, attr, btn, click, el, rootEl, tag, txt)
+module El exposing (Prop, attr, btn, click, el, ipt, ipt3, rootEl, tag, txt)
 
 import Html exposing (Attribute, Html, node, text)
+import Html.Attributes exposing (value)
 import Html.Events as E
 
 
@@ -42,6 +43,16 @@ taggedEl tagName props =
 btn : List (Prop msg) -> Prop msg
 btn =
     taggedEl "button"
+
+
+ipt : List (Prop msg) -> Prop msg
+ipt =
+    taggedEl "input"
+
+
+ipt3 : String -> (String -> msg) -> List (Prop msg) -> Prop msg
+ipt3 val onInput props =
+    ipt (List.map attr [ value val, E.onInput onInput ] ++ props)
 
 
 tag : String -> Prop msg
