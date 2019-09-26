@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (btn, click, rootEl, txt)
+import El exposing (attr, btn, click, el, rootEl, tag, txt)
 import Html exposing (Attribute, Html, div, input, text)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
@@ -336,13 +336,13 @@ viewAddTodo : Toggle AddTodoForm -> Html Msg
 viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
-            div []
-                [ input
-                    [ value fields.title
-                    , E.onInput (patchAddTodoTitle form)
+            rootEl
+                [ el
+                    [ tag "input"
+                    , attr <| value fields.title
+                    , attr <| E.onInput (patchAddTodoTitle form)
                     ]
-                    []
-                , rootEl
+                , el
                     [ btn [ click Save, txt "Save" ]
                     , btn [ click closeForm, txt "Cancel" ]
                     ]

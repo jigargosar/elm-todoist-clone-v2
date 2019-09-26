@@ -1,4 +1,4 @@
-module El exposing (Prop, attr, btn, click, el, rootEl, txt)
+module El exposing (Prop, attr, btn, click, el, rootEl, tag, txt)
 
 import Html exposing (Attribute, Html, node, text)
 import Html.Events as E
@@ -38,6 +38,11 @@ btn props =
     el (Tag "button" :: props)
 
 
+tag : String -> Prop msg
+tag =
+    Tag
+
+
 rootEl : List (Prop msg) -> Html msg
 rootEl props =
     El props |> toHtml
@@ -71,7 +76,7 @@ toHtml el_ =
                 )
                 ( "div", [], [] )
                 props
-                |> (\( tag, attrs, children ) -> node tag attrs children)
+                |> (\( tag_, attrs, children ) -> node tag_ attrs children)
 
         TxtEl v ->
             text v
