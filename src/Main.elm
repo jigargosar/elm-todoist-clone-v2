@@ -3,8 +3,8 @@ port module Main exposing (main)
 import Basics.More exposing (updateWhenIdEq)
 import Browser
 import El exposing (attr, boolIpt, btn3, col, el, rootEl, row, strIpt, txt)
-import Html exposing (Attribute, Html)
-import Html.Attributes exposing (class)
+import Html
+import Html.Styled.Attributes exposing (class)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)

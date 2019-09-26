@@ -1,8 +1,9 @@
 module El exposing (Prop, attr, boolIpt, btn, btn3, col, el, ipt, rootEl, row, strIpt, tag, txt)
 
-import Html exposing (Attribute, Html, node, text)
-import Html.Attributes exposing (checked, class, style, type_, value)
-import Html.Events as E
+import Html
+import Html.Styled as H exposing (Attribute, Html, node, text)
+import Html.Styled.Attributes exposing (checked, class, type_, value)
+import Html.Styled.Events as E
 
 
 type alias Attrs msg =
@@ -57,7 +58,7 @@ btn =
 
 btn3 : String -> msg -> List (Prop msg) -> Prop msg
 btn3 title action props =
-    btn ((attr <| E.onClick action) :: txt title :: props)
+    btn (fromHtmlAttrs [ E.onClick action, class "ph2 pv1" ] ++ (txt title :: props))
 
 
 ipt : List (Prop msg) -> Prop msg
@@ -86,9 +87,11 @@ tag =
     Tag
 
 
-rootEl : List (Prop msg) -> Html msg
+rootEl : List (Prop msg) -> Html.Html msg
 rootEl props =
-    El props |> toHtml
+    El props
+        |> toHtml
+        |> H.toUnstyled
 
 
 txt : String -> Prop msg
