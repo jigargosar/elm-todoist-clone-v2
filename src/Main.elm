@@ -355,10 +355,11 @@ type alias Children msg =
 type BtnProp msg
     = Attr (Attribute msg)
     | Child (Html msg)
+    | Tag String
 
 
-viewBtn : List (BtnProp msg) -> Html msg
-viewBtn props =
+el : List (BtnProp msg) -> Html msg
+el props =
     List.foldr
         (\prop ( t, a, c ) ->
             case prop of
@@ -367,6 +368,9 @@ viewBtn props =
 
                 Child v ->
                     ( t, a, v :: c )
+
+                Tag v ->
+                    ( v, a, c )
         )
         ( "div", [], [] )
         props
