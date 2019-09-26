@@ -318,7 +318,7 @@ viewTodo todo =
             [ class "pv1 ph1"
             , boolIpt todo.isDone (doneChecked todo.id) [ class "h1 w1" ]
             ]
-        , el [ class "lh-copy ph1 flex-grow-1", el [ txt todo.title ] ]
+        , el [ class "ph1 flex-grow-1", el [ txt todo.title ] ]
         ]
 
 
