@@ -191,16 +191,6 @@ type Toggle a
     | Off
 
 
-mapToggle : (a -> b) -> Toggle a -> Toggle b
-mapToggle func toggle =
-    case toggle of
-        On a ->
-            On <| func a
-
-        Off ->
-            Off
-
-
 unpackToggle : (() -> a) -> (b -> a) -> Toggle b -> a
 unpackToggle default func toggle =
     case toggle of
@@ -209,11 +199,6 @@ unpackToggle default func toggle =
 
         Off ->
             default ()
-
-
-getOnOr : a -> Toggle a -> a
-getOnOr default toggle =
-    unpackToggle (always default) identity toggle
 
 
 unwrapToggle : a -> (b -> a) -> Toggle b -> a
