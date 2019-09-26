@@ -1,4 +1,4 @@
-module El exposing (El, Prop, attr, click, el, rootEl, txt)
+module El exposing (Prop, attr, click, el, rootEl, txt)
 
 import Html exposing (Attribute, Html, node, text)
 import Html.Events as E
