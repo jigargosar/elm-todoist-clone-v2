@@ -58,3 +58,7 @@ button {
 .flex-column {
   flex-direction: column;
 }
+
+
+.nice-blue {color: hsl(217, 99%, 53%)
+}

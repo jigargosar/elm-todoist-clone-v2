@@ -315,7 +315,7 @@ viewTodo todo =
     row
         [ class "pa1"
         , el
-            [ class "pv1 ph1"
+            [ class "ph1"
             , boolIpt todo.isDone (doneChecked todo.id) [ class "h1 w1" ]
             ]
         , el [ class "ph1 flex-grow-1", el [ txt todo.title ] ]

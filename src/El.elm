@@ -63,7 +63,7 @@ btn =
 
 btn3 : String -> msg -> List (Prop msg) -> Prop msg
 btn3 title action props =
-    btn (fromHtmlAttrs [ E.onClick action, A.class "ph2 pv1 blue" ] ++ (txt title :: props))
+    btn (fromHtmlAttrs [ E.onClick action, A.class "ph2 pv1 nice-blue" ] ++ (txt title :: props))
 
 
 ipt : List (Prop msg) -> Prop msg
