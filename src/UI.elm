@@ -36,3 +36,8 @@ checkbox3 bool onCheck attrs =
 btn2 : String -> msg -> H.Html msg
 btn2 title msg =
     H.button [ E.onClick msg, A.class "ph2 pv1 nice-blue" ] [ H.text title ]
+
+
+ipt2 : String -> (String -> msg) -> H.Html msg
+ipt2 val msg =
+    H.input [ A.value val, E.onInput msg ] []

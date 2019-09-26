@@ -9,7 +9,7 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
-import UI exposing (btn2, checkbox3, col, row)
+import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
 
@@ -342,7 +342,7 @@ viewAddTodo addTodo =
         On ({ fields } as form) ->
             col [ A.class "ph2 pv1" ]
                 [ col [ A.class "pv1" ]
-                    [ H.input [ A.value fields.title, E.onInput (patchAddTodoTitle form) ] []
+                    [ ipt2 fields.title (patchAddTodoTitle form)
                     ]
                 , row [] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
