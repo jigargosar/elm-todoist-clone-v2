@@ -258,17 +258,17 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | SetAddTodoForm (Toggle AddTodoForm)
+    | SetAddTodoToggle (Toggle AddTodoForm)
     | Save
 
 
 setAddTodoForm : AddTodoForm -> Msg
 setAddTodoForm form =
-    SetAddTodoForm (On form)
+    SetAddTodoToggle (On form)
 
 
 closeForm =
-    SetAddTodoForm Off
+    SetAddTodoToggle Off
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -290,7 +290,7 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        SetAddTodoForm addTodo ->
+        SetAddTodoToggle addTodo ->
             let
                 newModel =
                     { model | addTodo = addTodo }
