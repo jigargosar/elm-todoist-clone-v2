@@ -340,15 +340,11 @@ viewAddTodo addTodo =
         On ({ fields } as form) ->
             col
                 [ strIpt fields.title (patchAddTodoTitle form) []
-                , row
-                    [ btn3 "Save" Save []
-                    , btn3 "Cancel" closeForm []
-                    ]
+                , row [ btn3 "Save" Save [], btn3 "Cancel" closeForm [] ]
                 ]
 
         Off ->
-            row
-                [ btn3 "add todo" addTodoFormClicked [] ]
+            row [ btn3 "add todo" addTodoFormClicked [] ]
 
 
 main : Program Flags Model Msg
