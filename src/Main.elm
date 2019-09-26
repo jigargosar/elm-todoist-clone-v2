@@ -316,9 +316,33 @@ view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
         H.div [ A.class "sans-serif pa4 measure-wide" ]
+            [ viewNav model
+            , col [] (viewPage model model.page)
+            ]
+
+
+viewNav _ =
+    row [] []
+
+
+viewPage model page =
+    case page of
+        AllTodos ->
             [ viewTodoList model.todoList
             , viewAddTodo model.addTodo
             ]
+
+        SingleProject ->
+            viewPage model page
+
+        Today ->
+            viewPage model page
+
+        Next7Days ->
+            viewPage model page
+
+        Search ->
+            viewPage model page
 
 
 viewTodoList : List Todo -> H.Html Msg
