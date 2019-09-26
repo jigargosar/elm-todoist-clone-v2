@@ -9,14 +9,14 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
-import UI exposing (btn2, checkbox3, col, ipt2, row)
+import UI exposing (btn1, btn2, checkbox3, col, ipt2, row)
 
 
 type Page
     = SingleProject
-    | Today
-    | Next7Days
-    | Search
+      --    | Today
+      --    | Next7Days
+      --    | Search
     | AllTodos
 
 
@@ -321,10 +321,54 @@ view model =
             ]
 
 
-viewNav _ =
-    row [] []
+viewNav : Model -> H.Html msg
+viewNav { page } =
+    let
+        navItems =
+            [ NavInbox
+            , NavToday
+            , NavProjects
+                [ NavProject "Build Utils"
+                , NavProject "Publish Post"
+                , NavProject "Complete Story"
+                , NavProject "Exam Prep"
+                ]
+            ]
+    in
+    col [] (navItems |> List.map viewNavItem)
 
 
+type NavProject
+    = NavProject String
+
+
+type NavItem
+    = NavInbox
+    | NavToday
+    | NavProjects (List NavProject)
+
+
+viewNavItem item =
+    case item of
+        NavInbox ->
+            H.button [ A.class "tl nice-blue  pv1" ] [ H.text "Inbox" ]
+
+        NavToday ->
+            H.button [ A.class "tl nice-blue  pv1" ] [ H.text "Today" ]
+
+        NavProjects list ->
+            col []
+                [ row [ A.class "pv2" ] [ H.text "Projects:" ]
+                , col [ A.class "pl2" ] (list |> List.map viewNavProject)
+                ]
+
+
+viewNavProject : NavProject -> H.Html msg
+viewNavProject (NavProject title) =
+    H.button [ A.class "tl nice-blue pv1" ] [ H.text title ]
+
+
+viewPage : Model -> Page -> List (H.Html Msg)
 viewPage model page =
     case page of
         AllTodos ->
@@ -333,15 +377,6 @@ viewPage model page =
             ]
 
         SingleProject ->
-            viewPage model AllTodos
-
-        Today ->
-            viewPage model AllTodos
-
-        Next7Days ->
-            viewPage model AllTodos
-
-        Search ->
             viewPage model AllTodos
 
 
