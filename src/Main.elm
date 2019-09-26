@@ -216,17 +216,22 @@ mapTodoList func model =
 
 
 mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
-mapTodo todoId fn =
-    mapTodoList
-        (List.map
-            (\todo ->
-                if todo.id == todoId then
-                    fn todo
+mapTodo todoId func =
+    mapTodoList (List.map (when (idEq todoId) func))
 
-                else
-                    todo
-            )
-        )
+
+idEq : a -> { b | id : a } -> Bool
+idEq id_ { id } =
+    id == id_
+
+
+when : (c -> Bool) -> (c -> c) -> c -> c
+when pred func val =
+    if pred val then
+        func val
+
+    else
+        val
 
 
 
