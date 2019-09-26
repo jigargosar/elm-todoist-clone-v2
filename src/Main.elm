@@ -2,10 +2,8 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (attr, boolIpt, btn, click, el, ipt, rootEl, strIpt, tag, txt)
+import El exposing (boolIpt, btn3, el, rootEl, strIpt, txt)
 import Html exposing (Attribute, Html)
-import Html.Attributes exposing (type_, value)
-import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
@@ -336,18 +334,14 @@ viewAddTodo addTodo =
             el
                 [ strIpt fields.title (patchAddTodoTitle form) []
                 , el
-                    [ btn [ click Save, txt "Save" ]
-                    , btn [ click closeForm, txt "Cancel" ]
+                    [ btn3 "Save" Save []
+                    , btn3 "Cancel" closeForm []
                     ]
                 ]
 
         Off ->
             el
-                [ btn
-                    [ click addTodoFormClicked
-                    , txt "add todo"
-                    ]
-                ]
+                [ btn3 "add todo" addTodoFormClicked [] ]
 
 
 main : Program Flags Model Msg

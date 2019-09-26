@@ -1,4 +1,4 @@
-module El exposing (Prop, attr, boolIpt, btn, click, el, ipt, rootEl, strIpt, tag, txt)
+module El exposing (Prop, attr, boolIpt, btn, btn3, el, ipt, rootEl, strIpt, tag, txt)
 
 import Html exposing (Attribute, Html, node, text)
 import Html.Attributes exposing (checked, type_, value)
@@ -45,6 +45,11 @@ btn =
     taggedEl "button"
 
 
+btn3 : String -> msg -> List (Prop msg) -> Prop msg
+btn3 title action props =
+    btn (List.map attr [ E.onClick action, txt title ] ++ props)
+
+
 ipt : List (Prop msg) -> Prop msg
 ipt =
     taggedEl "input"
@@ -68,11 +73,6 @@ tag =
 rootEl : List (Prop msg) -> Html msg
 rootEl props =
     El props |> toHtml
-
-
-click : msg -> Prop msg
-click =
-    attr << E.onClick
 
 
 txt : String -> Prop msg
