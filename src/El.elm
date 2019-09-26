@@ -1,4 +1,4 @@
-module El exposing (El, Prop, click, el, rootEl, toHtml, txt)
+module El exposing (El, Prop, attr, click, el, rootEl, toHtml, txt)
 
 import Html exposing (Attribute, Html, node, text)
 import Html.Events as E
@@ -8,6 +8,11 @@ type Prop msg
     = Attr (Attribute msg)
     | Child (El msg)
     | Tag String
+
+
+attr : Attribute msg -> Prop msg
+attr =
+    Attr
 
 
 el : List (Prop msg) -> Prop msg
@@ -22,7 +27,7 @@ rootEl props =
 
 click : msg -> Prop msg
 click =
-    Attr << E.onClick
+    attr << E.onClick
 
 
 txt : String -> Prop msg

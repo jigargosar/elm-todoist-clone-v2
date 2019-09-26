@@ -1,9 +1,9 @@
 port module Main exposing (main)
 
 import Browser
-import El exposing (click, el, rootEl, txt)
+import El exposing (attr, click, el, rootEl, txt)
 import Html exposing (Attribute, Html, button, div, input, text)
-import Html.Attributes exposing (type_, value)
+import Html.Attributes exposing (attribute, property, type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -344,6 +344,8 @@ viewAddTodo addTodo =
                 [ el
                     [ click addTodoFormClicked
                     , txt "add todo"
+
+                    --, attr (attribute "data-onclick" "alert('addTodo')")
                     ]
                 ]
 
