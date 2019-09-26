@@ -342,8 +342,7 @@ viewAddTodo addTodo =
         On ({ fields } as form) ->
             col [ A.class "ph2 pv1" ]
                 [ col [ A.class "pv1" ]
-                    [ ipt2 fields.title (patchAddTodoTitle form)
-                    ]
+                    [ ipt2 fields.title (patchAddTodoTitle form) ]
                 , row [] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
