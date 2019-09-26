@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (attr, btn, click, el, ipt, ipt3, iptCheck3, rootEl, tag, txt)
+import El exposing (attr, btn, click, el, ipt, iptBool, iptStr, rootEl, tag, txt)
 import Html exposing (Attribute, Html)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
@@ -315,7 +315,7 @@ viewTodoList list =
 
 viewTodo todo =
     el
-        [ iptCheck3 todo.isDone (doneChecked todo.id) []
+        [ iptBool todo.isDone (doneChecked todo.id) []
         , txt todo.title
         ]
 
@@ -334,7 +334,7 @@ viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
             el
-                [ ipt3 fields.title (patchAddTodoTitle form) []
+                [ iptStr fields.title (patchAddTodoTitle form) []
                 , el
                     [ btn [ click Save, txt "Save" ]
                     , btn [ click closeForm, txt "Cancel" ]
