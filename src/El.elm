@@ -15,6 +15,7 @@ type alias Children msg =
 type Prop msg
     = Attr (Attribute msg)
     | Child (El msg)
+    | Children (List (El msg))
     | Tag String
 
 
@@ -33,9 +34,14 @@ el =
     Child << El
 
 
+taggedEl : String -> List (Prop msg) -> Prop msg
+taggedEl tagName props =
+    el (Tag tagName :: props)
+
+
 btn : List (Prop msg) -> Prop msg
-btn props =
-    el (Tag "button" :: props)
+btn =
+    taggedEl "button"
 
 
 tag : String -> Prop msg
@@ -73,6 +79,9 @@ toHtml el_ =
 
                         Tag v ->
                             ( v, a, c )
+
+                        Children list ->
+                            ( t, a, List.map toHtml list ++ c )
                 )
                 ( "div", [], [] )
                 props
