@@ -378,8 +378,12 @@ el props =
 
 
 btn : msg -> Attrs msg -> Children msg -> Html msg
-btn onPress attrs =
-    div (E.onClick onPress :: attrs)
+btn onPress attrs children =
+    el
+        ([ Attr <| E.onClick onPress, Tag "div" ]
+            ++ List.map Attr attrs
+            ++ List.map Child children
+        )
 
 
 main : Program Flags Model Msg
