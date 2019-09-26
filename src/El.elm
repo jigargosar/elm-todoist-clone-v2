@@ -47,7 +47,7 @@ btn =
 
 btn3 : String -> msg -> List (Prop msg) -> Prop msg
 btn3 title action props =
-    btn (List.map attr [ E.onClick action, txt title ] ++ props)
+    btn ((attr <| E.onClick action) :: txt title :: props)
 
 
 ipt : List (Prop msg) -> Prop msg
