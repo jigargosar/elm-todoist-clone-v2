@@ -25,3 +25,17 @@ button {
   padding-left: var(--spc3);
   padding-right: var(--spc3);
 }
+
+
+.pv1 {
+    padding-top: var(--spc1);
+    padding-bottom: var(--spc1);
+}
+.pv2 {
+    padding-top: var(--spc2);
+    padding-bottom: var(--spc2);
+}
+.pv3 {
+    padding-top: var(--spc3);
+    padding-bottom: var(--spc3);
+}
