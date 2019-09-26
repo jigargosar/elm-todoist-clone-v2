@@ -333,16 +333,16 @@ viewPage model page =
             ]
 
         SingleProject ->
-            viewPage model page
+            viewPage model AllTodos
 
         Today ->
-            viewPage model page
+            viewPage model AllTodos
 
         Next7Days ->
-            viewPage model page
+            viewPage model AllTodos
 
         Search ->
-            viewPage model page
+            viewPage model AllTodos
 
 
 viewTodoList : List Todo -> H.Html Msg
