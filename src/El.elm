@@ -18,6 +18,11 @@ type Prop msg
     | Tag String
 
 
+type El msg
+    = El (List (Prop msg))
+    | TxtEl String
+
+
 attr : Attribute msg -> Prop msg
 attr =
     Attr
@@ -41,11 +46,6 @@ click =
 txt : String -> Prop msg
 txt =
     Child << TxtEl
-
-
-type El msg
-    = El (List (Prop msg))
-    | TxtEl String
 
 
 toHtml : El msg -> Html msg
