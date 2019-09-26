@@ -1,4 +1,4 @@
-module El exposing (Prop, attr, btn, click, el, ipt, iptBool, iptStr, rootEl, tag, txt)
+module El exposing (Prop, attr, boolIpt, btn, click, el, ipt, rootEl, strIpt, tag, txt)
 
 import Html exposing (Attribute, Html, node, text)
 import Html.Attributes exposing (checked, type_, value)
@@ -50,13 +50,13 @@ ipt =
     taggedEl "input"
 
 
-iptStr : String -> (String -> msg) -> List (Prop msg) -> Prop msg
-iptStr val onInput props =
+strIpt : String -> (String -> msg) -> List (Prop msg) -> Prop msg
+strIpt val onInput props =
     ipt (List.map attr [ value val, E.onInput onInput ] ++ props)
 
 
-iptBool : Bool -> (Bool -> msg) -> List (Prop msg) -> Prop msg
-iptBool val onCheck props =
+boolIpt : Bool -> (Bool -> msg) -> List (Prop msg) -> Prop msg
+boolIpt val onCheck props =
     ipt (List.map attr [ type_ "checkbox", checked val, E.onCheck onCheck ] ++ props)
 
 
