@@ -1,14 +1,15 @@
 port module Main exposing (main)
 
-import Basics.Extra exposing (when)
+import Basics.More exposing (idEq)
 import Browser
-import El exposing (attr, click, el, rootEl, txt)
+import El exposing (click, el, rootEl, txt)
 import Html exposing (Attribute, Html, button, div, input, text)
-import Html.Attributes exposing (attribute, property, type_, value)
+import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
+import List.Extra as List
 
 
 
@@ -218,12 +219,7 @@ mapTodoList func model =
 
 mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
 mapTodo todoId func =
-    mapTodoList (List.map (when (idEq todoId) func))
-
-
-idEq : a -> { b | id : a } -> Bool
-idEq id_ { id } =
-    id == id_
+    mapTodoList (List.updateIf (idEq todoId) func)
 
 
 
