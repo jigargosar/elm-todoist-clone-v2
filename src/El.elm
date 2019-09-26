@@ -9,14 +9,9 @@ type alias Attrs msg =
     List (Attribute msg)
 
 
-type alias Children msg =
-    List (Html msg)
-
-
 type Prop msg
     = Attr (Attribute msg)
     | Child (El msg)
-    | Children (List (El msg))
     | Tag String
 
 
@@ -106,9 +101,6 @@ toHtml el_ =
 
                         Tag v ->
                             ( v, a, c )
-
-                        Children list ->
-                            ( t, a, List.map toHtml list ++ c )
                 )
                 ( "div", [], [] )
                 props
