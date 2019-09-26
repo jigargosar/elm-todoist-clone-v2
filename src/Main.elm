@@ -1,7 +1,8 @@
 port module Main exposing (main)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, input, node, text)
+import El exposing (click, el, rootEl, txt)
+import Html exposing (Attribute, Html, button, div, input, text)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -339,8 +340,11 @@ viewAddTodo addTodo =
                 ]
 
         Off ->
-            div []
-                [ btn addTodoFormClicked [] [ text "add todo" ]
+            rootEl
+                [ el
+                    [ click addTodoFormClicked
+                    , txt "add todo"
+                    ]
                 ]
 
 
@@ -350,40 +354,6 @@ type alias Attrs msg =
 
 type alias Children msg =
     List (Html msg)
-
-
-type BtnProp msg
-    = Attr (Attribute msg)
-    | Child (Html msg)
-    | Tag String
-
-
-el : List (BtnProp msg) -> Html msg
-el props =
-    List.foldr
-        (\prop ( t, a, c ) ->
-            case prop of
-                Attr v ->
-                    ( t, v :: a, c )
-
-                Child v ->
-                    ( t, a, v :: c )
-
-                Tag v ->
-                    ( v, a, c )
-        )
-        ( "div", [], [] )
-        props
-        |> (\( tag, attrs, children ) -> node tag attrs children)
-
-
-btn : msg -> Attrs msg -> Children msg -> Html msg
-btn onPress attrs children =
-    el
-        ([ Attr <| E.onClick onPress, Tag "div" ]
-            ++ List.map Attr attrs
-            ++ List.map Child children
-        )
 
 
 main : Program Flags Model Msg
