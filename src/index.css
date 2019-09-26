@@ -46,7 +46,6 @@ button {
   padding-bottom: var(--spc3);
 }
 
-
 .flex {
   display: flex;
 }
@@ -59,6 +58,15 @@ button {
   flex-direction: column;
 }
 
+.nice-blue {
+  color: hsl(217, 99%, 53%);
+}
 
-.nice-blue {color: hsl(217, 99%, 53%)
+.sz-24 {
+  width: 24px;
+  height: 24px;
+}
+.sz-32 {
+  width: 32px;
+  height: 32px;
 }
