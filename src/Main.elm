@@ -17,6 +17,7 @@ type Page
     | Today
     | Next7Days
     | Search
+    | AllTodos
 
 
 
@@ -216,6 +217,7 @@ unwrapToggle default func toggle =
 type alias Model =
     { todoList : List Todo
     , addTodo : Toggle AddTodoForm
+    , page : Page
     }
 
 
@@ -231,6 +233,7 @@ init flags =
         model =
             { todoList = cache.todoList
             , addTodo = cache.addTodo
+            , page = AllTodos
             }
     in
     ( model
