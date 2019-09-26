@@ -1,4 +1,4 @@
-module Basics.More exposing (idEq, updateWhenIdEq, when)
+module Basics.More exposing (callWith, idEq, updateWhenIdEq, when)
 
 import List.Extra
 
@@ -24,3 +24,8 @@ idEq id_ { id } =
 updateWhenIdEq : id -> (HasId a id -> HasId a id) -> List (HasId a id) -> List (HasId a id)
 updateWhenIdEq id =
     List.Extra.updateIf (idEq id)
+
+
+callWith : a -> (a -> b) -> b
+callWith =
+    (|>)
