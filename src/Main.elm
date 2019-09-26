@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (idEq, updateWhenIdEq)
+import Basics.More exposing (updateWhenIdEq)
 import Browser
 import El exposing (click, el, rootEl, txt)
 import Html exposing (Attribute, Html, button, div, input, text)
@@ -9,7 +9,6 @@ import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
-import List.Extra as List
 
 
 
@@ -351,7 +350,7 @@ viewAddTodo addTodo =
 
         Off ->
             rootEl
-                [ el
+                [ El.button
                     [ click addTodoFormClicked
                     , txt "add todo"
 
