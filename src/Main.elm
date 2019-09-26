@@ -4,7 +4,7 @@ import Browser
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
-import Json.Decode as JD
+import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 
@@ -58,12 +58,13 @@ port setCache : String -> Cmd msg
 
 type alias Cache =
     { todoList : List Todo
+    , addTodo : Toggle AddTodoForm
     }
 
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = initialTodoList }
+    { todoList = initialTodoList, addTodo = Off }
 
 
 cacheDecoder : JD.Decoder Cache
@@ -75,9 +76,27 @@ cacheDecoder =
                 |> required "id" (JD.string |> JD.map TodoId)
                 |> required "title" JD.string
                 |> required "isDone" JD.bool
+
+        addTodoDecoder : Decoder (Toggle AddTodoForm)
+        addTodoDecoder =
+            JD.oneOf
+                [ JD.null Off
+                , todoFormDecoder |> JD.map On
+                ]
+
+        fieldsDecoder : Decoder TodoFormFields
+        fieldsDecoder =
+            JD.succeed TodoFormFields
+                |> required "title" JD.string
+
+        todoFormDecoder : Decoder AddTodoForm
+        todoFormDecoder =
+            JD.succeed AddTodoForm
+                |> required "fields" fieldsDecoder
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
+        |> optional "addTodo" addTodoDecoder Off
 
 
 cacheModel : Model -> Cmd msg
@@ -96,14 +115,13 @@ cacheModel model =
                 ]
 
         addTodoEncoder : AddTodoForm -> Value
-        addTodoEncoder { isOpen, fields } =
+        addTodoEncoder { fields } =
             let
                 fieldsEncoder { title } =
                     object [ ( "title", JE.string title ) ]
             in
             object
-                [ ( "isOpen", JE.bool isOpen )
-                , ( "fields", fieldsEncoder fields )
+                [ ( "fields", fieldsEncoder fields )
                 ]
 
         modelEncoder : Model -> Value
@@ -153,8 +171,12 @@ type alias Flags =
     }
 
 
+type alias TodoFormFields =
+    { title : String }
+
+
 type alias AddTodoForm =
-    { fields : { title : String }, isOpen : Bool }
+    { fields : TodoFormFields }
 
 
 type Toggle a
@@ -213,6 +235,10 @@ type Msg
     | PatchAddTodoForm AddTodoForm
 
 
+setAddTodoForm form =
+    PatchAddTodoForm form
+
+
 doneChecked : TodoId -> Bool -> Msg
 doneChecked todoId isDone =
     PatchTodo todoId (SetDone isDone)
@@ -267,23 +293,23 @@ viewTodo todo =
 
 addTodoFormClicked : Msg
 addTodoFormClicked =
-    AddTodoForm { title = "" } True |> PatchAddTodoForm
+    AddTodoForm { title = "" } |> setAddTodoForm
 
 
 patchAddTodoTitle : AddTodoForm -> String -> Msg
-patchAddTodoTitle { fields, isOpen } title =
-    AddTodoForm { fields | title = title } isOpen
-        |> PatchAddTodoForm
+patchAddTodoTitle { fields } title =
+    AddTodoForm { fields | title = title }
+        |> setAddTodoForm
 
 
 closeAddTodoForm { fields } =
-    AddTodoForm fields False |> PatchAddTodoForm
+    AddTodoForm fields |> setAddTodoForm
 
 
 viewAddTodo : Toggle AddTodoForm -> Html Msg
 viewAddTodo addTodo =
     case addTodo of
-        On ({ fields, isOpen } as form) ->
+        On ({ fields } as form) ->
             div []
                 [ input
                     [ value fields.title
