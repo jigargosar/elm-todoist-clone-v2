@@ -187,6 +187,26 @@ type Toggle a
     | Off
 
 
+mapToggle : (a -> b) -> Toggle a -> Toggle b
+mapToggle func toggle =
+    case toggle of
+        On a ->
+            On <| func a
+
+        Off ->
+            Off
+
+
+getOnOr : a -> Toggle a -> a
+getOnOr default toggle =
+    case toggle of
+        On a ->
+            a
+
+        Off ->
+            default
+
+
 type alias Model =
     { todoList : List Todo
     , addTodo : Toggle AddTodoForm
@@ -268,19 +288,19 @@ update msg model =
             ( newModel, cacheModel newModel )
 
         Save ->
-            case model.addTodo of
-                On { fields } ->
-                    let
-                        newModel =
-                            { model
-                                | todoList = createTodo "" fields.title :: model.todoList
-                                , addTodo = Off
-                            }
-                    in
-                    ( newModel, cacheModel newModel )
-
-                Off ->
-                    ( model, Cmd.none )
+            model.addTodo
+                |> mapToggle
+                    (\{ fields } ->
+                        let
+                            newModel =
+                                { model
+                                    | todoList = createTodo "" fields.title :: model.todoList
+                                    , addTodo = Off
+                                }
+                        in
+                        ( newModel, cacheModel newModel )
+                    )
+                |> getOnOr ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
