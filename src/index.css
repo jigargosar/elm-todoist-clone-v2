@@ -79,6 +79,6 @@ button {
   flex-direction: row;
 }
 
-.flex-col {
+.flex-column {
   flex-direction: column;
 }
