@@ -342,7 +342,7 @@ viewAddTodo addTodo =
             col
                 [ strIpt fields.title (patchAddTodoTitle form) []
                 , row
-                    [ btn3 "Save" Save [ attr <| class "pv1  ph2" ]
+                    [ btn3 "Save" Save [ attr <| class "pv1 ph2" ]
                     , btn3 "Cancel" closeForm [ attr <| class "pv1 ph2" ]
                     ]
                 ]
