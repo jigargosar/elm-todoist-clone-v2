@@ -1,8 +1,8 @@
-module El exposing (Prop, attr, boolIpt, btn, btn3, col, el, ipt, rootEl, row, strIpt, tag, txt)
+module El exposing (Prop, attr, boolIpt, btn, btn3, class, col, el, ipt, rootEl, row, strIpt, tag, txt)
 
 import Html
 import Html.Styled as H exposing (Attribute, Html, node, text)
-import Html.Styled.Attributes exposing (checked, class, type_, value)
+import Html.Styled.Attributes as A exposing (checked, type_, value)
 import Html.Styled.Events as E
 
 
@@ -26,6 +26,11 @@ attr =
     Attr
 
 
+class : String -> Prop msg
+class =
+    Attr << A.class
+
+
 fromHtmlAttrs : List (Attribute msg) -> List (Prop msg)
 fromHtmlAttrs =
     List.map attr
@@ -38,12 +43,12 @@ el =
 
 row : List (Prop msg) -> Prop msg
 row props =
-    el (fromHtmlAttrs [ class "flex flex-row" ] ++ props)
+    el (fromHtmlAttrs [ A.class "flex flex-row" ] ++ props)
 
 
 col : List (Prop msg) -> Prop msg
 col props =
-    el (fromHtmlAttrs [ class "flex flex-column" ] ++ props)
+    el (fromHtmlAttrs [ A.class "flex flex-column" ] ++ props)
 
 
 taggedEl : String -> List (Prop msg) -> Prop msg
@@ -58,7 +63,7 @@ btn =
 
 btn3 : String -> msg -> List (Prop msg) -> Prop msg
 btn3 title action props =
-    btn (fromHtmlAttrs [ E.onClick action, class "ph2 pv1 blue" ] ++ (txt title :: props))
+    btn (fromHtmlAttrs [ E.onClick action, A.class "ph2 pv1 blue" ] ++ (txt title :: props))
 
 
 ipt : List (Prop msg) -> Prop msg
