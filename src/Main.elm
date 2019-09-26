@@ -3,7 +3,7 @@ port module Main exposing (main)
 import Basics.More exposing (updateWhenIdEq)
 import Browser
 import El exposing (attr, btn, click, el, rootEl, tag, txt)
-import Html exposing (Attribute, Html, div, input, text)
+import Html exposing (Attribute, Html)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -303,22 +303,24 @@ subscriptions _ =
 
 view : Model -> Html.Html Msg
 view model =
-    div []
+    rootEl
         [ viewTodoList model.todoList
         , viewAddTodo model.addTodo
         ]
 
 
-viewTodoList : List Todo -> Html Msg
 viewTodoList list =
-    div [] (List.map viewTodo list)
+    el (List.map viewTodo list)
 
 
-viewTodo : Todo -> Html Msg
 viewTodo todo =
-    div []
-        [ input [ type_ "checkbox", E.onCheck (doneChecked todo.id) ] []
-        , text todo.title
+    el
+        [ el
+            [ tag "input"
+            , attr <| type_ "checkbox"
+            , attr <| E.onCheck (doneChecked todo.id)
+            ]
+        , txt todo.title
         ]
 
 
@@ -332,11 +334,10 @@ patchAddTodoTitle { fields } title =
     AddTodoForm { fields | title = title } |> setAddTodoForm
 
 
-viewAddTodo : Toggle AddTodoForm -> Html Msg
 viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
-            rootEl
+            el
                 [ el
                     [ tag "input"
                     , attr <| value fields.title
@@ -349,7 +350,7 @@ viewAddTodo addTodo =
                 ]
 
         Off ->
-            rootEl
+            el
                 [ btn
                     [ click addTodoFormClicked
                     , txt "add todo"
