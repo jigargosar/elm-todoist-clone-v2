@@ -1,4 +1,4 @@
-module El exposing (Prop, attr, boolIpt, btn, btn3, col, el, ipt, rootEl, row, strIpt, tag, txt)
+module El exposing (Prop, attr, boolIpt, btn, btn3, col, ipt, rootEl, row, strIpt, tag, txt)
 
 import Html
 import Html.Styled as H exposing (Attribute, Html, node, text)
