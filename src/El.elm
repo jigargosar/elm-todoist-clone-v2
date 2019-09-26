@@ -30,6 +30,11 @@ attr =
     Attr
 
 
+fromHtmlAttrs : List (Attribute msg) -> List (Prop msg)
+fromHtmlAttrs =
+    List.map attr
+
+
 el : List (Prop msg) -> Prop msg
 el =
     Child << El
@@ -57,12 +62,18 @@ ipt =
 
 strIpt : String -> (String -> msg) -> List (Prop msg) -> Prop msg
 strIpt val onInput props =
-    ipt (List.map attr [ value val, E.onInput onInput ] ++ props)
+    ipt
+        (fromHtmlAttrs [ value val, E.onInput onInput ]
+            ++ props
+        )
 
 
 boolIpt : Bool -> (Bool -> msg) -> List (Prop msg) -> Prop msg
 boolIpt val onCheck props =
-    ipt (List.map attr [ type_ "checkbox", checked val, E.onCheck onCheck ] ++ props)
+    ipt
+        (fromHtmlAttrs [ type_ "checkbox", checked val, E.onCheck onCheck ]
+            ++ props
+        )
 
 
 tag : String -> Prop msg
