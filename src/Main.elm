@@ -329,7 +329,13 @@ viewTodo : Todo -> H.Html Msg
 viewTodo todo =
     row [ A.class "pa1" ]
         [ H.div [ A.class "ph1" ]
-            [ H.input [ A.checked todo.isDone, E.onCheck (doneChecked todo.id), A.class "sz-24" ] []
+            [ H.input
+                [ A.type_ "checkbox"
+                , A.checked todo.isDone
+                , E.onCheck (doneChecked todo.id)
+                , A.class "sz-24"
+                ]
+                []
             ]
         , H.div [ A.class "ph1 flex-grow-1" ] [ H.text todo.title ]
         ]
