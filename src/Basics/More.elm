@@ -1,4 +1,4 @@
-module Basics.More exposing (idEq, updateIfIdEq, when)
+module Basics.More exposing (idEq, updateWhenIdEq, when)
 
 import List.Extra
 
@@ -12,15 +12,15 @@ when pred func val =
         val
 
 
-idEq : a -> { b | id : a } -> Bool
-idEq id_ { id } =
-    id == id_
-
-
 type alias HasId a id =
     { a | id : id }
 
 
-updateIfIdEq : id -> (HasId a id -> HasId a id) -> List (HasId a id) -> List (HasId a id)
-updateIfIdEq id =
+idEq : id -> HasId a id -> Bool
+idEq id_ { id } =
+    id == id_
+
+
+updateWhenIdEq : id -> (HasId a id -> HasId a id) -> List (HasId a id) -> List (HasId a id)
+updateWhenIdEq id =
     List.Extra.updateIf (idEq id)

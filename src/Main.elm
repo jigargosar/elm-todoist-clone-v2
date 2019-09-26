@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (idEq, updateIfIdEq)
+import Basics.More exposing (idEq, updateWhenIdEq)
 import Browser
 import El exposing (click, el, rootEl, txt)
 import Html exposing (Attribute, Html, button, div, input, text)
@@ -219,7 +219,7 @@ mapTodoList func model =
 
 mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
 mapTodo todoId func =
-    mapTodoList (updateIfIdEq todoId func)
+    mapTodoList (updateWhenIdEq todoId func)
 
 
 
