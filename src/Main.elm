@@ -322,10 +322,6 @@ patchAddTodoTitle { fields } title =
     AddTodoForm { fields | title = title } |> setAddTodoForm
 
 
-closeAddTodoForm { fields } =
-    closeForm
-
-
 viewAddTodo : Toggle AddTodoForm -> Html Msg
 viewAddTodo addTodo =
     case addTodo of
@@ -337,8 +333,8 @@ viewAddTodo addTodo =
                     ]
                     []
                 , div []
-                    [ button [ E.onClick (closeAddTodoForm form) ] [ text "Save" ]
-                    , button [ E.onClick (closeAddTodoForm form) ] [ text "Cancel" ]
+                    [ button [ E.onClick Save ] [ text "Save" ]
+                    , button [ E.onClick closeForm ] [ text "Cancel" ]
                     ]
                 ]
 
