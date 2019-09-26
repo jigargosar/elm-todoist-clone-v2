@@ -315,13 +315,13 @@ subscriptions _ =
 view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
-        H.div [ A.class "sans-serif pa4 measure-wide" ]
-            [ viewNav model
+        H.div [ A.class "sans-serif ph4 measure-wide" ]
+            [ col [ A.class "pv3" ] (viewNav model)
             , col [] (viewPage model model.page)
             ]
 
 
-viewNav : Model -> H.Html msg
+viewNav : Model -> List (H.Html msg)
 viewNav { page } =
     let
         navItems =
@@ -335,7 +335,7 @@ viewNav { page } =
                 ]
             ]
     in
-    col [] (navItems |> List.map viewNavItem)
+    navItems |> List.map viewNavItem
 
 
 type NavProject
