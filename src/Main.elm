@@ -1,7 +1,7 @@
 port module Main exposing (main)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, input, text)
+import Html exposing (Attribute, Html, button, div, input, node, text)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -350,6 +350,27 @@ type alias Attrs msg =
 
 type alias Children msg =
     List (Html msg)
+
+
+type BtnProp msg
+    = Attr (Attribute msg)
+    | Child (Html msg)
+
+
+viewBtn : List (BtnProp msg) -> Html msg
+viewBtn props =
+    List.foldr
+        (\prop ( t, a, c ) ->
+            case prop of
+                Attr v ->
+                    ( t, v :: a, c )
+
+                Child v ->
+                    ( t, a, v :: c )
+        )
+        ( "div", [], [] )
+        props
+        |> (\( tag, attrs, children ) -> node tag attrs children)
 
 
 btn : msg -> Attrs msg -> Children msg -> Html msg
