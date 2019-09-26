@@ -22,12 +22,13 @@ type alias Todo =
     { id : TodoId
     , title : String
     , isDone : Bool
+    , isDeleted : Bool
     }
 
 
 createTodo : String -> String -> Todo
 createTodo id title =
-    Todo (TodoId id) title False
+    Todo (TodoId id) title False False
 
 
 initialTodoList =
@@ -41,6 +42,7 @@ initialTodoList =
 
 type TodoPatch
     = SetDone Bool
+    | SetDeleted Bool
     | TodoPatches (List TodoPatch)
 
 
@@ -52,6 +54,9 @@ patchTodo patch todo =
 
         TodoPatches patches ->
             List.foldl patchTodo todo patches
+
+        SetDeleted isDeleted ->
+            { todo | isDeleted = isDeleted }
 
 
 
@@ -81,6 +86,7 @@ cacheDecoder =
                 |> required "id" (JD.string |> JD.map TodoId)
                 |> required "title" JD.string
                 |> required "isDone" JD.bool
+                |> optional "isDeleted" JD.bool False
 
         addTodoDecoder : Decoder (Toggle AddTodoForm)
         addTodoDecoder =
@@ -108,7 +114,7 @@ cacheModel : Model -> Cmd msg
 cacheModel model =
     let
         todoEncoder : Todo -> Value
-        todoEncoder { id, title, isDone } =
+        todoEncoder { id, title, isDone, isDeleted } =
             let
                 unwrapId (TodoId v) =
                     v
@@ -117,6 +123,7 @@ cacheModel model =
                 [ ( "id", JE.string <| unwrapId id )
                 , ( "title", JE.string title )
                 , ( "isDone", JE.bool isDone )
+                , ( "isDeleted", JE.bool isDeleted )
                 ]
 
         addTodoEncoder : AddTodoForm -> Value
