@@ -305,7 +305,7 @@ subscriptions _ =
 view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
-        H.div [ A.class "sans-serif" ]
+        H.div [ A.class "sans-serif pa4 measure-wide" ]
             [ viewTodoList model.todoList
             , viewAddTodo model.addTodo
             ]
@@ -340,9 +340,9 @@ viewAddTodo : Toggle AddTodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
-            col [ A.class "pa3" ]
-                [ col [] [ ipt2 fields.title (patchAddTodoTitle form) ]
-                , row [] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
+            col [ A.class "pa1" ]
+                [ col [ A.class "pv1" ] [ ipt2 fields.title (patchAddTodoTitle form) ]
+                , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
         Off ->
