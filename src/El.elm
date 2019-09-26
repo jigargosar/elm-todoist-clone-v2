@@ -4,6 +4,14 @@ import Html exposing (Attribute, Html, node, text)
 import Html.Events as E
 
 
+type alias Attrs msg =
+    List (Attribute msg)
+
+
+type alias Children msg =
+    List (Html msg)
+
+
 type Prop msg
     = Attr (Attribute msg)
     | Child (El msg)

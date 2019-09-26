@@ -360,14 +360,6 @@ viewAddTodo addTodo =
                 ]
 
 
-type alias Attrs msg =
-    List (Attribute msg)
-
-
-type alias Children msg =
-    List (Html msg)
-
-
 main : Program Flags Model Msg
 main =
     Browser.element
