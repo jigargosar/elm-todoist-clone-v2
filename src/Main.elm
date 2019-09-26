@@ -2,8 +2,8 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (click, el, rootEl, txt)
-import Html exposing (Attribute, Html, button, div, input, text)
+import El exposing (btn, click, rootEl, txt)
+import Html exposing (Attribute, Html, div, input, text)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -342,19 +342,17 @@ viewAddTodo addTodo =
                     , E.onInput (patchAddTodoTitle form)
                     ]
                     []
-                , div []
-                    [ button [ E.onClick Save ] [ text "Save" ]
-                    , button [ E.onClick closeForm ] [ text "Cancel" ]
+                , rootEl
+                    [ btn [ click Save, txt "Save" ]
+                    , btn [ click closeForm, txt "Cancel" ]
                     ]
                 ]
 
         Off ->
             rootEl
-                [ El.button
+                [ btn
                     [ click addTodoFormClicked
                     , txt "add todo"
-
-                    --, attr (attribute "data-onclick" "alert('addTodo')")
                     ]
                 ]
 
