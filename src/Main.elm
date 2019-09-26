@@ -304,7 +304,7 @@ subscriptions _ =
 view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
-        H.div [ A.class "serif helvetica" ]
+        H.div [ A.class "sans-serif" ]
             [ viewTodoList model.todoList
             , viewAddTodo model.addTodo
             ]
