@@ -210,20 +210,23 @@ init flags =
     )
 
 
-mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
-mapTodo todoId fn model =
-    { model
-        | todoList =
-            model.todoList
-                |> List.map
-                    (\todo ->
-                        if todo.id == todoId then
-                            fn todo
+mapTodoList : (small -> small) -> { big | todoList : small } -> { big | todoList : small }
+mapTodoList func model =
+    { model | todoList = func model.todoList }
 
-                        else
-                            todo
-                    )
-    }
+
+mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
+mapTodo todoId fn =
+    mapTodoList
+        (List.map
+            (\todo ->
+                if todo.id == todoId then
+                    fn todo
+
+                else
+                    todo
+            )
+        )
 
 
 
