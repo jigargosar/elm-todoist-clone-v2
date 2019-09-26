@@ -2,8 +2,9 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (boolIpt, btn3, col, el, rootEl, row, strIpt, txt)
+import El exposing (attr, boolIpt, btn3, col, el, rootEl, row, strIpt, txt)
 import Html exposing (Attribute, Html)
+import Html.Attributes exposing (class)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
@@ -334,8 +335,8 @@ viewAddTodo addTodo =
             col
                 [ strIpt fields.title (patchAddTodoTitle form) []
                 , row
-                    [ btn3 "Save" Save []
-                    , btn3 "Cancel" closeForm []
+                    [ btn3 "Save" Save [ attr <| class "pv1 ph2" ]
+                    , btn3 "Cancel" closeForm [ attr <| class "pv1 ph2" ]
                     ]
                 ]
 

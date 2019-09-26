@@ -1,7 +1,27 @@
 button {
-    background: unset;
-    border: unset;
-    display: unset;
-    padding: unset;
-    margin: unset;
+  background: unset;
+  border: unset;
+  display: unset;
+  padding: unset;
+  margin: unset;
+}
+:root {
+  --spc0: 0;
+  --spc1: 0.25rem;
+  --spc2: 0.5rem;
+  --spc3: 1rem;
+  --spc4: 2rem;
+}
+
+.ph1 {
+  padding-left: var(--spc1);
+  padding-right: var(--spc1);
+}
+.ph2 {
+  padding-left: var(--spc2);
+  padding-right: var(--spc2);
+}
+.ph3 {
+  padding-left: var(--spc3);
+  padding-right: var(--spc3);
 }
