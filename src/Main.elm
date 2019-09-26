@@ -43,6 +43,7 @@ initialTodoList =
 
 type TodoPatch
     = SetDone Bool
+    | TodoPatches (List TodoPatch)
 
 
 patchTodo : TodoPatch -> Todo -> Todo
@@ -50,6 +51,9 @@ patchTodo patch todo =
     case patch of
         SetDone isDone ->
             { todo | isDone = isDone }
+
+        TodoPatches patches ->
+            List.foldl patchTodo todo patches
 
 
 
@@ -247,11 +251,6 @@ mapTodoList func model =
     { model | todoList = func model.todoList }
 
 
-mapTodo : TodoId -> (Todo -> Todo) -> Model -> Model
-mapTodo todoId func =
-    mapTodoList (updateWhenIdEq todoId func)
-
-
 
 -- UPDATE
 
@@ -286,7 +285,8 @@ update msg model =
         PatchTodo todoId todoPatch ->
             let
                 newModel =
-                    mapTodo todoId (patchTodo todoPatch) model
+                    model
+                        |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
             in
             ( newModel, cacheModel newModel )
 
