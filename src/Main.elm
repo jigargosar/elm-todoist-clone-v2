@@ -197,14 +197,24 @@ mapToggle func toggle =
             Off
 
 
-getOnOr : a -> Toggle a -> a
-getOnOr default toggle =
+unpackToggle : (() -> a) -> (b -> a) -> Toggle b -> a
+unpackToggle default func toggle =
     case toggle of
         On a ->
-            a
+            func a
 
         Off ->
-            default
+            default ()
+
+
+getOnOr : a -> Toggle a -> a
+getOnOr default toggle =
+    unpackToggle (always default) identity toggle
+
+
+unwrapToggle : a -> (b -> a) -> Toggle b -> a
+unwrapToggle default func toggle =
+    unpackToggle (always default) func toggle
 
 
 type alias Model =
@@ -289,7 +299,7 @@ update msg model =
 
         Save ->
             model.addTodo
-                |> mapToggle
+                |> unwrapToggle ( model, Cmd.none )
                     (\{ fields } ->
                         let
                             newModel =
@@ -300,7 +310,6 @@ update msg model =
                         in
                         ( newModel, cacheModel newModel )
                     )
-                |> getOnOr ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
