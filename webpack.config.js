@@ -14,11 +14,30 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.css$/, loader: ['style-loader', 'css-loader'] },
-      { test: /\.tsx?$/, loader: ['ts-loader'] },
+      {
+        test: /\.s?css$/,
+        loader: [
+          'style-loader',
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          {
+            loader: 'postcss-loader',
+            options: {
+              // ident: 'postcss',
+              plugins: [
+                require('postcss-import'),
+                require('precss'),
+                require('tailwindcss'),
+                require('autoprefixer'),
+              ],
+            },
+          },
+        ],
+      },
+      // { test: /\.tsx?$/, loader: ['ts-loader'] },
       {
         test: /\.elm$/,
-        use: ["elm-hot-webpack-loader",
+        use: [
+          'elm-hot-webpack-loader',
           {
             loader: 'elm-webpack-loader',
             options: { optimize: false, debug: true },
@@ -31,13 +50,13 @@ module.exports = {
   optimization: {
     // splitChunks: false,
     // runtimeChunk: true,
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-        }
-      }
-    }
+    // splitChunks: {
+    //   cacheGroups: {
+    //     vendors: {
+    //       test: /[\\/]node_modules[\\/]/,
+    //     },
+    //   },
+    // },
   },
   // https://webpack.js.org/configuration/stats/
   // stats: 'errors-warnings',
