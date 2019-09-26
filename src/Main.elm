@@ -1,5 +1,6 @@
 port module Main exposing (main)
 
+import Basics.Extra exposing (when)
 import Browser
 import El exposing (attr, click, el, rootEl, txt)
 import Html exposing (Attribute, Html, button, div, input, text)
@@ -223,15 +224,6 @@ mapTodo todoId func =
 idEq : a -> { b | id : a } -> Bool
 idEq id_ { id } =
     id == id_
-
-
-when : (c -> Bool) -> (c -> c) -> c -> c
-when pred func val =
-    if pred val then
-        func val
-
-    else
-        val
 
 
 
