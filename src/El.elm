@@ -52,12 +52,12 @@ ipt =
 
 ipt3 : String -> (String -> msg) -> List (Prop msg) -> Prop msg
 ipt3 val onInput props =
-    taggedEl "input" (List.map attr [ value val, E.onInput onInput ] ++ props)
+    ipt (List.map attr [ value val, E.onInput onInput ] ++ props)
 
 
 iptCheck3 : Bool -> (Bool -> msg) -> List (Prop msg) -> Prop msg
 iptCheck3 val onCheck props =
-    taggedEl "input" (List.map attr [ type_ "checkbox", checked val, E.onCheck onCheck ] ++ props)
+    ipt (List.map attr [ type_ "checkbox", checked val, E.onCheck onCheck ] ++ props)
 
 
 tag : String -> Prop msg
