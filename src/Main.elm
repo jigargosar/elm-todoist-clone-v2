@@ -337,7 +337,7 @@ viewAddTodo addTodo =
         On ({ fields } as form) ->
             col
                 [ class "ph2 pv1"
-                , el [ class "pv1", strIpt fields.title (patchAddTodoTitle form) [] ]
+                , col [ class "pv1", strIpt fields.title (patchAddTodoTitle form) [] ]
                 , row [ btn3 "Save" Save [], btn3 "Cancel" closeForm [] ]
                 ]
 
