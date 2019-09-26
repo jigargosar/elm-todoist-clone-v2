@@ -1,7 +1,7 @@
 port module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, input, text)
+import Html exposing (Attribute, Html, button, div, input, text)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -340,11 +340,21 @@ viewAddTodo addTodo =
 
         Off ->
             div []
-                [ button
-                    [ E.onClick addTodoFormClicked
-                    ]
-                    [ text "add todo" ]
+                [ btn addTodoFormClicked [] [ text "add todo" ]
                 ]
+
+
+type alias Attrs msg =
+    List (Attribute msg)
+
+
+type alias Children msg =
+    List (Html msg)
+
+
+btn : msg -> Attrs msg -> Children msg -> Html msg
+btn onPress attrs =
+    div (E.onClick onPress :: attrs)
 
 
 main : Program Flags Model Msg
