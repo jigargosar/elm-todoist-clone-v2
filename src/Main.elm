@@ -12,6 +12,13 @@ import Json.Encode as JE exposing (Value, encode, object)
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
+type Page
+    = SingleProject
+    | Today
+    | Next7Days
+    | Search
+
+
 
 -- TODO_
 
