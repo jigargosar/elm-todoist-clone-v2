@@ -329,14 +329,14 @@ viewTodo : Todo -> H.Html Msg
 viewTodo todo =
     row [ A.class "pa1" ]
         [ H.div [ A.class "ph1" ]
-            [ checkbox todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
+            [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
             ]
         , H.div [ A.class "ph1 flex-grow-1" ] [ H.text todo.title ]
         ]
 
 
-checkbox : Bool -> (Bool -> msg) -> List (H.Attribute msg) -> H.Html msg
-checkbox bool onCheck attrs =
+checkbox3 : Bool -> (Bool -> msg) -> List (H.Attribute msg) -> H.Html msg
+checkbox3 bool onCheck attrs =
     H.input
         ([ A.type_ "checkbox"
          , A.checked bool
@@ -357,9 +357,9 @@ patchAddTodoTitle { fields } title =
     AddTodoForm { fields | title = title } |> setAddTodoForm
 
 
-btn3 : String -> msg -> H.Html msg
-btn3 title msg =
-    H.button [] []
+btn2 : String -> msg -> H.Html msg
+btn2 title msg =
+    H.button [ E.onClick msg, A.class "ph2 pv1 nice-blue" ] [ H.text title ]
 
 
 viewAddTodo : Toggle AddTodoForm -> H.Html Msg
@@ -370,11 +370,11 @@ viewAddTodo addTodo =
                 [ col [ A.class "pv1" ]
                     [ H.input [ A.value fields.title, E.onInput (patchAddTodoTitle form) ] []
                     ]
-                , row [] [ btn3 "Save" Save, btn3 "Cancel" closeForm ]
+                , row [] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
         Off ->
-            row [ A.class "pa1" ] [ btn3 "add todo" addTodoFormClicked ]
+            row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
 
 
 main : Program Flags Model Msg
