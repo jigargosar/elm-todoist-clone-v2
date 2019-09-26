@@ -1,4 +1,4 @@
-module El exposing (Prop, attr, boolIpt, btn, btn3, col, ipt, rootEl, row, strIpt, tag, txt)
+module El exposing (Prop, attr, boolIpt, btn, btn3, col, el, ipt, rootEl, row, strIpt, tag, txt)
 
 import Html
 import Html.Styled as H exposing (Attribute, Html, node, text)
@@ -58,7 +58,7 @@ btn =
 
 btn3 : String -> msg -> List (Prop msg) -> Prop msg
 btn3 title action props =
-    btn (fromHtmlAttrs [ E.onClick action, class "ph2 pv1" ] ++ (txt title :: props))
+    btn (fromHtmlAttrs [ E.onClick action, class "ph2 pv1 light-blue" ] ++ (txt title :: props))
 
 
 ipt : List (Prop msg) -> Prop msg

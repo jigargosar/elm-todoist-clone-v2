@@ -1,3 +1,4 @@
+import 'tachyons'
 import './index.css'
 import { Elm } from './Main.elm'
 

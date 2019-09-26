@@ -2,8 +2,9 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (boolIpt, btn3, col, rootEl, row, strIpt, txt)
+import El exposing (attr, boolIpt, btn3, col, el, rootEl, row, strIpt, txt)
 import Html
+import Html.Styled.Attributes exposing (class)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
@@ -320,8 +321,12 @@ viewTodoList list =
 
 viewTodo todo =
     row
-        [ boolIpt todo.isDone (doneChecked todo.id) []
-        , txt todo.title
+        [ attr <| class "pa1"
+        , el
+            [ attr <| class "pv1 ph1"
+            , boolIpt todo.isDone (doneChecked todo.id) [ attr <| class "h1 w1" ]
+            ]
+        , el [ attr <| class "lh-copy ph1 flex-grow-1", el [ txt todo.title ] ]
         ]
 
 

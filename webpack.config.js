@@ -18,19 +18,20 @@ module.exports = {
         test: /\.s?css$/,
         loader: [
           'style-loader',
-          { loader: 'css-loader', options: { importLoaders: 1 } },
-          {
-            loader: 'postcss-loader',
-            options: {
-              // ident: 'postcss',
-              plugins: [
-                require('postcss-import'),
-                require('precss'),
-                require('tailwindcss'),
-                require('autoprefixer'),
-              ],
-            },
-          },
+          'css-loader',
+          // { loader: 'css-loader', options: { importLoaders: 1 } },
+          // {
+          //   loader: 'postcss-loader',
+          //   options: {
+          //     // ident: 'postcss',
+          //     plugins: [
+          //       require('postcss-import'),
+          //       require('precss'),
+          //       require('tailwindcss'),
+          //       require('autoprefixer'),
+          //     ],
+          //   },
+          // },
         ],
       },
       // { test: /\.tsx?$/, loader: ['ts-loader'] },
