@@ -1,7 +1,7 @@
-module El exposing (Prop, attr, boolIpt, btn, btn3, el, ipt, rootEl, strIpt, tag, txt)
+module El exposing (Prop, attr, boolIpt, btn, btn3, col, el, ipt, rootEl, row, strIpt, tag, txt)
 
 import Html exposing (Attribute, Html, node, text)
-import Html.Attributes exposing (checked, type_, value)
+import Html.Attributes exposing (checked, style, type_, value)
 import Html.Events as E
 
 
@@ -33,6 +33,16 @@ fromHtmlAttrs =
 el : List (Prop msg) -> Prop msg
 el =
     Child << El
+
+
+row : List (Prop msg) -> Prop msg
+row props =
+    el (fromHtmlAttrs [ style "display" "flex", style "flex-direction" "row" ] ++ props)
+
+
+col : List (Prop msg) -> Prop msg
+col props =
+    el (fromHtmlAttrs [ style "display" "flex", style "flex-direction" "column" ] ++ props)
 
 
 taggedEl : String -> List (Prop msg) -> Prop msg

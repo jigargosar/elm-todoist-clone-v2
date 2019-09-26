@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (boolIpt, btn3, el, rootEl, strIpt, txt)
+import El exposing (boolIpt, btn3, col, el, rootEl, row, strIpt, txt)
 import Html exposing (Attribute, Html)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -308,11 +308,11 @@ view model =
 
 
 viewTodoList list =
-    el (List.map viewTodo list)
+    col (List.map viewTodo list)
 
 
 viewTodo todo =
-    el
+    row
         [ boolIpt todo.isDone (doneChecked todo.id) []
         , txt todo.title
         ]
@@ -331,9 +331,9 @@ patchAddTodoTitle { fields } title =
 viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
-            el
+            col
                 [ strIpt fields.title (patchAddTodoTitle form) []
-                , el
+                , row
                     [ btn3 "Save" Save []
                     , btn3 "Cancel" closeForm []
                     ]
