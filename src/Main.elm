@@ -351,10 +351,10 @@ type NavItem
 viewNavItem item =
     case item of
         NavInbox ->
-            H.button [ A.class "tl nice-blue  pv1" ] [ H.text "Inbox" ]
+            navBtn "Inbox"
 
         NavToday ->
-            H.button [ A.class "tl nice-blue  pv1" ] [ H.text "Today" ]
+            navBtn "Today"
 
         NavProjects list ->
             col []
@@ -363,9 +363,14 @@ viewNavItem item =
                 ]
 
 
+navBtn : String -> H.Html msg
+navBtn title =
+    H.button [ A.class "tl nice-blue  pv1" ] [ H.text title ]
+
+
 viewNavProject : NavProject -> H.Html msg
 viewNavProject (NavProject title) =
-    H.button [ A.class "tl nice-blue pv1" ] [ H.text title ]
+    navBtn title
 
 
 viewPage : Model -> Page -> List (H.Html Msg)
