@@ -232,11 +232,17 @@ mapTodo todoId fn model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | PatchAddTodoForm AddTodoForm
+    | SetAddTodoForm (Toggle AddTodoForm)
+    | Save
 
 
+setAddTodoForm : AddTodoForm -> Msg
 setAddTodoForm form =
-    PatchAddTodoForm form
+    SetAddTodoForm (On form)
+
+
+closeForm =
+    SetAddTodoForm Off
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -257,12 +263,27 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        PatchAddTodoForm addTodo ->
+        SetAddTodoForm addTodo ->
             let
                 newModel =
-                    { model | addTodo = On addTodo }
+                    { model | addTodo = addTodo }
             in
             ( newModel, cacheModel newModel )
+
+        Save ->
+            case model.addTodo of
+                On { fields } ->
+                    let
+                        newModel =
+                            { model
+                                | todoList = createTodo "" fields.title :: model.todoList
+                                , addTodo = Off
+                            }
+                    in
+                    ( newModel, cacheModel newModel )
+
+                Off ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
@@ -298,12 +319,11 @@ addTodoFormClicked =
 
 patchAddTodoTitle : AddTodoForm -> String -> Msg
 patchAddTodoTitle { fields } title =
-    AddTodoForm { fields | title = title }
-        |> setAddTodoForm
+    AddTodoForm { fields | title = title } |> setAddTodoForm
 
 
 closeAddTodoForm { fields } =
-    AddTodoForm fields |> setAddTodoForm
+    closeForm
 
 
 viewAddTodo : Toggle AddTodoForm -> Html Msg
