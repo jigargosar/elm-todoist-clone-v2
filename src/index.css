@@ -11,6 +11,7 @@ button {
   padding: unset;
   margin: unset;
 }
+
 :root {
   --spc0: 0;
   --spc1: 0.25rem;
@@ -45,31 +46,6 @@ button {
   padding-bottom: var(--spc3);
 }
 
-.ph1.ph1 {
-  padding-left: var(--spc1);
-  padding-right: var(--spc1);
-}
-.ph2.ph2 {
-  padding-left: var(--spc2);
-  padding-right: var(--spc2);
-}
-.ph3.ph3 {
-  padding-left: var(--spc3);
-  padding-right: var(--spc3);
-}
-
-.pv1.pv1 {
-  padding-top: var(--spc1);
-  padding-bottom: var(--spc1);
-}
-.pv2.pv2 {
-  padding-top: var(--spc2);
-  padding-bottom: var(--spc2);
-}
-.pv3.pv3 {
-  padding-top: var(--spc3);
-  padding-bottom: var(--spc3);
-}
 
 .flex {
   display: flex;
