@@ -13,9 +13,10 @@ app.ports.setCache.subscribe(cacheString => {
   localStorage.setItem('elm-todoist-clone-v2-cache', cacheString)
 })
 
-
-document.addEventListener("click", e=>{
-  const click = e.target.dataset['onclick']
-  console.log('click',click)
-  eval(click)
+document.addEventListener('click', e => {
+  const onclick = e.target.dataset['onclick']
+  if (onclick) {
+    console.log('click', onclick)
+    eval(onclick)
+  }
 })
