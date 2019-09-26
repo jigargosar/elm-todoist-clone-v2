@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Basics.More exposing (updateWhenIdEq)
 import Browser
-import El exposing (attr, btn, click, el, ipt, ipt3, rootEl, tag, txt)
+import El exposing (attr, btn, click, el, ipt, ipt3, iptCheck3, rootEl, tag, txt)
 import Html exposing (Attribute, Html)
 import Html.Attributes exposing (type_, value)
 import Html.Events as E
@@ -315,11 +315,7 @@ viewTodoList list =
 
 viewTodo todo =
     el
-        [ el
-            [ tag "input"
-            , attr <| type_ "checkbox"
-            , attr <| E.onCheck (doneChecked todo.id)
-            ]
+        [ iptCheck3 todo.isDone (doneChecked todo.id) []
         , txt todo.title
         ]
 
