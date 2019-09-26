@@ -318,11 +318,11 @@ viewTodoList list =
 
 viewTodo : Todo -> H.Html Msg
 viewTodo todo =
-    row [ A.class "pa1" ]
-        [ H.div [ A.class "ph1" ]
+    row []
+        [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
             ]
-        , H.div [ A.class "ph1 flex-grow-1" ] [ H.text todo.title ]
+        , row [ A.class "pa1 flex-grow-1" ] [ H.text todo.title ]
         ]
 
 
@@ -340,9 +340,8 @@ viewAddTodo : Toggle AddTodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
-            col [ A.class "ph2 pv1" ]
-                [ col [ A.class "pv1" ]
-                    [ ipt2 fields.title (patchAddTodoTitle form) ]
+            col [ A.class "pa3" ]
+                [ col [] [ ipt2 fields.title (patchAddTodoTitle form) ]
                 , row [] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
