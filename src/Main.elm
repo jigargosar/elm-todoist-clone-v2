@@ -88,13 +88,6 @@ cacheDecoder =
                 |> required "isDone" JD.bool
                 |> optional "isDeleted" JD.bool False
 
-        addTodoDecoder : Decoder (Toggle AddTodoForm)
-        addTodoDecoder =
-            JD.oneOf
-                [ JD.null Off
-                , todoFormDecoder |> JD.map On
-                ]
-
         fieldsDecoder : Decoder TodoFormFields
         fieldsDecoder =
             JD.succeed TodoFormFields
@@ -107,7 +100,7 @@ cacheDecoder =
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
-        |> optional "addTodo" addTodoDecoder Off
+        |> optional "addTodo" (todoFormDecoder |> JD.map On) Off
 
 
 cacheModel : Model -> Cmd msg
@@ -228,7 +221,7 @@ init flags =
         model : Model
         model =
             { todoList = cache.todoList
-            , addTodo = Off
+            , addTodo = cache.addTodo
             }
     in
     ( model
@@ -344,12 +337,13 @@ viewAddTodo addTodo =
     case addTodo of
         On ({ fields } as form) ->
             col
-                [ strIpt fields.title (patchAddTodoTitle form) []
+                [ attr <| class "pa1"
+                , strIpt fields.title (patchAddTodoTitle form) []
                 , row [ btn3 "Save" Save [], btn3 "Cancel" closeForm [] ]
                 ]
 
         Off ->
-            row [ btn3 "add todo" addTodoFormClicked [] ]
+            row [ attr <| class "pa1", btn3 "add todo" addTodoFormClicked [] ]
 
 
 main : Program Flags Model Msg
