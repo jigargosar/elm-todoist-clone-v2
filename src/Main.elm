@@ -329,16 +329,22 @@ viewTodo : Todo -> H.Html Msg
 viewTodo todo =
     row [ A.class "pa1" ]
         [ H.div [ A.class "ph1" ]
-            [ H.input
-                [ A.type_ "checkbox"
-                , A.checked todo.isDone
-                , E.onCheck (doneChecked todo.id)
-                , A.class "sz-24"
-                ]
-                []
+            [ checkbox todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
             ]
         , H.div [ A.class "ph1 flex-grow-1" ] [ H.text todo.title ]
         ]
+
+
+checkbox : Bool -> (Bool -> msg) -> List (H.Attribute msg) -> H.Html msg
+checkbox bool onCheck attrs =
+    H.input
+        ([ A.type_ "checkbox"
+         , A.checked bool
+         , E.onCheck onCheck
+         ]
+            ++ attrs
+        )
+        []
 
 
 addTodoFormClicked : Msg
