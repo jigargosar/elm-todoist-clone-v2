@@ -12,15 +12,15 @@ import Json.Encode as JE exposing (Value, encode, object)
 import UI exposing (btn1, btn2, checkbox3, col, ipt2, row)
 
 
-type Page
-    = SingleProject
-      --    | Today
-      --    | Next7Days
-      --    | Search
-    | AllTodos
+type Route
+    = RouteInbox
+    | RouteToday
+    | RouteProject
 
 
 
+--    | Next7Days
+--    | Search
 -- TODO_
 
 
@@ -217,7 +217,7 @@ unwrapToggle default func toggle =
 type alias Model =
     { todoList : List Todo
     , addTodo : Toggle AddTodoForm
-    , page : Page
+    , page : Route
     }
 
 
@@ -233,7 +233,7 @@ init flags =
         model =
             { todoList = cache.todoList
             , addTodo = cache.addTodo
-            , page = AllTodos
+            , page = RouteInbox
             }
     in
     ( model
@@ -373,16 +373,19 @@ viewNavProject (NavProject title) =
     navBtn title
 
 
-viewPage : Model -> Page -> List (H.Html Msg)
-viewPage model page =
-    case page of
-        AllTodos ->
+viewPage : Model -> Route -> List (H.Html Msg)
+viewPage model route =
+    case route of
+        RouteInbox ->
             [ viewTodoList model.todoList
             , viewAddTodo model.addTodo
             ]
 
-        SingleProject ->
-            viewPage model AllTodos
+        RouteToday ->
+            viewPage model RouteInbox
+
+        RouteProject ->
+            viewPage model RouteInbox
 
 
 viewTodoList : List Todo -> H.Html Msg
