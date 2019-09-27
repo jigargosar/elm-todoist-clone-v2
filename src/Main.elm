@@ -298,7 +298,13 @@ update msg model =
             ( newModel, cacheModel newModel )
 
         AddTodoFormClicked ->
-            ( model, todoIdGen |> Random.generate (\todoId -> setTodoForm (AddTodoForm { newTodoId = todoId, title = "" })) )
+            ( model
+            , todoIdGen
+                |> Random.generate
+                    (\todoId ->
+                        setTodoForm (AddTodoForm { newTodoId = todoId, title = "" })
+                    )
+            )
 
         SetMaybeTodoForm addTodo ->
             let
