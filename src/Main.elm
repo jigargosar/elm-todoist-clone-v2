@@ -261,7 +261,7 @@ init flags =
         model =
             { todoList = cache.todoList
             , addTodo = cache.addTodo
-            , route = RouteInbox
+            , route = RouteProject (ProjectId "1")
             }
     in
     ( model
