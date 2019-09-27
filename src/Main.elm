@@ -12,6 +12,7 @@ import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
 import Random
+import Task
 import Time
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
@@ -254,7 +255,7 @@ defaultModel =
     }
 
 
-init : Flags -> ( Model, Cmd msg )
+init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         cache =
@@ -267,7 +268,7 @@ init flags =
             { defaultModel | todoList = cache.todoList }
     in
     ( model
-    , cacheModel model
+    , Cmd.batch [ cacheModel model, Time.here |> Task.perform GotZone ]
     )
 
 
