@@ -461,7 +461,6 @@ viewAddTodo addTodo =
             H.text ""
 
 
-viewEditTodoForm : Todo -> H.Html Msg
 viewEditTodoForm todo =
     let
         editTodoConfig =
