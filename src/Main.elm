@@ -570,6 +570,7 @@ viewEditTodoForm fields =
         config =
             { titleChanged = \title -> setForm { fields | title = title }
             , projectIdChanged = \maybeProjectId -> setForm { fields | maybeProjectId = maybeProjectId }
+            , dueDateChanged = \maybeDueDate -> setForm { fields | maybeDueDate = maybeDueDate }
             }
     in
     viewTodoForm config fields
@@ -583,6 +584,7 @@ viewAddTodoForm fields =
         config =
             { titleChanged = \title -> setForm { fields | title = title }
             , projectIdChanged = \maybeProjectId -> setForm { fields | maybeProjectId = maybeProjectId }
+            , dueDateChanged = \maybeDueDate -> setForm { fields | maybeDueDate = maybeDueDate }
             }
     in
     viewTodoForm config fields
@@ -594,12 +596,12 @@ viewTodoForm config { title, maybeProjectId, maybeDueDate } =
             [ ipt2 title config.titleChanged
             ]
         , viewProjectSelect maybeProjectId config.projectIdChanged
-        , viewDueDateInput maybeDueDate
+        , viewDueDateInput maybeDueDate config.dueDateChanged
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
 
-viewDueDateInput maybeDueDate =
+viewDueDateInput maybeDueDate dueDateChanged =
     let
         dateVal =
             maybeDueDate
@@ -608,12 +610,7 @@ viewDueDateInput maybeDueDate =
     H.input
         [ A.type_ "date"
         , A.value dateVal
-        , E.onInput
-            (Date.fromIsoString
-                >> Result.toMaybe
-                >> Debug.log "dateChanged"
-                >> always NoOp
-            )
+        , E.onInput (Date.fromIsoString >> Result.toMaybe >> dueDateChanged)
         ]
         []
 
