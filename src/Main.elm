@@ -466,11 +466,11 @@ viewEditTodoForm todo =
         setForm =
             setTodoForm << EditTodoForm
 
-        editTodoConfig =
+        config =
             { titleChanged = \title -> setForm { todo | title = title }
             }
     in
-    viewTodoForm editTodoConfig todo
+    viewTodoForm config todo
 
 
 viewAddTodoForm fields =
