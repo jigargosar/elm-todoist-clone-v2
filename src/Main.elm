@@ -340,17 +340,6 @@ update msg model =
             ( { model | route = route }, Cmd.none )
 
 
-upsertTodoAndCloseFormAndCache todo model =
-    let
-        newModel =
-            { model
-                | todoList = upsertById todo model.todoList
-                , maybeTodoForm = Nothing
-            }
-    in
-    ( newModel, cacheModel newModel )
-
-
 subscriptions : Model -> Sub msg
 subscriptions _ =
     Sub.none
