@@ -305,7 +305,7 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | AddTodoFormClicked
+    | AddTodoFormClicked (Maybe ProjectId)
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | ChangeRouteTo Route
@@ -317,12 +317,6 @@ type Msg
 setTodoForm : TodoForm -> Msg
 setTodoForm form =
     SetMaybeTodoForm (Just form)
-
-
-addTodoFormClicked : Msg
-addTodoFormClicked =
-    --    setTodoForm (AddTodoForm { title = "" })
-    AddTodoFormClicked
 
 
 editTodoClicked : Todo -> Msg
@@ -365,7 +359,7 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        AddTodoFormClicked ->
+        AddTodoFormClicked maybeProjectId ->
             ( model
             , todoIdGen
                 |> Random.generate
@@ -374,7 +368,7 @@ update msg model =
                             (AddTodoForm
                                 { newTodoId = todoId
                                 , title = ""
-                                , maybeProjectId = Nothing
+                                , maybeProjectId = maybeProjectId
                                 , maybeDueDate = Nothing
                                 }
                             )
@@ -560,7 +554,7 @@ viewTodoListItems =
                     viewEditTodoForm todo
 
                 ProjectAddTodoBtn maybeProjectId ->
-                    row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
+                    row [ A.class "pa1" ] [ btn2 "add todo" (AddTodoFormClicked maybeProjectId) ]
 
                 ProjectAddTodoForm fields ->
                     viewAddTodoForm fields
