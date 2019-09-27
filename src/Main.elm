@@ -289,6 +289,9 @@ update msg model =
         ResetModel ->
             ( defaultModel, cacheModel defaultModel )
 
+        ChangeRouteTo route ->
+            ( { model | route = route }, Cmd.none )
+
         PatchTodo todoId todoPatch ->
             let
                 newModel =
@@ -335,9 +338,6 @@ update msg model =
 
                 Nothing ->
                     ( model, Cmd.none )
-
-        ChangeRouteTo route ->
-            ( { model | route = route }, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
