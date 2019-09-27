@@ -321,7 +321,7 @@ view model =
             ]
 
 
-viewNav : Model -> List (H.Html msg)
+viewNav : Model -> List (H.Html Msg)
 viewNav { page } =
     let
         navItems =
@@ -348,6 +348,7 @@ type NavItem
     | NavProjects (List NavProject)
 
 
+viewNavItem : NavItem -> H.Html Msg
 viewNavItem item =
     case item of
         NavInbox ->
