@@ -517,6 +517,9 @@ type TodoListItem
 viewInbox : Maybe TodoForm -> List Todo -> List TodoListItem
 viewInbox maybeTodoForm todoList =
     let
+        filteredTodoList =
+            todoList |> List.filter (.maybeProjectId >> (==) Nothing)
+
         list : List TodoListItem
         list =
             List.map
@@ -532,7 +535,7 @@ viewInbox maybeTodoForm todoList =
                         _ ->
                             TodoItem todo
                 )
-                todoList
+                filteredTodoList
 
         addTodoItem : TodoListItem
         addTodoItem =
