@@ -367,7 +367,7 @@ viewNavItem route item =
 navBtn : Bool -> String -> H.Html msg
 navBtn isActive title =
     H.button
-        [ A.class "tl  pv1"
+        [ A.class "tl pv1"
         , A.classList
             [ ( "", isActive ), ( "nice-blue", not isActive ) ]
         ]
