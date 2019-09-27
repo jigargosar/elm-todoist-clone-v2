@@ -192,7 +192,7 @@ type alias Flags =
 
 type TodoForm
     = AddTodoForm
-    | EditTodoForm
+    | EditTodoForm Todo
 
 
 type alias Model =
@@ -247,6 +247,11 @@ setTodoForm form =
 addTodoFormClicked : Msg
 addTodoFormClicked =
     setTodoForm AddTodoForm
+
+
+editTodoClicked : Todo -> Msg
+editTodoClicked todo =
+    setTodoForm (EditTodoForm todo)
 
 
 closeForm =
