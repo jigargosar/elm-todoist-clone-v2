@@ -272,6 +272,13 @@ init flags =
     )
 
 
+initModel : Model -> ( Model, Cmd Msg )
+initModel model =
+    ( model
+    , Cmd.batch [ cacheModel model, getZone ]
+    )
+
+
 getZone : Cmd Msg
 getZone =
     Time.here |> Task.perform GotZone
@@ -329,7 +336,7 @@ update msg model =
             ( model, Cmd.none )
 
         ResetModel ->
-            ( defaultModel, cacheModel defaultModel )
+            initModel defaultModel
 
         GotZone zone ->
             ( { model | zone = zone }, Cmd.none )
