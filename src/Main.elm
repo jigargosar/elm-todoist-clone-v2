@@ -249,7 +249,7 @@ type Msg
     | PatchTodo TodoId TodoPatch
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
-    | CreateAndAddTodo AddTodoFields
+    | AddTodoAndCloseFormAndCache AddTodoFields TodoId
     | ChangeRouteTo Route
     | ResetModel
 
@@ -302,15 +302,15 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        CreateAndAddTodo fields ->
-            ( model, Cmd.none )
+        AddTodoAndCloseFormAndCache fields todoId ->
+            upsertTodoAndCloseFormAndCache (todoFromFields todoId fields) model
 
         Save ->
             case model.maybeTodoForm of
                 Just form ->
                     case form of
                         AddTodoForm fields ->
-                            update (CreateAndAddTodo fields) model
+                            ( model, Random.generate (AddTodoAndCloseFormAndCache fields) todoIdGen )
 
                         EditTodoForm editingTodo ->
                             upsertTodoAndCloseFormAndCache editingTodo model
