@@ -335,7 +335,7 @@ viewNav { route } =
                 ]
             ]
     in
-    navItems |> List.map viewNavItem
+    navItems |> List.map (viewNavItem route)
 
 
 type NavProject
@@ -348,30 +348,35 @@ type NavItem
     | NavProjects (List NavProject)
 
 
-viewNavItem : NavItem -> H.Html Msg
-viewNavItem item =
+viewNavItem : Route -> NavItem -> H.Html Msg
+viewNavItem route item =
     case item of
         NavInbox ->
-            navBtn "Inbox"
+            navBtn (route == RouteInbox) "Inbox"
 
         NavToday ->
-            navBtn "Today"
+            navBtn (route == RouteToday) "Today"
 
         NavProjects list ->
             col []
                 [ row [ A.class "pv2" ] [ H.text "Projects:" ]
-                , col [ A.class "pl2" ] (list |> List.map viewNavProject)
+                , col [ A.class "pl2" ] (list |> List.map (viewNavProject False))
                 ]
 
 
-navBtn : String -> H.Html msg
-navBtn title =
-    H.button [ A.class "tl nice-blue  pv1" ] [ H.text title ]
+navBtn : Bool -> String -> H.Html msg
+navBtn isActive title =
+    H.button
+        [ A.class "tl  pv1"
+        , A.classList
+            [ ( "", isActive ), ( "nice-blue", not isActive ) ]
+        ]
+        [ H.text title ]
 
 
-viewNavProject : NavProject -> H.Html msg
-viewNavProject (NavProject title) =
-    navBtn title
+viewNavProject : Bool -> NavProject -> H.Html msg
+viewNavProject isActive (NavProject title) =
+    navBtn isActive title
 
 
 viewPage : Model -> Route -> List (H.Html Msg)
