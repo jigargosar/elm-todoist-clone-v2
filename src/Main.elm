@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, propEq, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import Html
@@ -516,7 +516,7 @@ inboxViewModel : Model -> List TodoListItem
 inboxViewModel { maybeTodoForm, todoList } =
     let
         filteredTodoList =
-            todoList |> List.filter (.maybeProjectId >> (==) Nothing)
+            todoList |> List.filter (propEq .maybeProjectId Nothing)
     in
     todoItemsFromList maybeTodoForm filteredTodoList ++ [ addTodoItem maybeTodoForm ]
 
@@ -525,7 +525,7 @@ projectViewModel : ProjectId -> Model -> List TodoListItem
 projectViewModel projectId { maybeTodoForm, todoList } =
     let
         filteredTodoList =
-            todoList |> List.filter (.maybeProjectId >> (==) (Just projectId))
+            todoList |> List.filter (propEq .maybeProjectId (Just projectId))
     in
     todoItemsFromList maybeTodoForm filteredTodoList ++ [ addTodoItem maybeTodoForm ]
 

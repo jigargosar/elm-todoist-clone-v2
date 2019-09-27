@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, callWith, idEq, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, callWith, idEq, propEq, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -19,6 +19,11 @@ type alias HasId a id =
 idEq : id -> HasId a id -> Bool
 idEq id_ { id } =
     id == id_
+
+
+propEq : (big -> small) -> small -> big -> Bool
+propEq get val obj =
+    get obj == val
 
 
 updateWhenIdEq : id -> (HasId a id -> HasId a id) -> List (HasId a id) -> List (HasId a id)
