@@ -342,7 +342,7 @@ update msg model =
             ( { model | zone = zone }, Cmd.none )
 
         ChangeRouteTo route ->
-            ( { model | route = route, maybeTodoForm = Nothing }, Cmd.none )
+            ( { model | route = route, maybeTodoForm = Nothing }, getZone )
 
         PatchTodo todoId todoPatch ->
             let
