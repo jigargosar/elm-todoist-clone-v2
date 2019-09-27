@@ -202,6 +202,13 @@ type alias Model =
     }
 
 
+defaultModel =
+    { todoList = initialTodoList
+    , maybeTodoForm = Nothing
+    , route = RouteProject (ProjectId "1")
+    }
+
+
 init : Flags -> ( Model, Cmd msg )
 init flags =
     let
@@ -212,10 +219,7 @@ init flags =
 
         model : Model
         model =
-            { todoList = cache.todoList
-            , maybeTodoForm = Nothing
-            , route = RouteProject (ProjectId "1")
-            }
+            { defaultModel | todoList = cache.todoList }
     in
     ( model
     , cacheModel model
@@ -237,6 +241,7 @@ type Msg
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | ChangeRouteTo Route
+    | ResetModel
 
 
 setTodoForm : TodoForm -> Msg
@@ -268,6 +273,9 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        ResetModel ->
+            ( defaultModel, cacheModel defaultModel )
 
         PatchTodo todoId todoPatch ->
             let
