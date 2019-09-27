@@ -521,6 +521,15 @@ inboxViewModel { maybeTodoForm, todoList } =
     todoItemsFromList maybeTodoForm filteredTodoList ++ [ addTodoItem maybeTodoForm ]
 
 
+projectViewModel : ProjectId -> Model -> List TodoListItem
+projectViewModel projectId { maybeTodoForm, todoList } =
+    let
+        filteredTodoList =
+            todoList |> List.filter (.maybeProjectId >> (==) (Just projectId))
+    in
+    todoItemsFromList maybeTodoForm filteredTodoList ++ [ addTodoItem maybeTodoForm ]
+
+
 todoItemsFromList maybeTodoForm todoList =
     List.map
         (\todo ->
