@@ -152,7 +152,7 @@ cacheModel model =
                 ]
 
         modelEncoder : Model -> Value
-        modelEncoder { todoList, maybeAddTodoForm } =
+        modelEncoder { todoList } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
                 ]
@@ -190,18 +190,14 @@ type alias Flags =
     }
 
 
-type alias AddTodoForm =
-    {}
-
-
-type alias EditTodoForm =
-    {}
+type TodoForm
+    = AddTodoForm
+    | EditTodoForm
 
 
 type alias Model =
     { todoList : List Todo
-    , maybeAddTodoForm : Maybe AddTodoForm
-    , maybeEditTodoForm : Maybe EditTodoForm
+    , maybeTodoForm : Maybe TodoForm
     , route : Route
     }
 
@@ -217,8 +213,7 @@ init flags =
         model : Model
         model =
             { todoList = cache.todoList
-            , maybeAddTodoForm = Nothing
-            , maybeEditTodoForm = Nothing
+            , maybeTodoForm = Nothing
             , route = RouteProject (ProjectId "1")
             }
     in
@@ -239,18 +234,23 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | SetAddTodoToggle (Maybe AddTodoForm)
+    | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | ChangeRouteTo Route
 
 
-setAddTodoForm : AddTodoForm -> Msg
-setAddTodoForm form =
-    SetAddTodoToggle (Just form)
+setTodoForm : TodoForm -> Msg
+setTodoForm form =
+    SetMaybeTodoForm (Just form)
+
+
+addTodoFormClicked : Msg
+addTodoFormClicked =
+    setTodoForm AddTodoForm
 
 
 closeForm =
-    SetAddTodoToggle Nothing
+    SetMaybeTodoForm Nothing
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -272,22 +272,22 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        SetAddTodoToggle addTodo ->
+        SetMaybeTodoForm addTodo ->
             let
                 newModel =
-                    { model | maybeAddTodoForm = addTodo }
+                    { model | maybeTodoForm = addTodo }
             in
             ( newModel, cacheModel newModel )
 
         Save ->
-            model.maybeAddTodoForm
+            model.maybeTodoForm
                 |> MX.unwrap ( model, Cmd.none )
                     (\_ ->
                         let
                             newModel =
                                 { model
                                     | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
-                                    , maybeAddTodoForm = Nothing
+                                    , maybeTodoForm = Nothing
                                 }
                         in
                         ( newModel, cacheModel newModel )
@@ -376,7 +376,7 @@ viewPage model route =
     case route of
         RouteInbox ->
             [ viewTodoList model.todoList
-            , viewAddTodo model.maybeAddTodoForm
+            , viewAddTodo model.maybeTodoForm
             ]
 
         RouteToday ->
@@ -401,15 +401,10 @@ viewTodo todo =
         ]
 
 
-addTodoFormClicked : Msg
-addTodoFormClicked =
-    {} |> setAddTodoForm
-
-
-viewAddTodo : Maybe AddTodoForm -> H.Html Msg
+viewAddTodo : Maybe TodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
-        Just _ ->
+        Just AddTodoForm ->
             col [ A.class "pa1" ]
                 [ col [ A.class "pv1" ] [ ipt2 "New Todo Title" (\_ -> NoOp) ]
                 , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
@@ -417,6 +412,9 @@ viewAddTodo addTodo =
 
         Nothing ->
             row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
+
+        _ ->
+            H.text ""
 
 
 main : Program Flags Model Msg
