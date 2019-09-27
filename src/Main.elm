@@ -520,7 +520,7 @@ viewEditTodoForm fields =
 
         config =
             { titleChanged = \title -> setForm { fields | title = title }
-            , projectIdChanged = \str -> setForm { fields | maybeProjectId = projectIdFromString str }
+            , projectIdChanged = \maybeProjectId -> setForm { fields | maybeProjectId = maybeProjectId }
             }
     in
     viewTodoForm config fields
@@ -533,7 +533,7 @@ viewAddTodoForm fields =
 
         config =
             { titleChanged = \title -> setForm { fields | title = title }
-            , projectIdChanged = \str -> setForm { fields | maybeProjectId = projectIdFromString str }
+            , projectIdChanged = \maybeProjectId -> setForm { fields | maybeProjectId = maybeProjectId }
             }
     in
     viewTodoForm config fields
@@ -544,12 +544,12 @@ viewTodoForm config { title, maybeProjectId } =
         [ col [ A.class "pv1" ]
             [ ipt2 title config.titleChanged
             ]
-        , viewProjectSelect maybeProjectId
+        , viewProjectSelect maybeProjectId config.projectIdChanged
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
 
-viewProjectSelect maybeProjectId =
+viewProjectSelect maybeProjectId projectIdChanged =
     let
         viewOpt { id, title } =
             H.option
@@ -559,7 +559,9 @@ viewProjectSelect maybeProjectId =
                 [ H.text title ]
     in
     H.select []
-        (H.option [] [ H.text "Inbox" ] :: List.map viewOpt initialProjectList)
+        (H.option [ E.onInput (projectIdFromString >> projectIdChanged) ] [ H.text "Inbox" ]
+            :: List.map viewOpt initialProjectList
+        )
 
 
 main : Program Flags Model Msg
