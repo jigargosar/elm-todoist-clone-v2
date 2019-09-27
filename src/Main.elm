@@ -380,7 +380,7 @@ viewPage : Model -> Route -> List (H.Html Msg)
 viewPage model route =
     case route of
         RouteInbox ->
-            [ viewTodoList model.todoList
+            [ viewTodoList model
             , viewAddTodo model.maybeTodoForm
             ]
 
@@ -391,9 +391,24 @@ viewPage model route =
             viewPage model RouteInbox
 
 
-viewTodoList : List Todo -> H.Html Msg
-viewTodoList list =
-    col [] (List.map viewTodo list)
+viewTodoList : { a | maybeTodoForm : Maybe TodoForm, todoList : List Todo } -> H.Html Msg
+viewTodoList { maybeTodoForm, todoList } =
+    col []
+        (List.map
+            (\todo ->
+                case maybeTodoForm of
+                    Just (EditTodoForm editTodo) ->
+                        if todo.id == editTodo.id then
+                            viewTodo todo
+
+                        else
+                            viewTodo todo
+
+                    _ ->
+                        viewTodo todo
+            )
+            todoList
+        )
 
 
 viewTodo : Todo -> H.Html Msg
