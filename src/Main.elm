@@ -504,7 +504,7 @@ type TodoListItem
     = TodoItem Todo
     | EditTodoItem Todo
     | ProjectAddTodoBtn (Maybe ProjectId)
-    | ProjectAddTodoForm AddTodoFields
+    | AddTodoFormItem AddTodoFields
 
 
 maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListItem
@@ -516,7 +516,7 @@ maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
     todoItemsFromList maybeTodoForm filteredTodoList
         ++ [ case maybeTodoForm of
                 Just (AddTodoForm fields) ->
-                    ProjectAddTodoForm fields
+                    AddTodoFormItem fields
 
                 _ ->
                     ProjectAddTodoBtn maybeProjectId
@@ -553,7 +553,7 @@ viewTodoListItems =
                 ProjectAddTodoBtn maybeProjectId ->
                     row [ A.class "pa1" ] [ btn2 "add todo" (AddTodoFormClicked maybeProjectId) ]
 
-                ProjectAddTodoForm fields ->
+                AddTodoFormItem fields ->
                     viewAddTodoForm fields
     in
     List.map viewItem
