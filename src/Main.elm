@@ -194,9 +194,14 @@ type alias AddTodoForm =
     {}
 
 
+type alias EditTodoForm =
+    {}
+
+
 type alias Model =
     { todoList : List Todo
     , maybeAddTodoForm : Maybe AddTodoForm
+    , maybeEditTodoForm : Maybe EditTodoForm
     , route : Route
     }
 
@@ -213,6 +218,7 @@ init flags =
         model =
             { todoList = cache.todoList
             , maybeAddTodoForm = Nothing
+            , maybeEditTodoForm = Nothing
             , route = RouteProject (ProjectId "1")
             }
     in
