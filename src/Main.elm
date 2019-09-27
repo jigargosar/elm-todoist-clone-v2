@@ -448,21 +448,6 @@ viewTodo todo =
         ]
 
 
-viewEditTodo : Todo -> H.Html Msg
-viewEditTodo todo =
-    let
-        config =
-            editTodoConfig todo
-    in
-    col [ A.class "pa1" ]
-        [ col [ A.class "pv1" ]
-            [ ipt2 todo.title
-                config.titleChanged
-            ]
-        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
-        ]
-
-
 editTodoConfig todo =
     let
         setForm =
@@ -480,6 +465,11 @@ addTodoConfig fields =
     { titleChanged = \title -> setForm { fields | title = title } }
 
 
+viewEditTodo : Todo -> H.Html Msg
+viewEditTodo todo =
+    viewEditTodoForm (editTodoConfig todo) todo
+
+
 viewAddTodo : Maybe TodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
@@ -491,6 +481,16 @@ viewAddTodo addTodo =
 
         _ ->
             H.text ""
+
+
+viewEditTodoForm config todo =
+    col [ A.class "pa1" ]
+        [ col [ A.class "pv1" ]
+            [ ipt2 todo.title
+                config.titleChanged
+            ]
+        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
+        ]
 
 
 viewAddTodoForm config fields =
