@@ -9,7 +9,6 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
-import Maybe.Extra as MX
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
@@ -68,11 +67,6 @@ type alias Todo =
 createTodo : String -> String -> Todo
 createTodo id title =
     Todo (TodoId id) title False False
-
-
-mockTodoForAddTodoFormSave : Todo
-mockTodoForAddTodoFormSave =
-    Todo (TodoId "6") "Newly Added Todo" False False
 
 
 initialTodoList =
@@ -457,7 +451,10 @@ viewTodo todo =
 viewEditTodo : Todo -> H.Html Msg
 viewEditTodo todo =
     col [ A.class "pa1" ]
-        [ col [ A.class "pv1" ] [ ipt2 todo.title (\title -> setTodoForm (EditTodoForm { todo | title = title })) ]
+        [ col [ A.class "pv1" ]
+            [ ipt2 todo.title
+                (\title -> setTodoForm (EditTodoForm { todo | title = title }))
+            ]
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
@@ -465,9 +462,12 @@ viewEditTodo todo =
 viewAddTodo : Maybe TodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
-        Just AddTodoForm ->
+        Just (AddTodoForm fields) ->
             col [ A.class "pa1" ]
-                [ col [ A.class "pv1" ] [ ipt2 "New Todo Title" (\_ -> NoOp) ]
+                [ col [ A.class "pv1" ]
+                    [ ipt2 fields.title
+                        (\title -> setTodoForm (AddTodoForm { fields | title = title }))
+                    ]
                 , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
