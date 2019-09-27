@@ -534,23 +534,24 @@ inboxViewModel { maybeTodoForm, todoList } =
                             TodoItem todo
                 )
                 filteredTodoList
-
-        addTodoItem : TodoListItem
-        addTodoItem =
-            AddTodoItem
-                (maybeTodoForm
-                    |> Maybe.andThen
-                        (\form ->
-                            case form of
-                                AddTodoForm fields ->
-                                    Just fields
-
-                                _ ->
-                                    Nothing
-                        )
-                )
     in
-    list ++ [ addTodoItem ]
+    list ++ [ addTodoItem maybeTodoForm ]
+
+
+addTodoItem : Maybe TodoForm -> TodoListItem
+addTodoItem maybeTodoForm =
+    AddTodoItem
+        (maybeTodoForm
+            |> Maybe.andThen
+                (\form ->
+                    case form of
+                        AddTodoForm fields ->
+                            Just fields
+
+                        _ ->
+                            Nothing
+                )
+        )
 
 
 viewTodoListItems =
