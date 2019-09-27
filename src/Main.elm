@@ -380,25 +380,25 @@ viewNavItem : Route -> NavItem -> H.Html Msg
 viewNavItem route item =
     case item of
         NavInbox ->
-            navBtn (route == RouteInbox) "Inbox" (ChangeRouteTo RouteInbox)
+            navBtn route "Inbox" RouteInbox
 
         NavToday ->
-            navBtn (route == RouteToday) "Today" (ChangeRouteTo RouteToday)
+            navBtn route "Today" RouteToday
 
         NavProjects list ->
             col []
                 [ row [ A.class "pv2" ] [ H.text "Projects:" ]
-                , col [ A.class "pl2" ] (list |> List.map (viewNavProject route))
+                , col [ A.class "pl2" ] (list |> List.map (\(NavProject { id, title }) -> navBtn route title (RouteProject id)))
                 ]
 
 
-navBtnNoOp : Bool -> String -> H.Html Msg
-navBtnNoOp isActive title =
-    navBtn isActive title NoOp
+navBtn : Route -> String -> Route -> H.Html Msg
+navBtn currentRoute title toRoute =
+    navBtnHelp (currentRoute == toRoute) title (ChangeRouteTo toRoute)
 
 
-navBtn : Bool -> String -> msg -> H.Html msg
-navBtn isActive title msg =
+navBtnHelp : Bool -> String -> msg -> H.Html msg
+navBtnHelp isActive title msg =
     H.button
         [ A.class "tl pa1"
         , A.classList
@@ -406,11 +406,6 @@ navBtn isActive title msg =
         , E.onClick msg
         ]
         [ H.text title ]
-
-
-viewNavProject : Route -> NavProject -> H.Html Msg
-viewNavProject route (NavProject { id, title }) =
-    navBtn (route == RouteProject id) title (ChangeRouteTo (RouteProject id))
 
 
 viewPage : Model -> Route -> List (H.Html Msg)
