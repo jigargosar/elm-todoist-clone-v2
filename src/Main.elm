@@ -379,15 +379,15 @@ type NavItem
 viewNavItem : Route -> NavItem -> H.Html Msg
 viewNavItem route item =
     let
-        viewNavBtnHelp title toRoute =
+        navBtnHelp title toRoute =
             navBtn (route == toRoute) title (ChangeRouteTo toRoute)
     in
     case item of
         NavInbox ->
-            viewNavBtnHelp "Inbox" RouteInbox
+            navBtnHelp "Inbox" RouteInbox
 
         NavToday ->
-            viewNavBtnHelp "Today" RouteToday
+            navBtnHelp "Today" RouteToday
 
         NavProjects list ->
             col []
@@ -396,7 +396,7 @@ viewNavItem route item =
                     (list
                         |> List.map
                             (\(NavProject { id, title }) ->
-                                viewNavBtnHelp title (RouteProject id)
+                                navBtnHelp title (RouteProject id)
                             )
                     )
                 ]
