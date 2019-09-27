@@ -463,11 +463,10 @@ viewAddTodo addTodo =
 
 viewEditTodoForm todo =
     let
+        setForm =
+            setTodoForm << EditTodoForm
+
         editTodoConfig =
-            let
-                setForm =
-                    setTodoForm << EditTodoForm
-            in
             { titleChanged = \title -> setForm { todo | title = title }
             }
     in
