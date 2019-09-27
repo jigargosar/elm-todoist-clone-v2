@@ -268,8 +268,13 @@ init flags =
             { defaultModel | todoList = cache.todoList }
     in
     ( model
-    , Cmd.batch [ cacheModel model, Time.here |> Task.perform GotZone ]
+    , Cmd.batch [ cacheModel model, getZone ]
     )
+
+
+getZone : Cmd Msg
+getZone =
+    Time.here |> Task.perform GotZone
 
 
 mapTodoList : (small -> small) -> { big | todoList : small } -> { big | todoList : small }
