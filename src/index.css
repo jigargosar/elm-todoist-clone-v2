@@ -1,3 +1,12 @@
+:root {
+  --spc0: 0;
+  --spc1: 0.25rem;
+  --spc2: 0.5rem;
+  --spc3: 1rem;
+  --spc4: 2rem;
+  --primary-color: dodgerblue;
+}
+
 button {
   background: unset;
   border: unset;
@@ -6,13 +15,12 @@ button {
   margin: unset;
 }
 
-:root {
-  --spc0: 0;
-  --spc1: 0.25rem;
-  --spc2: 0.5rem;
-  --spc3: 1rem;
-  --spc4: 2rem;
+button:focus,
+input:focus {
+  outline-offset: 1px;
+  outline: dodgerblue solid medium;
 }
+
 
 .ph1 {
   padding-left: var(--spc1);
@@ -52,8 +60,12 @@ button {
   flex-direction: column;
 }
 
-.nice-blue {
-  color: hsl(217, 99%, 53%);
+.primary-color {
+  color: var(--primary-color);
+}
+
+.bg-primary-color {
+  background-color: var(--primary-color);
 }
 
 .sz-24 {
