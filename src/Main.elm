@@ -509,7 +509,7 @@ viewRoute model route =
 type TodoListItem
     = TodoItem Todo
     | EditTodoItem Todo
-    | AddTodoItem (Maybe AddTodoFields)
+    | ProjectAddTodoItem (Maybe ProjectId) (Maybe AddTodoFields)
 
 
 maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListItem
@@ -518,7 +518,7 @@ maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
         filteredTodoList =
             todoList |> List.filter (propEq .maybeProjectId maybeProjectId)
     in
-    todoItemsFromList maybeTodoForm filteredTodoList ++ [ addTodoItem maybeTodoForm ]
+    todoItemsFromList maybeTodoForm filteredTodoList ++ [ projectAddTodoItem maybeProjectId maybeTodoForm ]
 
 
 todoItemsFromList maybeTodoForm todoList =
@@ -538,9 +538,9 @@ todoItemsFromList maybeTodoForm todoList =
         todoList
 
 
-addTodoItem : Maybe TodoForm -> TodoListItem
-addTodoItem maybeTodoForm =
-    AddTodoItem
+projectAddTodoItem : Maybe ProjectId -> Maybe TodoForm -> TodoListItem
+projectAddTodoItem maybeProjectId maybeTodoForm =
+    ProjectAddTodoItem maybeProjectId
         (maybeTodoForm
             |> Maybe.andThen
                 (\form ->
@@ -564,8 +564,8 @@ viewTodoListItems =
                 EditTodoItem todo ->
                     viewEditTodoForm todo
 
-                AddTodoItem maybe ->
-                    viewAddTodo maybe
+                ProjectAddTodoItem maybeProjectId maybeFields ->
+                    viewAddTodo maybeProjectId maybeFields
     in
     List.map viewItem
 
@@ -596,8 +596,8 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
-viewAddTodo : Maybe AddTodoFields -> H.Html Msg
-viewAddTodo addTodo =
+viewAddTodo : Maybe ProjectId -> Maybe AddTodoFields -> H.Html Msg
+viewAddTodo maybeProjectId addTodo =
     case addTodo of
         Just fields ->
             viewAddTodoForm fields
