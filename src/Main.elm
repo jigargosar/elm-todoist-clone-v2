@@ -540,7 +540,7 @@ viewTodo todo =
             ]
             [ H.text todo.title ]
         , todo.maybeDueDate
-            |> MX.unwrap (H.text "")
+            |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
                 (\dueDate ->
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
                 )
