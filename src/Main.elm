@@ -328,9 +328,12 @@ subscriptions _ =
 view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
-        row [ A.class "sans-serif ph4" ]
-            [ col [ A.class "pa2 measure-wide" ] (viewNav model)
-            , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewPage model model.route)
+        col [ A.class "sans-serif ph4" ]
+            [ row [ A.class "bg-black-10 pa1" ] [ btn2 "Reset" ResetModel ]
+            , row []
+                [ col [ A.class "pa2" ] (viewNav model)
+                , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewPage model model.route)
+                ]
             ]
 
 
