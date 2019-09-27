@@ -30,6 +30,14 @@ type ProjectId
     = ProjectId String
 
 
+projectIdFromString str =
+    if str |> String.trim |> String.isEmpty then
+        Nothing
+
+    else
+        Just <| ProjectId (String.trim str)
+
+
 type alias Project =
     { id : ProjectId
     , title : String
@@ -208,7 +216,10 @@ type alias Flags =
 
 
 type alias AddTodoFields =
-    { newTodoId : TodoId, title : String }
+    { newTodoId : TodoId
+    , title : String
+    , maybeProjectId : Maybe ProjectId
+    }
 
 
 type TodoForm
@@ -316,7 +327,7 @@ update msg model =
             , todoIdGen
                 |> Random.generate
                     (\todoId ->
-                        setTodoForm (AddTodoForm { newTodoId = todoId, title = "" })
+                        setTodoForm (AddTodoForm { newTodoId = todoId, title = "", maybeProjectId = Nothing })
                     )
             )
 
@@ -512,7 +523,9 @@ viewAddTodoForm fields =
             setTodoForm << AddTodoForm
 
         config =
-            { titleChanged = \title -> setForm { fields | title = title } }
+            { titleChanged = \title -> setForm { fields | title = title }
+            , projectIdChanged = \str -> setForm { fields | maybeProjectId = projectIdFromString str }
+            }
     in
     viewTodoForm config fields
 
