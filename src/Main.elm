@@ -561,7 +561,8 @@ viewTodo layout todo =
             H.text ""
 
           else
-            row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ] [ H.text <| todoProjectTitle todo ]
+            row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
+                [ H.text <| todoProjectTitle todo ]
         ]
 
 
