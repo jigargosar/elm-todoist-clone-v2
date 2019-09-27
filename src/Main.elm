@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, propEq, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, idEq, propEq, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import Html
@@ -11,6 +11,7 @@ import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
+import Maybe as MX
 import Maybe.Extra as MX
 import Random
 import Task
@@ -500,13 +501,18 @@ viewRoute model route =
             viewTodoListForMaybeProjectId (Just projectId) model
 
 
-maybeEditTodoForm maybeForm =
+getEditTodoForm maybeForm =
     case maybeForm of
         Just (EditTodoForm editTodo) ->
             Just editTodo
 
         _ ->
             Nothing
+
+
+getEditTodoFormForTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
+getEditTodoFormForTodoId todoId =
+    getEditTodoForm >> MX.filter (idEq todoId)
 
 
 viewTodoListDueAt today { todoList, maybeTodoForm } =
@@ -523,16 +529,8 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
                 |> List.filter filterPredicate
                 |> List.map
                     (\todo ->
-                        case maybeTodoForm of
-                            Just (EditTodoForm editTodo) ->
-                                if todo.id == editTodo.id then
-                                    viewEditTodoForm editTodo
-
-                                else
-                                    viewTodo DueDateItemLayout todo
-
-                            _ ->
-                                viewTodo DueDateItemLayout todo
+                        getEditTodoFormForTodoId todo.id maybeTodoForm
+                            |> MX.unpack (\_ -> viewTodo DueDateItemLayout todo) viewEditTodoForm
                     )
 
         viewAddTodoItem =
