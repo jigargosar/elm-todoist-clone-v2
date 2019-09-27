@@ -9,6 +9,7 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
+import Maybe.Extra as MX
 import Random
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
