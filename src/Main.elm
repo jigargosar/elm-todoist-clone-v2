@@ -230,6 +230,7 @@ type alias AddTodoFields =
     { newTodoId : TodoId
     , title : String
     , maybeProjectId : Maybe ProjectId
+    , maybeDueDate : Maybe Time.Posix
     }
 
 
@@ -365,7 +366,14 @@ update msg model =
             , todoIdGen
                 |> Random.generate
                     (\todoId ->
-                        setTodoForm (AddTodoForm { newTodoId = todoId, title = "", maybeProjectId = Nothing })
+                        setTodoForm
+                            (AddTodoForm
+                                { newTodoId = todoId
+                                , title = ""
+                                , maybeProjectId = Nothing
+                                , maybeDueDate = Nothing
+                                }
+                            )
                     )
             )
 
