@@ -17,8 +17,8 @@ button {
 
 button:focus,
 input:focus {
-  outline-offset: 1px;
-  outline: var(--primary-color) solid medium;
+  outline-offset: -0.1rem;
+  outline: hsla(210, 100%, 56%, 0.5) solid thick;
 }
 
 .ph1 {
