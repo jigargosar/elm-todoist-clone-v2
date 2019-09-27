@@ -500,33 +500,40 @@ viewRoute model route =
             viewTodoListForMaybeProjectId (Just projectId) model
 
 
+maybeEditTodoForm maybeForm =
+    case maybeForm of
+        Just (EditTodoForm editTodo) ->
+            Just editTodo
+
+        _ ->
+            Nothing
+
+
 viewTodoListDueAt today { todoList, maybeTodoForm } =
     let
-        filter =
+        filterPredicate =
             allPass
                 [ propEq .maybeDueDate (Just today)
                 , propEq .isDone False
                 ]
 
-        filteredTodoList =
-            List.filter filter todoList
-
         viewFilteredTodoList : List (H.Html Msg)
         viewFilteredTodoList =
-            List.map
-                (\todo ->
-                    case maybeTodoForm of
-                        Just (EditTodoForm editTodo) ->
-                            if todo.id == editTodo.id then
-                                viewEditTodoForm editTodo
+            todoList
+                |> List.filter filterPredicate
+                |> List.map
+                    (\todo ->
+                        case maybeTodoForm of
+                            Just (EditTodoForm editTodo) ->
+                                if todo.id == editTodo.id then
+                                    viewEditTodoForm editTodo
 
-                            else
+                                else
+                                    viewTodo DueDateItemLayout todo
+
+                            _ ->
                                 viewTodo DueDateItemLayout todo
-
-                        _ ->
-                            viewTodo DueDateItemLayout todo
-                )
-                filteredTodoList
+                    )
 
         viewAddTodoItem =
             case maybeTodoForm of
