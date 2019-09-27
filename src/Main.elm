@@ -558,8 +558,8 @@ viewProjectSelect maybeProjectId projectIdChanged =
                 ]
                 [ H.text title ]
     in
-    H.select []
-        (H.option [ E.onInput (projectIdFromString >> projectIdChanged) ] [ H.text "Inbox" ]
+    H.select [ E.onInput (projectIdFromString >> projectIdChanged) ]
+        (H.option [] [ H.text "Inbox" ]
             :: List.map viewOpt initialProjectList
         )
 
