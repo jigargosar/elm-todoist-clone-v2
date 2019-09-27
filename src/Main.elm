@@ -321,7 +321,7 @@ update msg model =
             ( defaultModel, cacheModel defaultModel )
 
         ChangeRouteTo route ->
-            ( { model | route = route }, Cmd.none )
+            ( { model | route = route, maybeTodoForm = Nothing }, Cmd.none )
 
         PatchTodo todoId todoPatch ->
             let
