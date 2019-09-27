@@ -19,7 +19,7 @@ button {
 button:focus,
 input:focus {
   outline-offset: -0.1rem;
-  outline: var(--primary-color-light) solid thick;
+  outline: var(--primary-color) solid thin;
 }
 
 .ph1 {
