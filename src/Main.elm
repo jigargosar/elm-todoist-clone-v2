@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, propEq, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, propEq, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import Html
@@ -502,8 +502,14 @@ viewRoute model route =
 
 viewTodoListDueAt today { todoList, maybeTodoForm } =
     let
+        filter =
+            allPass
+                [ propEq .maybeDueDate (Just today)
+                , propEq .isDone False
+                ]
+
         filteredTodoList =
-            List.filter (propEq .maybeDueDate (Just today)) todoList
+            List.filter filter todoList
 
         viewFilteredTodoList : List (H.Html Msg)
         viewFilteredTodoList =
