@@ -509,7 +509,8 @@ viewRoute model route =
 type TodoListItem
     = TodoItem Todo
     | EditTodoItem Todo
-    | ProjectAddTodoItem (Maybe ProjectId) (Maybe AddTodoFields)
+    | ProjectAddTodoBtn (Maybe ProjectId)
+    | ProjectAddTodoForm AddTodoFields
 
 
 maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListItem
@@ -540,18 +541,12 @@ todoItemsFromList maybeTodoForm todoList =
 
 projectAddTodoItem : Maybe ProjectId -> Maybe TodoForm -> TodoListItem
 projectAddTodoItem maybeProjectId maybeTodoForm =
-    ProjectAddTodoItem maybeProjectId
-        (maybeTodoForm
-            |> Maybe.andThen
-                (\form ->
-                    case form of
-                        AddTodoForm fields ->
-                            Just fields
+    case maybeTodoForm of
+        Just (AddTodoForm fields) ->
+            ProjectAddTodoForm fields
 
-                        _ ->
-                            Nothing
-                )
-        )
+        _ ->
+            ProjectAddTodoBtn maybeProjectId
 
 
 viewTodoListItems =
@@ -564,8 +559,11 @@ viewTodoListItems =
                 EditTodoItem todo ->
                     viewEditTodoForm todo
 
-                ProjectAddTodoItem maybeProjectId maybeFields ->
-                    viewAddTodo maybeProjectId maybeFields
+                ProjectAddTodoBtn maybeProjectId ->
+                    row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
+
+                ProjectAddTodoForm fields ->
+                    viewAddTodoForm fields
     in
     List.map viewItem
 
@@ -594,16 +592,6 @@ todoProjectTitle { maybeProjectId } =
     initialProjectList
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
         |> MX.unwrap "Inbox" .title
-
-
-viewAddTodo : Maybe ProjectId -> Maybe AddTodoFields -> H.Html Msg
-viewAddTodo maybeProjectId addTodo =
-    case addTodo of
-        Just fields ->
-            viewAddTodoForm fields
-
-        Nothing ->
-            row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
 
 
 viewEditTodoForm fields =
