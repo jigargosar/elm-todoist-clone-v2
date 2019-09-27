@@ -464,12 +464,20 @@ viewEditTodo todo =
 
 
 editTodoConfig todo =
-    { titleChanged = \title -> setTodoForm (EditTodoForm { todo | title = title })
+    let
+        setForm =
+            setTodoForm << EditTodoForm
+    in
+    { titleChanged = \title -> setForm { todo | title = title }
     }
 
 
 addTodoConfig fields =
-    { titleChanged = \title -> setTodoForm (AddTodoForm { fields | title = title }) }
+    let
+        setForm =
+            setTodoForm << AddTodoForm
+    in
+    { titleChanged = \title -> setForm { fields | title = title } }
 
 
 viewAddTodo : Maybe TodoForm -> H.Html Msg
