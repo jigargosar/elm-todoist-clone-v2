@@ -303,8 +303,7 @@ update msg model =
 
                                 EditTodoForm editingTodo ->
                                     editingTodo
-                    in
-                    let
+
                         newModel =
                             { model
                                 | todoList = upsertById todo model.todoList
