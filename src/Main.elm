@@ -378,27 +378,32 @@ type NavItem
 
 viewNavItem : Route -> NavItem -> H.Html Msg
 viewNavItem route item =
+    let
+        viewNavBtnHelp title toRoute =
+            navBtn (route == toRoute) title (ChangeRouteTo toRoute)
+    in
     case item of
         NavInbox ->
-            navBtn route "Inbox" RouteInbox
+            viewNavBtnHelp "Inbox" RouteInbox
 
         NavToday ->
-            navBtn route "Today" RouteToday
+            viewNavBtnHelp "Today" RouteToday
 
         NavProjects list ->
             col []
                 [ row [ A.class "pv2" ] [ H.text "Projects:" ]
-                , col [ A.class "pl2" ] (list |> List.map (\(NavProject { id, title }) -> navBtn route title (RouteProject id)))
+                , col [ A.class "pl2" ]
+                    (list
+                        |> List.map
+                            (\(NavProject { id, title }) ->
+                                viewNavBtnHelp title (RouteProject id)
+                            )
+                    )
                 ]
 
 
-navBtn : Route -> String -> Route -> H.Html Msg
-navBtn currentRoute title toRoute =
-    navBtnHelp (currentRoute == toRoute) title (ChangeRouteTo toRoute)
-
-
-navBtnHelp : Bool -> String -> msg -> H.Html msg
-navBtnHelp isActive title msg =
+navBtn : Bool -> String -> msg -> H.Html msg
+navBtn isActive title msg =
     H.button
         [ A.class "tl pa1"
         , A.classList
