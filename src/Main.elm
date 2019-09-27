@@ -539,7 +539,12 @@ viewTodo todo =
             , E.onClick (editTodoClicked todo)
             ]
             [ H.text todo.title ]
-        , row [ A.class " " ] [ H.text <| todoProjectTitle todo ]
+        , row [ A.class "pa1" ] [ H.text <| todoProjectTitle todo ]
+        , todo.maybeDueDate
+            |> MX.unwrap (H.text "")
+                (\dueDate ->
+                    row [ A.class "pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
+                )
         ]
 
 
