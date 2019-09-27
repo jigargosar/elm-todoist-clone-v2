@@ -399,7 +399,7 @@ viewTodoList { maybeTodoForm, todoList } =
                 case maybeTodoForm of
                     Just (EditTodoForm editTodo) ->
                         if todo.id == editTodo.id then
-                            viewTodo todo
+                            viewEditTodo editTodo
 
                         else
                             viewTodo todo
@@ -422,6 +422,14 @@ viewTodo todo =
             , E.onClick (editTodoClicked todo)
             ]
             [ H.text todo.title ]
+        ]
+
+
+viewEditTodo : Todo -> H.Html Msg
+viewEditTodo todo =
+    col [ A.class "pa1" ]
+        [ col [ A.class "pv1" ] [ ipt2 todo.title (\_ -> NoOp) ]
+        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
 
