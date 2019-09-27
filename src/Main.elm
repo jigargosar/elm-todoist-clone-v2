@@ -64,17 +64,21 @@ type alias Todo =
     }
 
 
-createTodo : String -> String -> Todo
-createTodo id title =
+createMockTodo : String -> String -> Todo
+createMockTodo id title =
     Todo (TodoId id) title False False
 
 
+createTodoFromFields id { title } =
+    Todo id title False False
+
+
 initialTodoList =
-    [ createTodo "1" "Get Milk!!"
-    , createTodo "2" "Submit assignment"
-    , createTodo "3" "Check Facebook"
-    , createTodo "4" "Go to movies"
-    , createTodo "5" "Get Milk!!"
+    [ createMockTodo "1" "Get Milk!!"
+    , createMockTodo "2" "Submit assignment"
+    , createMockTodo "3" "Check Facebook"
+    , createMockTodo "4" "Go to movies"
+    , createMockTodo "5" "Get Milk!!"
     ]
 
 
