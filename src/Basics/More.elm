@@ -1,4 +1,4 @@
-module Basics.More exposing (callWith, idEq, updateWhenIdEq, when)
+module Basics.More exposing (HasId, callWith, idEq, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -29,3 +29,12 @@ updateWhenIdEq id =
 callWith : a -> (a -> b) -> b
 callWith =
     (|>)
+
+
+upsertById : { a | id : id } -> List (HasId a id) -> List (HasId a id)
+upsertById item itemList =
+    if List.any (idEq item.id) itemList then
+        updateWhenIdEq item.id (always item) itemList
+
+    else
+        item :: itemList

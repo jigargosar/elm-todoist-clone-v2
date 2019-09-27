@@ -1,13 +1,13 @@
 port module Main exposing (main)
 
-import Basics.More exposing (updateWhenIdEq)
+import Basics.More exposing (HasId, idEq, updateWhenIdEq, upsertById)
 import Browser
 import Html
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Pipeline exposing (optional, required)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
@@ -69,6 +69,11 @@ createTodo id title =
     Todo (TodoId id) title False False
 
 
+mockTodoForAddTodoFormSave : Todo
+mockTodoForAddTodoFormSave =
+    Todo (TodoId "6") "Newly Added Todo" False False
+
+
 initialTodoList =
     [ createTodo "1" "Get Milk!!"
     , createTodo "2" "Submit assignment"
@@ -125,20 +130,10 @@ cacheDecoder =
                 |> required "title" JD.string
                 |> required "isDone" JD.bool
                 |> optional "isDeleted" JD.bool False
-
-        fieldsDecoder : Decoder TodoFormFields
-        fieldsDecoder =
-            JD.succeed TodoFormFields
-                |> required "title" JD.string
-
-        todoFormDecoder : Decoder AddTodoForm
-        todoFormDecoder =
-            JD.succeed AddTodoForm
-                |> required "fields" fieldsDecoder
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
-        |> optional "addTodo" (todoFormDecoder |> JD.map On) Off
+        |> hardcoded Off
 
 
 cacheModel : Model -> Cmd msg
@@ -157,28 +152,10 @@ cacheModel model =
                 , ( "isDeleted", JE.bool isDeleted )
                 ]
 
-        addTodoEncoder : AddTodoForm -> Value
-        addTodoEncoder { fields } =
-            let
-                fieldsEncoder { title } =
-                    object [ ( "title", JE.string title ) ]
-            in
-            object
-                [ ( "fields", fieldsEncoder fields )
-                ]
-
         modelEncoder : Model -> Value
         modelEncoder { todoList, addTodo } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
-                , ( "addTodo"
-                  , case addTodo of
-                        On form ->
-                            addTodoEncoder form
-
-                        Off ->
-                            JE.null
-                  )
                 ]
 
         modelValue =
@@ -214,12 +191,8 @@ type alias Flags =
     }
 
 
-type alias TodoFormFields =
-    { title : String }
-
-
 type alias AddTodoForm =
-    { fields : TodoFormFields }
+    {}
 
 
 type Toggle a
@@ -324,11 +297,11 @@ update msg model =
         Save ->
             model.addTodo
                 |> unwrapToggle ( model, Cmd.none )
-                    (\{ fields } ->
+                    (\_ ->
                         let
                             newModel =
                                 { model
-                                    | todoList = createTodo "" fields.title :: model.todoList
+                                    | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
                                     , addTodo = Off
                                 }
                         in
@@ -445,20 +418,15 @@ viewTodo todo =
 
 addTodoFormClicked : Msg
 addTodoFormClicked =
-    AddTodoForm { title = "" } |> setAddTodoForm
-
-
-patchAddTodoTitle : AddTodoForm -> String -> Msg
-patchAddTodoTitle { fields } title =
-    AddTodoForm { fields | title = title } |> setAddTodoForm
+    {} |> setAddTodoForm
 
 
 viewAddTodo : Toggle AddTodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
-        On ({ fields } as form) ->
+        On _ ->
             col [ A.class "pa1" ]
-                [ col [ A.class "pv1" ] [ ipt2 fields.title (patchAddTodoTitle form) ]
+                [ col [ A.class "pv1" ] [ ipt2 "New Todo Title" (\_ -> NoOp) ]
                 , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
