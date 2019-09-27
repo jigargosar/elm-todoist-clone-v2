@@ -310,7 +310,9 @@ update msg model =
                 Just form ->
                     case form of
                         AddTodoForm fields ->
-                            ( model, Random.generate (AddTodoAndCloseFormAndCache fields) todoIdGen )
+                            ( model
+                            , Random.generate (AddTodoAndCloseFormAndCache fields) todoIdGen
+                            )
 
                         EditTodoForm editingTodo ->
                             upsertTodoAndCloseFormAndCache editingTodo model
