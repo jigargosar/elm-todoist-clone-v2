@@ -12,6 +12,7 @@ import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
 import Random
+import Time
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
@@ -240,13 +241,16 @@ type alias Model =
     { todoList : List Todo
     , maybeTodoForm : Maybe TodoForm
     , route : Route
+    , zone : Time.Zone
     }
 
 
+defaultModel : Model
 defaultModel =
     { todoList = initialTodoList
     , maybeTodoForm = Nothing
     , route = RouteProject (ProjectId "1")
+    , zone = Time.utc
     }
 
 
@@ -284,6 +288,7 @@ type Msg
     | Save
     | ChangeRouteTo Route
     | ResetModel
+    | GotZone Time.Zone
 
 
 setTodoForm : TodoForm -> Msg
@@ -319,6 +324,9 @@ update msg model =
 
         ResetModel ->
             ( defaultModel, cacheModel defaultModel )
+
+        GotZone zone ->
+            ( { model | zone = zone }, Cmd.none )
 
         ChangeRouteTo route ->
             ( { model | route = route, maybeTodoForm = Nothing }, Cmd.none )
