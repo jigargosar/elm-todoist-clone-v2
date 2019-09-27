@@ -69,7 +69,7 @@ createMockTodo id title =
     Todo (TodoId id) title False False
 
 
-createTodoFromFields id { title } =
+todoFromFields id { title } =
     Todo id title False False
 
 
