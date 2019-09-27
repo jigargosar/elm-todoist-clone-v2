@@ -9,6 +9,7 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
+import Random
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
@@ -54,6 +55,12 @@ initialProjectList =
 
 type TodoId
     = TodoId String
+
+
+todoIdGen : Random.Generator TodoId
+todoIdGen =
+    Random.int (10 ^ 3) (10 ^ 5)
+        |> Random.map (String.fromInt >> (++) "TodoId-" >> TodoId)
 
 
 type alias Todo =
