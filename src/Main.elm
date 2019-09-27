@@ -491,13 +491,13 @@ viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
     case route of
         RouteInbox ->
-            todoDisplayItemsForMaybeProjectId Nothing model |> viewTodoListItems
+            todoDisplayItemsForMaybeProjectId Nothing model |> viewTodoDisplayItems
 
         RouteToday ->
             viewRoute model RouteInbox
 
         RouteProject projectId ->
-            todoDisplayItemsForMaybeProjectId (Just projectId) model |> viewTodoListItems
+            todoDisplayItemsForMaybeProjectId (Just projectId) model |> viewTodoDisplayItems
 
 
 type TodoListDisplayItem
@@ -540,7 +540,7 @@ todoDisplayItemsFromTodoList layout maybeTodoForm todoList =
         todoList
 
 
-viewTodoListItems =
+viewTodoDisplayItems =
     let
         viewItem item =
             case item of
