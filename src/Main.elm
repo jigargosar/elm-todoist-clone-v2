@@ -503,7 +503,7 @@ viewRoute model route =
 type TodoListItem
     = TodoItem Todo
     | EditTodoItem Todo
-    | ProjectAddTodoBtn (Maybe ProjectId)
+    | AddTodoToProjectItem (Maybe ProjectId)
     | AddTodoFormItem AddTodoFields
 
 
@@ -519,7 +519,7 @@ maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
                     AddTodoFormItem fields
 
                 _ ->
-                    ProjectAddTodoBtn maybeProjectId
+                    AddTodoToProjectItem maybeProjectId
            ]
 
 
@@ -550,7 +550,7 @@ viewTodoListItems =
                 EditTodoItem todo ->
                     viewEditTodoForm todo
 
-                ProjectAddTodoBtn maybeProjectId ->
+                AddTodoToProjectItem maybeProjectId ->
                     row [ A.class "pa1" ] [ btn2 "add todo" (AddTodoFormClicked maybeProjectId) ]
 
                 AddTodoFormItem fields ->
