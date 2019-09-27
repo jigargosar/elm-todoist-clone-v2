@@ -513,7 +513,7 @@ todoDisplayItemsForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
-    todoListDisplayItems ProjectItemLayout maybeTodoForm filteredTodoList
+    todoDisplayItemsFromTodoList ProjectItemLayout maybeTodoForm filteredTodoList
         ++ [ case maybeTodoForm of
                 Just (AddTodoForm fields) ->
                     AddTodoFormItem fields
@@ -523,7 +523,7 @@ todoDisplayItemsForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
            ]
 
 
-todoListDisplayItems layout maybeTodoForm todoList =
+todoDisplayItemsFromTodoList layout maybeTodoForm todoList =
     List.map
         (\todo ->
             case maybeTodoForm of
