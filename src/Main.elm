@@ -448,33 +448,25 @@ viewTodo todo =
         ]
 
 
-editTodoConfig todo =
-    let
-        setForm =
-            setTodoForm << EditTodoForm
-    in
-    { titleChanged = \title -> setForm { todo | title = title }
-    }
-
-
-addTodoConfig fields =
-    let
-        setForm =
-            setTodoForm << AddTodoForm
-    in
-    { titleChanged = \title -> setForm { fields | title = title } }
-
-
 viewEditTodo : Todo -> H.Html Msg
 viewEditTodo todo =
-    viewEditTodoForm (editTodoConfig todo) todo
+    let
+        editTodoConfig =
+            let
+                setForm =
+                    setTodoForm << EditTodoForm
+            in
+            { titleChanged = \title -> setForm { todo | title = title }
+            }
+    in
+    viewEditTodoForm editTodoConfig todo
 
 
 viewAddTodo : Maybe TodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
         Just (AddTodoForm fields) ->
-            viewAddTodoForm (addTodoConfig fields) fields
+            viewAddTodoForm fields
 
         Nothing ->
             row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
@@ -487,8 +479,16 @@ viewEditTodoForm config =
     viewTodoForm config
 
 
-viewAddTodoForm config =
-    viewTodoForm config
+viewAddTodoForm fields =
+    let
+        config =
+            let
+                setForm =
+                    setTodoForm << AddTodoForm
+            in
+            { titleChanged = \title -> setForm { fields | title = title } }
+    in
+    viewTodoForm config fields
 
 
 viewTodoForm config { title } =
