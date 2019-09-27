@@ -9,7 +9,7 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
-import UI exposing (btn1, btn2, checkbox3, col, ipt2, row)
+import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
 type Route
@@ -283,6 +283,7 @@ type Msg
     | PatchTodo TodoId TodoPatch
     | SetAddTodoToggle (Toggle AddTodoForm)
     | Save
+    | ChangeRouteTo Route
 
 
 setAddTodoForm : AddTodoForm -> Msg
@@ -334,6 +335,9 @@ update msg model =
                         ( newModel, cacheModel newModel )
                     )
 
+        ChangeRouteTo route ->
+            ( { model | route = route }, Cmd.none )
+
 
 subscriptions : Model -> Sub msg
 subscriptions _ =
@@ -376,10 +380,10 @@ viewNavItem : Route -> NavItem -> H.Html Msg
 viewNavItem route item =
     case item of
         NavInbox ->
-            navBtn (route == RouteInbox) "Inbox"
+            navBtnNoOp (route == RouteInbox) "Inbox"
 
         NavToday ->
-            navBtn (route == RouteToday) "Today"
+            navBtnNoOp (route == RouteToday) "Today"
 
         NavProjects list ->
             col []
@@ -388,19 +392,25 @@ viewNavItem route item =
                 ]
 
 
-navBtn : Bool -> String -> H.Html msg
-navBtn isActive title =
+navBtnNoOp : Bool -> String -> H.Html Msg
+navBtnNoOp isActive title =
+    navBtn isActive title NoOp
+
+
+navBtn : Bool -> String -> msg -> H.Html msg
+navBtn isActive title msg =
     H.button
         [ A.class "tl pa1"
         , A.classList
             [ ( "white bg-primary", isActive ), ( "color-primary", not isActive ) ]
+        , E.onClick msg
         ]
         [ H.text title ]
 
 
-viewNavProject : Route -> NavProject -> H.Html msg
+viewNavProject : Route -> NavProject -> H.Html Msg
 viewNavProject route (NavProject { id, title }) =
-    navBtn (route == RouteProject id) title
+    navBtnNoOp (route == RouteProject id) title
 
 
 viewPage : Model -> Route -> List (H.Html Msg)
