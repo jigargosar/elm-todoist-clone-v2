@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Basics.More exposing (HasId, updateWhenIdEq, upsertById)
 import Browser
+import Date exposing (Date)
 import Html
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -95,7 +96,7 @@ type alias Todo =
     , isDone : Bool
     , isDeleted : Bool
     , maybeProjectId : Maybe ProjectId
-    , maybeDueDate : Maybe Time.Posix
+    , maybeDueDate : Maybe Date
     }
 
 
@@ -167,7 +168,7 @@ cacheDecoder =
                 |> optional "maybeProjectId"
                     (JD.string |> JD.map (ProjectId >> Just))
                     Nothing
-                |> optional "maybeDueDate" (JD.int |> JD.map (Time.millisToPosix >> Just)) Nothing
+                |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
@@ -187,7 +188,7 @@ cacheModel model =
                 , ( "isDone", JE.bool isDone )
                 , ( "isDeleted", JE.bool isDeleted )
                 , ( "maybeProjectId", maybeEncoder projectIdEncoder maybeProjectId )
-                , ( "maybeDueDate", maybeEncoder (Time.posixToMillis >> JE.int) maybeDueDate )
+                , ( "maybeDueDate", maybeEncoder (Date.toIsoString >> JE.string) maybeDueDate )
                 ]
 
         modelEncoder : Model -> Value
@@ -233,7 +234,7 @@ type alias AddTodoFields =
     { newTodoId : TodoId
     , title : String
     , maybeProjectId : Maybe ProjectId
-    , maybeDueDate : Maybe Time.Posix
+    , maybeDueDate : Maybe Date
     }
 
 
@@ -247,7 +248,7 @@ type alias Model =
     , maybeTodoForm : Maybe TodoForm
     , route : Route
     , zone : Time.Zone
-    , today : Time.Posix
+    , today : Date
     }
 
 
@@ -257,7 +258,7 @@ defaultModel =
     , maybeTodoForm = Nothing
     , route = RouteProject (ProjectId "1")
     , zone = Time.utc
-    , today = Time.millisToPosix 0
+    , today = Date.fromRataDie 0
     }
 
 
@@ -289,7 +290,7 @@ getZone =
 
 
 getToday =
-    Time.now |> Task.perform GotToday
+    Date.today |> Task.perform GotToday
 
 
 mapTodoList : (small -> small) -> { big | todoList : small } -> { big | todoList : small }
@@ -310,7 +311,7 @@ type Msg
     | ChangeRouteTo Route
     | ResetModel
     | GotZone Time.Zone
-    | GotToday Time.Posix
+    | GotToday Date
 
 
 setTodoForm : TodoForm -> Msg
@@ -599,7 +600,22 @@ viewTodoForm config { title, maybeProjectId, maybeDueDate } =
 
 
 viewDueDateInput maybeDueDate =
-    H.input [ A.type_ "date" ] []
+    let
+        dateVal =
+            maybeDueDate
+                |> MX.unwrap "" Date.toIsoString
+    in
+    H.input
+        [ A.type_ "date"
+        , A.value dateVal
+        , E.onInput
+            (Date.fromIsoString
+                >> Result.toMaybe
+                >> Debug.log "dateChanged"
+                >> always NoOp
+            )
+        ]
+        []
 
 
 viewProjectSelect maybeProjectId projectIdChanged =
