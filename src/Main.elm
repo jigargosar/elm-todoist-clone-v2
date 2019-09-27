@@ -502,6 +502,7 @@ viewRoute model route =
 
 type TodoListItem
     = ProjectTodoItem Todo
+    | DueDateGroupedTodoItem Todo
     | EditTodoItem Todo
     | AddTodoToProjectItem (Maybe ProjectId)
     | AddTodoFormItem AddTodoFields
@@ -546,6 +547,9 @@ viewTodoListItems =
             case item of
                 ProjectTodoItem todo ->
                     viewTodo { hideProjectName = True } todo
+
+                DueDateGroupedTodoItem todo ->
+                    viewTodo { hideProjectName = False } todo
 
                 EditTodoItem todo ->
                     viewEditTodoForm todo
