@@ -196,7 +196,7 @@ type alias Flags =
 
 
 type alias AddTodoFields =
-    { title : String }
+    { id : TodoId, title : String }
 
 
 type TodoForm
@@ -247,6 +247,7 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
+    | AddTodoFormClicked
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | AddTodoAndCloseFormAndCache AddTodoFields TodoId
@@ -261,7 +262,8 @@ setTodoForm form =
 
 addTodoFormClicked : Msg
 addTodoFormClicked =
-    setTodoForm (AddTodoForm { title = "" })
+    --    setTodoForm (AddTodoForm { title = "" })
+    AddTodoFormClicked
 
 
 editTodoClicked : Todo -> Msg
@@ -294,6 +296,9 @@ update msg model =
                         |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
             in
             ( newModel, cacheModel newModel )
+
+        AddTodoFormClicked ->
+            ( model, todoIdGen |> Random.generate (\todoId -> setTodoForm (AddTodoForm { id = todoId, title = "" })) )
 
         SetMaybeTodoForm addTodo ->
             let
