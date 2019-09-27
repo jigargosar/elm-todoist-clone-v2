@@ -15,12 +15,40 @@ import UI exposing (btn1, btn2, checkbox3, col, ipt2, row)
 type Route
     = RouteInbox
     | RouteToday
-    | RouteProject
+    | RouteProject ProjectId
 
 
 
 --    | Next7Days
 --    | Search
+-- PROJECT
+
+
+type ProjectId
+    = ProjectId String
+
+
+type alias Project =
+    { id : ProjectId
+    , title : String
+    , isDeleted : Bool
+    }
+
+
+createProject : String -> String -> Project
+createProject id title =
+    Project (ProjectId id) title False
+
+
+initialProjectList =
+    [ createProject "1" "Build Utils"
+    , createProject "2" "Publish Post"
+    , createProject "3" "Complete Story"
+    , createProject "4" "Exam Prep"
+    ]
+
+
+
 -- TODO_
 
 
@@ -328,18 +356,14 @@ viewNav { route } =
             [ NavInbox
             , NavToday
             , NavProjects
-                [ NavProject "Build Utils"
-                , NavProject "Publish Post"
-                , NavProject "Complete Story"
-                , NavProject "Exam Prep"
-                ]
+                (initialProjectList |> List.map NavProject)
             ]
     in
     navItems |> List.map (viewNavItem route)
 
 
 type NavProject
-    = NavProject String
+    = NavProject Project
 
 
 type NavItem
@@ -360,7 +384,7 @@ viewNavItem route item =
         NavProjects list ->
             col []
                 [ row [ A.class "pv2" ] [ H.text "Projects:" ]
-                , col [ A.class "pl2" ] (list |> List.map (viewNavProject False))
+                , col [ A.class "pl2" ] (list |> List.map (viewNavProject route))
                 ]
 
 
@@ -374,9 +398,9 @@ navBtn isActive title =
         [ H.text title ]
 
 
-viewNavProject : Bool -> NavProject -> H.Html msg
-viewNavProject isActive (NavProject title) =
-    navBtn isActive title
+viewNavProject : Route -> NavProject -> H.Html msg
+viewNavProject route (NavProject { id, title }) =
+    navBtn (route == RouteProject id) title
 
 
 viewPage : Model -> Route -> List (H.Html Msg)
@@ -390,7 +414,7 @@ viewPage model route =
         RouteToday ->
             viewPage model RouteInbox
 
-        RouteProject ->
+        RouteProject _ ->
             viewPage model RouteInbox
 
 
