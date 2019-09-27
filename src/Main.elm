@@ -428,7 +428,7 @@ view model =
             [ row [ A.class "bg-black-10 pa1" ] [ btn2 "Reset" ResetModel ]
             , row []
                 [ col [ A.class "pa2" ] (viewNav model)
-                , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewPage model model.route)
+                , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewRoute model model.route)
                 ]
             ]
 
@@ -493,8 +493,8 @@ navBtn isActive title msg =
         [ H.text title ]
 
 
-viewPage : Model -> Route -> List (H.Html Msg)
-viewPage model route =
+viewRoute : Model -> Route -> List (H.Html Msg)
+viewRoute model route =
     case route of
         RouteInbox ->
             [ viewTodoList model
@@ -502,10 +502,10 @@ viewPage model route =
             ]
 
         RouteToday ->
-            viewPage model RouteInbox
+            viewRoute model RouteInbox
 
         RouteProject _ ->
-            viewPage model RouteInbox
+            viewRoute model RouteInbox
 
 
 viewTodoList : { a | maybeTodoForm : Maybe TodoForm, todoList : List Todo } -> H.Html Msg
