@@ -500,20 +500,20 @@ viewRoute model route =
             maybeProjectIdViewModel (Just projectId) model |> viewTodoListItems
 
 
-type TodoListItem
+type TodoListDisplayItem
     = TodoItem TodoItemLayout Todo
     | EditTodoItem Todo
     | AddTodoToProjectItem (Maybe ProjectId)
     | AddTodoFormItem AddTodoFields
 
 
-maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListItem
+maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListDisplayItem
 maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
     let
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
-    todoItemsFromList ProjectItemLayout maybeTodoForm filteredTodoList
+    todoListDisplayItems ProjectItemLayout maybeTodoForm filteredTodoList
         ++ [ case maybeTodoForm of
                 Just (AddTodoForm fields) ->
                     AddTodoFormItem fields
@@ -523,7 +523,7 @@ maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
            ]
 
 
-todoItemsFromList layout maybeTodoForm todoList =
+todoListDisplayItems layout maybeTodoForm todoList =
     List.map
         (\todo ->
             case maybeTodoForm of
