@@ -402,7 +402,11 @@ viewTodo todo =
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
             ]
-        , row [ A.class "pa1 flex-grow-1" ] [ H.text todo.title ]
+        , row
+            [ A.class "pa1 flex-grow-1"
+            , E.onClick (editTodoClicked todo)
+            ]
+            [ H.text todo.title ]
         ]
 
 
