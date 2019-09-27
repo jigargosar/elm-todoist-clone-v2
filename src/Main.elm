@@ -450,23 +450,39 @@ viewTodo todo =
 
 viewEditTodo : Todo -> H.Html Msg
 viewEditTodo todo =
+    let
+        config =
+            editTodoConfig todo
+    in
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
             [ ipt2 todo.title
-                (\title -> setTodoForm (EditTodoForm { todo | title = title }))
+                config.titleChanged
             ]
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
+
+
+editTodoConfig todo =
+    { titleChanged = \title -> setTodoForm (EditTodoForm { todo | title = title })
+    }
+
+
+addTodoConfig fields =
+    { titleChanged = \title -> setTodoForm (AddTodoForm { fields | title = title }) }
 
 
 viewAddTodo : Maybe TodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
         Just (AddTodoForm fields) ->
+            let
+                config =
+                    addTodoConfig fields
+            in
             col [ A.class "pa1" ]
                 [ col [ A.class "pv1" ]
-                    [ ipt2 fields.title
-                        (\title -> setTodoForm (AddTodoForm { fields | title = title }))
+                    [ ipt2 fields.title config.titleChanged
                     ]
                 , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
