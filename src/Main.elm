@@ -149,17 +149,20 @@ cacheDecoder =
 cacheModel : Model -> Cmd msg
 cacheModel model =
     let
+        projectIdEncoder (ProjectId v) =
+            JE.string v
+
+        todoIdEncoder (TodoId v) =
+            JE.string v
+
         todoEncoder : Todo -> Value
-        todoEncoder { id, title, isDone, isDeleted } =
-            let
-                unwrapId (TodoId v) =
-                    v
-            in
+        todoEncoder { id, title, isDone, isDeleted, maybeProjectId } =
             object
-                [ ( "id", JE.string <| unwrapId id )
+                [ ( "id", todoIdEncoder id )
                 , ( "title", JE.string title )
                 , ( "isDone", JE.bool isDone )
                 , ( "isDeleted", JE.bool isDeleted )
+                , ( "maybeProjectId", maybeProjectId |> MX.unwrap JE.null projectIdEncoder )
                 ]
 
         modelEncoder : Model -> Value
