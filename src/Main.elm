@@ -30,12 +30,22 @@ type ProjectId
     = ProjectId String
 
 
+projectIdFromString : String -> Maybe ProjectId
 projectIdFromString str =
     if str |> String.trim |> String.isEmpty then
         Nothing
 
     else
         Just <| ProjectId (String.trim str)
+
+
+projectIdEncoder (ProjectId v) =
+    JE.string v
+
+
+projectIdToValueAttr : ProjectId -> H.Attribute msg
+projectIdToValueAttr (ProjectId str) =
+    A.value str
 
 
 type alias Project =
@@ -70,6 +80,10 @@ todoIdGen : Random.Generator TodoId
 todoIdGen =
     Random.int (10 ^ 3) (10 ^ 5)
         |> Random.map (String.fromInt >> (++) "TodoId-" >> TodoId)
+
+
+todoIdEncoder (TodoId v) =
+    JE.string v
 
 
 type alias Todo =
@@ -157,12 +171,6 @@ cacheDecoder =
 cacheModel : Model -> Cmd msg
 cacheModel model =
     let
-        projectIdEncoder (ProjectId v) =
-            JE.string v
-
-        todoIdEncoder (TodoId v) =
-            JE.string v
-
         maybeEncoder =
             MX.unwrap JE.null
 
@@ -538,10 +546,6 @@ viewTodoForm config { title } =
         , viewProjectSelect
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
-
-
-projectIdToValueAttr (ProjectId str) =
-    A.value str
 
 
 viewProjectSelect =
