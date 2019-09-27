@@ -497,9 +497,7 @@ viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
     case route of
         RouteInbox ->
-            [ viewTodoList model
-            , viewAddTodo model.maybeTodoForm
-            ]
+            inboxViewModel model |> viewTodoListItems
 
         RouteToday ->
             viewRoute model RouteInbox
@@ -514,8 +512,8 @@ type TodoListItem
     | AddTodoItem (Maybe AddTodoFields)
 
 
-viewInbox : Maybe TodoForm -> List Todo -> List TodoListItem
-viewInbox maybeTodoForm todoList =
+inboxViewModel : Model -> List TodoListItem
+inboxViewModel { maybeTodoForm, todoList } =
     let
         filteredTodoList =
             todoList |> List.filter (.maybeProjectId >> (==) Nothing)
@@ -555,24 +553,20 @@ viewInbox maybeTodoForm todoList =
     list ++ [ addTodoItem ]
 
 
-viewTodoList : { a | maybeTodoForm : Maybe TodoForm, todoList : List Todo } -> H.Html Msg
-viewTodoList { maybeTodoForm, todoList } =
-    col []
-        (List.map
-            (\todo ->
-                case maybeTodoForm of
-                    Just (EditTodoForm editTodo) ->
-                        if todo.id == editTodo.id then
-                            viewEditTodoForm editTodo
+viewTodoListItems =
+    let
+        viewItem item =
+            case item of
+                TodoItem todo ->
+                    viewTodo todo
 
-                        else
-                            viewTodo todo
+                EditTodoItem todo ->
+                    viewEditTodoForm todo
 
-                    _ ->
-                        viewTodo todo
-            )
-            todoList
-        )
+                AddTodoItem maybe ->
+                    viewAddTodo maybe
+    in
+    List.map viewItem
 
 
 viewTodo : Todo -> H.Html Msg
@@ -601,17 +595,14 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
-viewAddTodo : Maybe TodoForm -> H.Html Msg
+viewAddTodo : Maybe AddTodoFields -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
-        Just (AddTodoForm fields) ->
+        Just fields ->
             viewAddTodoForm fields
 
         Nothing ->
             row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
-
-        _ ->
-            H.text ""
 
 
 viewEditTodoForm fields =
