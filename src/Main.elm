@@ -39,8 +39,8 @@ projectIdFromString str =
         Just <| ProjectId (String.trim str)
 
 
-projectIdEncoder (ProjectId v) =
-    JE.string v
+projectIdEncoder (ProjectId str) =
+    JE.string str
 
 
 projectIdToValueAttr : ProjectId -> H.Attribute msg
@@ -55,16 +55,16 @@ type alias Project =
     }
 
 
-createProject : String -> String -> Project
-createProject id title =
+createMockProject : String -> String -> Project
+createMockProject id title =
     Project (ProjectId id) title False
 
 
 initialProjectList =
-    [ createProject "1" "Build Utils"
-    , createProject "2" "Publish Post"
-    , createProject "3" "Complete Story"
-    , createProject "4" "Exam Prep"
+    [ createMockProject "1" "Build Utils"
+    , createMockProject "2" "Publish Post"
+    , createMockProject "3" "Complete Story"
+    , createMockProject "4" "Exam Prep"
     ]
 
 
