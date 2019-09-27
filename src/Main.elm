@@ -217,7 +217,7 @@ unwrapToggle default func toggle =
 type alias Model =
     { todoList : List Todo
     , addTodo : Toggle AddTodoForm
-    , page : Route
+    , route : Route
     }
 
 
@@ -233,7 +233,7 @@ init flags =
         model =
             { todoList = cache.todoList
             , addTodo = cache.addTodo
-            , page = RouteInbox
+            , route = RouteInbox
             }
     in
     ( model
@@ -317,12 +317,12 @@ view model =
     H.toUnstyled <|
         row [ A.class "sans-serif ph4" ]
             [ col [ A.class "pa2 measure-wide" ] (viewNav model)
-            , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewPage model model.page)
+            , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewPage model model.route)
             ]
 
 
 viewNav : Model -> List (H.Html Msg)
-viewNav { page } =
+viewNav { route } =
     let
         navItems =
             [ NavInbox
