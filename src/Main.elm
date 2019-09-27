@@ -1,13 +1,13 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, idEq, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, updateWhenIdEq, upsertById)
 import Browser
 import Html
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import Maybe.Extra as MX
 import UI exposing (btn2, checkbox3, col, ipt2, row)
@@ -112,13 +112,12 @@ port setCache : String -> Cmd msg
 
 type alias Cache =
     { todoList : List Todo
-    , addTodo : Maybe AddTodoForm
     }
 
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = initialTodoList, addTodo = Nothing }
+    { todoList = initialTodoList }
 
 
 cacheDecoder : JD.Decoder Cache
@@ -134,7 +133,6 @@ cacheDecoder =
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
-        |> hardcoded Nothing
 
 
 cacheModel : Model -> Cmd msg
@@ -214,7 +212,7 @@ init flags =
         model : Model
         model =
             { todoList = cache.todoList
-            , maybeAddTodoForm = cache.addTodo
+            , maybeAddTodoForm = Nothing
             , route = RouteProject (ProjectId "1")
             }
     in
