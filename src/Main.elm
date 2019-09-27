@@ -508,6 +508,50 @@ viewRoute model route =
             viewRoute model RouteInbox
 
 
+type TodoListItem
+    = TodoItem Todo
+    | EditTodoItem Todo
+    | AddTodoItem (Maybe AddTodoFields)
+
+
+viewInbox : Maybe TodoForm -> List Todo -> List TodoListItem
+viewInbox maybeTodoForm todoList =
+    let
+        list : List TodoListItem
+        list =
+            List.map
+                (\todo ->
+                    case maybeTodoForm of
+                        Just (EditTodoForm editTodo) ->
+                            if todo.id == editTodo.id then
+                                EditTodoItem editTodo
+
+                            else
+                                TodoItem todo
+
+                        _ ->
+                            TodoItem todo
+                )
+                todoList
+
+        addTodoItem : TodoListItem
+        addTodoItem =
+            AddTodoItem
+                (maybeTodoForm
+                    |> Maybe.andThen
+                        (\form ->
+                            case form of
+                                AddTodoForm fields ->
+                                    Just fields
+
+                                _ ->
+                                    Nothing
+                        )
+                )
+    in
+    list ++ [ addTodoItem ]
+
+
 viewTodoList : { a | maybeTodoForm : Maybe TodoForm, todoList : List Todo } -> H.Html Msg
 viewTodoList { maybeTodoForm, todoList } =
     col []
