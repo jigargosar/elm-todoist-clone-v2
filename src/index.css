@@ -5,6 +5,7 @@
   --spc3: 1rem;
   --spc4: 2rem;
   --primary-color: dodgerblue;
+  --primary-color-light: hsla(210, 100%, 56%, 0.5);
 }
 
 button {
@@ -18,7 +19,7 @@ button {
 button:focus,
 input:focus {
   outline-offset: -0.1rem;
-  outline: hsla(210, 100%, 56%, 0.5) solid thick;
+  outline: var(--primary-color-light) solid thick;
 }
 
 .ph1 {
@@ -63,8 +64,12 @@ input:focus {
   color: var(--primary-color);
 }
 
-.bg-primary-color {
+.bg-primary {
   background-color: var(--primary-color);
+}
+
+.bg-primary-light {
+  background-color: var(--primary-color-light);
 }
 
 .sz-24 {
