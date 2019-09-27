@@ -582,8 +582,13 @@ viewTodoForm config { title, maybeProjectId } =
             [ ipt2 title config.titleChanged
             ]
         , viewProjectSelect maybeProjectId config.projectIdChanged
+        , viewDueDateInput
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
+
+
+viewDueDateInput =
+    H.input [ A.type_ "date" ] []
 
 
 viewProjectSelect maybeProjectId projectIdChanged =
