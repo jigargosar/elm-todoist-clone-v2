@@ -369,7 +369,7 @@ navBtn isActive title =
     H.button
         [ A.class "tl pa1"
         , A.classList
-            [ ( "white bg-primary-color", isActive ), ( "primary-color", not isActive ) ]
+            [ ( "white bg-primary", isActive ), ( "primary-color", not isActive ) ]
         ]
         [ H.text title ]
 
