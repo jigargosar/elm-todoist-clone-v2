@@ -5,7 +5,6 @@
   --spc3: 1rem;
   --spc4: 2rem;
   --primary-color: dodgerblue;
-  --primary-color-light: hsla(210, 100%, 56%, 0.5);
 }
 
 button {
@@ -14,13 +13,6 @@ button {
   display: unset;
   padding: unset;
   margin: unset;
-}
-
-button:focus,
-input:focus {
-  outline-offset: -0.1rem;
-  outline-color: var(--primary-color);
-  outline-style: dot-dash;
 }
 
 .ph1 {
@@ -61,7 +53,7 @@ input:focus {
   flex-direction: column;
 }
 
-.primary-color {
+.color-primary {
   color: var(--primary-color);
 }
 
@@ -69,9 +61,6 @@ input:focus {
   background-color: var(--primary-color);
 }
 
-.bg-primary-light {
-  background-color: var(--primary-color-light);
-}
 
 .sz-24 {
   width: 24px;
