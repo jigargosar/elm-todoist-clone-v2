@@ -380,10 +380,10 @@ viewNavItem : Route -> NavItem -> H.Html Msg
 viewNavItem route item =
     case item of
         NavInbox ->
-            navBtnNoOp (route == RouteInbox) "Inbox"
+            navBtn (route == RouteInbox) "Inbox" (ChangeRouteTo RouteInbox)
 
         NavToday ->
-            navBtnNoOp (route == RouteToday) "Today"
+            navBtn (route == RouteToday) "Today" (ChangeRouteTo RouteToday)
 
         NavProjects list ->
             col []
@@ -410,7 +410,7 @@ navBtn isActive title msg =
 
 viewNavProject : Route -> NavProject -> H.Html Msg
 viewNavProject route (NavProject { id, title }) =
-    navBtnNoOp (route == RouteProject id) title
+    navBtn (route == RouteProject id) title (ChangeRouteTo (RouteProject id))
 
 
 viewPage : Model -> Route -> List (H.Html Msg)
