@@ -155,6 +155,9 @@ cacheModel model =
         todoIdEncoder (TodoId v) =
             JE.string v
 
+        maybeEncoder =
+            MX.unwrap JE.null
+
         todoEncoder : Todo -> Value
         todoEncoder { id, title, isDone, isDeleted, maybeProjectId } =
             object
@@ -162,7 +165,7 @@ cacheModel model =
                 , ( "title", JE.string title )
                 , ( "isDone", JE.bool isDone )
                 , ( "isDeleted", JE.bool isDeleted )
-                , ( "maybeProjectId", maybeProjectId |> MX.unwrap JE.null projectIdEncoder )
+                , ( "maybeProjectId", maybeEncoder projectIdEncoder maybeProjectId )
                 ]
 
         modelEncoder : Model -> Value
