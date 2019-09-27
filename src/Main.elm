@@ -422,7 +422,7 @@ viewTodoList { maybeTodoForm, todoList } =
                 case maybeTodoForm of
                     Just (EditTodoForm editTodo) ->
                         if todo.id == editTodo.id then
-                            viewEditTodo editTodo
+                            viewEditTodoForm editTodo
 
                         else
                             viewTodo todo
@@ -448,20 +448,6 @@ viewTodo todo =
         ]
 
 
-viewEditTodo : Todo -> H.Html Msg
-viewEditTodo todo =
-    let
-        editTodoConfig =
-            let
-                setForm =
-                    setTodoForm << EditTodoForm
-            in
-            { titleChanged = \title -> setForm { todo | title = title }
-            }
-    in
-    viewEditTodoForm editTodoConfig todo
-
-
 viewAddTodo : Maybe TodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
@@ -475,17 +461,26 @@ viewAddTodo addTodo =
             H.text ""
 
 
-viewEditTodoForm config =
-    viewTodoForm config
+viewEditTodoForm : Todo -> H.Html Msg
+viewEditTodoForm todo =
+    let
+        editTodoConfig =
+            let
+                setForm =
+                    setTodoForm << EditTodoForm
+            in
+            { titleChanged = \title -> setForm { todo | title = title }
+            }
+    in
+    viewTodoForm editTodoConfig todo
 
 
 viewAddTodoForm fields =
     let
+        setForm =
+            setTodoForm << AddTodoForm
+
         config =
-            let
-                setForm =
-                    setTodoForm << AddTodoForm
-            in
             { titleChanged = \title -> setForm { fields | title = title } }
     in
     viewTodoForm config fields
