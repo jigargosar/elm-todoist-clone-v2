@@ -501,8 +501,7 @@ viewRoute model route =
 
 
 type TodoListItem
-    = ProjectTodoItem Todo
-    | DueDateGroupedTodoItem Todo
+    = TodoItem TodoItemLayout Todo
     | EditTodoItem Todo
     | AddTodoToProjectItem (Maybe ProjectId)
     | AddTodoFormItem AddTodoFields
@@ -514,7 +513,7 @@ maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
-    todoItemsFromList maybeTodoForm filteredTodoList
+    todoItemsFromList ProjectItemLayout maybeTodoForm filteredTodoList
         ++ [ case maybeTodoForm of
                 Just (AddTodoForm fields) ->
                     AddTodoFormItem fields
@@ -524,7 +523,7 @@ maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
            ]
 
 
-todoItemsFromList maybeTodoForm todoList =
+todoItemsFromList layout maybeTodoForm todoList =
     List.map
         (\todo ->
             case maybeTodoForm of
@@ -533,10 +532,10 @@ todoItemsFromList maybeTodoForm todoList =
                         EditTodoItem editTodo
 
                     else
-                        ProjectTodoItem todo
+                        TodoItem layout todo
 
                 _ ->
-                    ProjectTodoItem todo
+                    TodoItem layout todo
         )
         todoList
 
@@ -545,11 +544,8 @@ viewTodoListItems =
     let
         viewItem item =
             case item of
-                ProjectTodoItem todo ->
-                    viewTodo { hideProjectName = True } todo
-
-                DueDateGroupedTodoItem todo ->
-                    viewTodo { hideProjectName = False } todo
+                TodoItem layout todo ->
+                    viewTodo layout todo
 
                 EditTodoItem todo ->
                     viewEditTodoForm todo
@@ -563,8 +559,13 @@ viewTodoListItems =
     List.map viewItem
 
 
-viewTodo : { hideProjectName : Bool } -> Todo -> H.Html Msg
-viewTodo opts todo =
+type TodoItemLayout
+    = ProjectItemLayout
+    | DueDateItemLayout
+
+
+viewTodo : TodoItemLayout -> Todo -> H.Html Msg
+viewTodo layout todo =
     row []
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
@@ -579,7 +580,7 @@ viewTodo opts todo =
                 (\dueDate ->
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
                 )
-        , if opts.hideProjectName then
+        , if layout == ProjectItemLayout then
             H.text ""
 
           else
