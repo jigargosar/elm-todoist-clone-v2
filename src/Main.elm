@@ -511,9 +511,16 @@ maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListItem
 maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
     let
         filteredTodoList =
-            todoList |> List.filter (propEq .maybeProjectId maybeProjectId)
+            List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
-    todoItemsFromList maybeTodoForm filteredTodoList ++ [ projectAddTodoItem maybeProjectId maybeTodoForm ]
+    todoItemsFromList maybeTodoForm filteredTodoList
+        ++ [ case maybeTodoForm of
+                Just (AddTodoForm fields) ->
+                    ProjectAddTodoForm fields
+
+                _ ->
+                    ProjectAddTodoBtn maybeProjectId
+           ]
 
 
 todoItemsFromList maybeTodoForm todoList =
@@ -531,16 +538,6 @@ todoItemsFromList maybeTodoForm todoList =
                     TodoItem todo
         )
         todoList
-
-
-projectAddTodoItem : Maybe ProjectId -> Maybe TodoForm -> TodoListItem
-projectAddTodoItem maybeProjectId maybeTodoForm =
-    case maybeTodoForm of
-        Just (AddTodoForm fields) ->
-            ProjectAddTodoForm fields
-
-        _ ->
-            ProjectAddTodoBtn maybeProjectId
 
 
 viewTodoListItems =
