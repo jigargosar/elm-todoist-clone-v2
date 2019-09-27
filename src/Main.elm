@@ -190,8 +190,12 @@ type alias Flags =
     }
 
 
+type alias AddTodoFields =
+    { title : String }
+
+
 type TodoForm
-    = AddTodoForm
+    = AddTodoForm AddTodoFields
     | EditTodoForm Todo
 
 
@@ -240,6 +244,7 @@ type Msg
     | PatchTodo TodoId TodoPatch
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
+    | CreateAndAddTodo AddTodoFields
     | ChangeRouteTo Route
     | ResetModel
 
@@ -251,7 +256,7 @@ setTodoForm form =
 
 addTodoFormClicked : Msg
 addTodoFormClicked =
-    setTodoForm AddTodoForm
+    setTodoForm (AddTodoForm { title = "" })
 
 
 editTodoClicked : Todo -> Msg
@@ -292,31 +297,35 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
+        CreateAndAddTodo fields ->
+            ( model, Cmd.none )
+
         Save ->
             case model.maybeTodoForm of
                 Just form ->
-                    let
-                        todo =
-                            case form of
-                                AddTodoForm ->
-                                    mockTodoForAddTodoFormSave
+                    case form of
+                        AddTodoForm fields ->
+                            update (CreateAndAddTodo fields) model
 
-                                EditTodoForm editingTodo ->
-                                    editingTodo
-
-                        newModel =
-                            { model
-                                | todoList = upsertById todo model.todoList
-                                , maybeTodoForm = Nothing
-                            }
-                    in
-                    ( newModel, cacheModel newModel )
+                        EditTodoForm editingTodo ->
+                            upsertTodoAndCloseFormAndCache editingTodo model
 
                 Nothing ->
                     ( model, Cmd.none )
 
         ChangeRouteTo route ->
             ( { model | route = route }, Cmd.none )
+
+
+upsertTodoAndCloseFormAndCache todo model =
+    let
+        newModel =
+            { model
+                | todoList = upsertById todo model.todoList
+                , maybeTodoForm = Nothing
+            }
+    in
+    ( newModel, cacheModel newModel )
 
 
 subscriptions : Model -> Sub msg
