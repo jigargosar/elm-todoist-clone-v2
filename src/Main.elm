@@ -243,6 +243,7 @@ type alias Model =
     , maybeTodoForm : Maybe TodoForm
     , route : Route
     , zone : Time.Zone
+    , today : Time.Posix
     }
 
 
@@ -252,6 +253,7 @@ defaultModel =
     , maybeTodoForm = Nothing
     , route = RouteProject (ProjectId "1")
     , zone = Time.utc
+    , today = Time.millisToPosix 0
     }
 
 
@@ -267,21 +269,23 @@ init flags =
         model =
             { defaultModel | todoList = cache.todoList }
     in
-    ( model
-    , Cmd.batch [ cacheModel model, getZone ]
-    )
+    initModel model
 
 
 initModel : Model -> ( Model, Cmd Msg )
 initModel model =
     ( model
-    , Cmd.batch [ cacheModel model, getZone ]
+    , Cmd.batch [ cacheModel model, getZone, getToday ]
     )
 
 
 getZone : Cmd Msg
 getZone =
     Time.here |> Task.perform GotZone
+
+
+getToday =
+    Time.now |> Task.perform GotToday
 
 
 mapTodoList : (small -> small) -> { big | todoList : small } -> { big | todoList : small }
@@ -302,6 +306,7 @@ type Msg
     | ChangeRouteTo Route
     | ResetModel
     | GotZone Time.Zone
+    | GotToday Time.Posix
 
 
 setTodoForm : TodoForm -> Msg
@@ -341,8 +346,11 @@ update msg model =
         GotZone zone ->
             ( { model | zone = zone }, Cmd.none )
 
+        GotToday today ->
+            ( { model | today = today }, Cmd.none )
+
         ChangeRouteTo route ->
-            ( { model | route = route, maybeTodoForm = Nothing }, getZone )
+            initModel { model | route = route, maybeTodoForm = Nothing }
 
         PatchTodo todoId todoPatch ->
             let
