@@ -540,6 +540,7 @@ todoDisplayItemsFromTodoList layout maybeTodoForm todoList =
         todoList
 
 
+viewTodoDisplayItems : List TodoListDisplayItem -> List (H.Html Msg)
 viewTodoDisplayItems =
     let
         viewItem item =
