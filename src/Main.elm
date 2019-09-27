@@ -491,13 +491,13 @@ viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
     case route of
         RouteInbox ->
-            maybeProjectIdViewModel Nothing model |> viewTodoListItems
+            todoDisplayItemsForMaybeProjectId Nothing model |> viewTodoListItems
 
         RouteToday ->
             viewRoute model RouteInbox
 
         RouteProject projectId ->
-            maybeProjectIdViewModel (Just projectId) model |> viewTodoListItems
+            todoDisplayItemsForMaybeProjectId (Just projectId) model |> viewTodoListItems
 
 
 type TodoListDisplayItem
@@ -507,8 +507,8 @@ type TodoListDisplayItem
     | AddTodoFormItem AddTodoFields
 
 
-maybeProjectIdViewModel : Maybe ProjectId -> Model -> List TodoListDisplayItem
-maybeProjectIdViewModel maybeProjectId { maybeTodoForm, todoList } =
+todoDisplayItemsForMaybeProjectId : Maybe ProjectId -> Model -> List TodoListDisplayItem
+todoDisplayItemsForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
     let
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
