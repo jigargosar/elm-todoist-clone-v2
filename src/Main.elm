@@ -517,25 +517,25 @@ inboxViewModel { maybeTodoForm, todoList } =
     let
         filteredTodoList =
             todoList |> List.filter (.maybeProjectId >> (==) Nothing)
-
-        list : List TodoListItem
-        list =
-            List.map
-                (\todo ->
-                    case maybeTodoForm of
-                        Just (EditTodoForm editTodo) ->
-                            if todo.id == editTodo.id then
-                                EditTodoItem editTodo
-
-                            else
-                                TodoItem todo
-
-                        _ ->
-                            TodoItem todo
-                )
-                filteredTodoList
     in
-    list ++ [ addTodoItem maybeTodoForm ]
+    todoItemsFromList maybeTodoForm filteredTodoList ++ [ addTodoItem maybeTodoForm ]
+
+
+todoItemsFromList maybeTodoForm todoList =
+    List.map
+        (\todo ->
+            case maybeTodoForm of
+                Just (EditTodoForm editTodo) ->
+                    if todo.id == editTodo.id then
+                        EditTodoItem editTodo
+
+                    else
+                        TodoItem todo
+
+                _ ->
+                    TodoItem todo
+        )
+        todoList
 
 
 addTodoItem : Maybe TodoForm -> TodoListItem
