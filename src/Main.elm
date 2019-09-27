@@ -180,13 +180,14 @@ cacheModel model =
             MX.unwrap JE.null
 
         todoEncoder : Todo -> Value
-        todoEncoder { id, title, isDone, isDeleted, maybeProjectId } =
+        todoEncoder { id, title, isDone, isDeleted, maybeProjectId, maybeDueDate } =
             object
                 [ ( "id", todoIdEncoder id )
                 , ( "title", JE.string title )
                 , ( "isDone", JE.bool isDone )
                 , ( "isDeleted", JE.bool isDeleted )
                 , ( "maybeProjectId", maybeEncoder projectIdEncoder maybeProjectId )
+                , ( "maybeDueDate", maybeEncoder (Time.posixToMillis >> JE.int) maybeDueDate )
                 ]
 
         modelEncoder : Model -> Value
