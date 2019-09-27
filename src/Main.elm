@@ -316,12 +316,22 @@ update msg model =
         Save ->
             case model.maybeTodoForm of
                 Just form ->
-                    case form of
-                        AddTodoForm fields ->
-                            upsertTodoAndCloseFormAndCache (todoFromFields fields) model
+                    let
+                        todo =
+                            case form of
+                                AddTodoForm fields ->
+                                    todoFromFields fields
 
-                        EditTodoForm editingTodo ->
-                            upsertTodoAndCloseFormAndCache editingTodo model
+                                EditTodoForm editingTodo ->
+                                    editingTodo
+
+                        newModel =
+                            { model
+                                | todoList = upsertById todo model.todoList
+                                , maybeTodoForm = Nothing
+                            }
+                    in
+                    ( newModel, cacheModel newModel )
 
                 Nothing ->
                     ( model, Cmd.none )
