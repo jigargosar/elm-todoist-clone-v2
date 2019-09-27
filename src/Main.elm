@@ -491,73 +491,49 @@ viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
     case route of
         RouteInbox ->
-            todoDisplayItemsForMaybeProjectId Nothing model |> viewTodoDisplayItems
+            viewTodoListForMaybeProjectId Nothing model
 
         RouteToday ->
             viewRoute model RouteInbox
 
         RouteProject projectId ->
-            todoDisplayItemsForMaybeProjectId (Just projectId) model |> viewTodoDisplayItems
+            viewTodoListForMaybeProjectId (Just projectId) model
 
 
-type TodoListDisplayItem
-    = TodoItem TodoItemLayout Todo
-    | EditTodoItem Todo
-    | AddTodoToProjectItem (Maybe ProjectId)
-    | AddTodoFormItem AddTodoFields
-
-
-todoDisplayItemsForMaybeProjectId : Maybe ProjectId -> Model -> List TodoListDisplayItem
-todoDisplayItemsForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
+viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
+viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
     let
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
-    in
-    todoDisplayItemsFromTodoList ProjectItemLayout maybeTodoForm filteredTodoList
-        ++ [ case maybeTodoForm of
-                Just (AddTodoForm fields) ->
-                    AddTodoFormItem fields
 
-                _ ->
-                    AddTodoToProjectItem maybeProjectId
-           ]
+        viewFilteredTodoList : List (H.Html Msg)
+        viewFilteredTodoList =
+            List.map
+                (\todo ->
+                    case maybeTodoForm of
+                        Just (EditTodoForm editTodo) ->
+                            if todo.id == editTodo.id then
+                                viewEditTodoForm editTodo
 
+                            else
+                                viewTodo ProjectItemLayout todo
 
-todoDisplayItemsFromTodoList layout maybeTodoForm todoList =
-    List.map
-        (\todo ->
+                        _ ->
+                            viewTodo ProjectItemLayout todo
+                )
+                filteredTodoList
+
+        viewAddTodoItem =
             case maybeTodoForm of
-                Just (EditTodoForm editTodo) ->
-                    if todo.id == editTodo.id then
-                        EditTodoItem editTodo
-
-                    else
-                        TodoItem layout todo
+                Just (AddTodoForm fields) ->
+                    viewAddTodoForm fields
 
                 _ ->
-                    TodoItem layout todo
-        )
-        todoList
-
-
-viewTodoDisplayItems : List TodoListDisplayItem -> List (H.Html Msg)
-viewTodoDisplayItems =
-    let
-        viewItem item =
-            case item of
-                TodoItem layout todo ->
-                    viewTodo layout todo
-
-                EditTodoItem todo ->
-                    viewEditTodoForm todo
-
-                AddTodoToProjectItem maybeProjectId ->
-                    row [ A.class "pa1" ] [ btn2 "add todo" (AddTodoFormClicked maybeProjectId) ]
-
-                AddTodoFormItem fields ->
-                    viewAddTodoForm fields
+                    row [ A.class "pa1" ]
+                        [ btn2 "add todo" (AddTodoFormClicked maybeProjectId) ]
     in
-    List.map viewItem
+    viewFilteredTodoList
+        ++ [ viewAddTodoItem ]
 
 
 type TodoItemLayout
