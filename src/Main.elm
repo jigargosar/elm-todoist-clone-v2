@@ -285,18 +285,29 @@ update msg model =
             ( newModel, cacheModel newModel )
 
         Save ->
-            model.maybeTodoForm
-                |> MX.unwrap ( model, Cmd.none )
-                    (\_ ->
-                        let
-                            newModel =
-                                { model
-                                    | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
-                                    , maybeTodoForm = Nothing
-                                }
-                        in
-                        ( newModel, cacheModel newModel )
-                    )
+            case model.maybeTodoForm of
+                Just AddTodoForm ->
+                    let
+                        newModel =
+                            { model
+                                | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
+                                , maybeTodoForm = Nothing
+                            }
+                    in
+                    ( newModel, cacheModel newModel )
+
+                Just (EditTodoForm editingTodo) ->
+                    let
+                        newModel =
+                            { model
+                                | todoList = upsertById editingTodo model.todoList
+                                , maybeTodoForm = Nothing
+                            }
+                    in
+                    ( newModel, cacheModel newModel )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         ChangeRouteTo route ->
             ( { model | route = route }, Cmd.none )
@@ -428,7 +439,7 @@ viewTodo todo =
 viewEditTodo : Todo -> H.Html Msg
 viewEditTodo todo =
     col [ A.class "pa1" ]
-        [ col [ A.class "pv1" ] [ ipt2 todo.title (\_ -> NoOp) ]
+        [ col [ A.class "pv1" ] [ ipt2 todo.title (\title -> setTodoForm (EditTodoForm { todo | title = title })) ]
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
