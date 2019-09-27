@@ -286,21 +286,20 @@ update msg model =
 
         Save ->
             case model.maybeTodoForm of
-                Just AddTodoForm ->
+                Just form ->
                     let
-                        newModel =
-                            { model
-                                | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
-                                , maybeTodoForm = Nothing
-                            }
-                    in
-                    ( newModel, cacheModel newModel )
+                        todo =
+                            case form of
+                                AddTodoForm ->
+                                    mockTodoForAddTodoFormSave
 
-                Just (EditTodoForm editingTodo) ->
+                                EditTodoForm editingTodo ->
+                                    editingTodo
+                    in
                     let
                         newModel =
                             { model
-                                | todoList = upsertById editingTodo model.todoList
+                                | todoList = upsertById todo model.todoList
                                 , maybeTodoForm = Nothing
                             }
                     in
