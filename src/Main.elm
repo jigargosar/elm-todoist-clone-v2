@@ -9,6 +9,7 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
+import List.Extra as LX
 import Maybe.Extra as MX
 import Random
 import UI exposing (btn2, checkbox3, col, ipt2, row)
@@ -497,7 +498,14 @@ viewTodo todo =
             , E.onClick (editTodoClicked todo)
             ]
             [ H.text todo.title ]
+        , row [ A.class " " ] [ H.text <| todoProjectTitle todo ]
         ]
+
+
+todoProjectTitle { maybeProjectId } =
+    initialProjectList
+        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
+        |> MX.unwrap "Inbox" .title
 
 
 viewAddTodo : Maybe TodoForm -> H.Html Msg
