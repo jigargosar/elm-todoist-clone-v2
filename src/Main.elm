@@ -587,18 +587,18 @@ viewAddTodoForm fields =
     viewTodoForm config fields
 
 
-viewTodoForm config { title, maybeProjectId } =
+viewTodoForm config { title, maybeProjectId, maybeDueDate } =
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
             [ ipt2 title config.titleChanged
             ]
         , viewProjectSelect maybeProjectId config.projectIdChanged
-        , viewDueDateInput
+        , viewDueDateInput maybeDueDate
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
 
-viewDueDateInput =
+viewDueDateInput maybeDueDate =
     H.input [ A.type_ "date" ] []
 
 
