@@ -501,7 +501,7 @@ viewRoute model route =
 
 
 type TodoListItem
-    = TodoItem Todo
+    = ProjectTodoItem Todo
     | EditTodoItem Todo
     | AddTodoToProjectItem (Maybe ProjectId)
     | AddTodoFormItem AddTodoFields
@@ -532,10 +532,10 @@ todoItemsFromList maybeTodoForm todoList =
                         EditTodoItem editTodo
 
                     else
-                        TodoItem todo
+                        ProjectTodoItem todo
 
                 _ ->
-                    TodoItem todo
+                    ProjectTodoItem todo
         )
         todoList
 
@@ -544,8 +544,8 @@ viewTodoListItems =
     let
         viewItem item =
             case item of
-                TodoItem todo ->
-                    viewTodo todo
+                ProjectTodoItem todo ->
+                    viewTodo { hideProjectName = True } todo
 
                 EditTodoItem todo ->
                     viewEditTodoForm todo
@@ -559,8 +559,8 @@ viewTodoListItems =
     List.map viewItem
 
 
-viewTodo : Todo -> H.Html Msg
-viewTodo todo =
+viewTodo : { hideProjectName : Bool } -> Todo -> H.Html Msg
+viewTodo opts todo =
     row []
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
@@ -575,7 +575,11 @@ viewTodo todo =
                 (\dueDate ->
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
                 )
-        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ] [ H.text <| todoProjectTitle todo ]
+        , if opts.hideProjectName then
+            H.text ""
+
+          else
+            row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ] [ H.text <| todoProjectTitle todo ]
         ]
 
 
