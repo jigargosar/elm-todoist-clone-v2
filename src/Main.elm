@@ -513,16 +513,17 @@ viewAddTodo addTodo =
             H.text ""
 
 
-viewEditTodoForm todo =
+viewEditTodoForm fields =
     let
         setForm =
             setTodoForm << EditTodoForm
 
         config =
-            { titleChanged = \title -> setForm { todo | title = title }
+            { titleChanged = \title -> setForm { fields | title = title }
+            , projectIdChanged = \str -> setForm { fields | maybeProjectId = projectIdFromString str }
             }
     in
-    viewTodoForm config todo
+    viewTodoForm config fields
 
 
 viewAddTodoForm fields =
@@ -538,20 +539,24 @@ viewAddTodoForm fields =
     viewTodoForm config fields
 
 
-viewTodoForm config { title } =
+viewTodoForm config { title, maybeProjectId } =
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
             [ ipt2 title config.titleChanged
             ]
-        , viewProjectSelect
+        , viewProjectSelect maybeProjectId
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
 
 
-viewProjectSelect =
+viewProjectSelect maybeProjectId =
     let
         viewOpt { id, title } =
-            H.option [ projectIdToValueAttr id ] [ H.text title ]
+            H.option
+                [ A.selected (maybeProjectId == Just id)
+                , projectIdToValueAttr id
+                ]
+                [ H.text title ]
     in
     H.select []
         (H.option [] [ H.text "Inbox" ] :: List.map viewOpt initialProjectList)
