@@ -9,6 +9,7 @@ import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
+import Maybe.Extra as MX
 import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
@@ -111,13 +112,13 @@ port setCache : String -> Cmd msg
 
 type alias Cache =
     { todoList : List Todo
-    , addTodo : Toggle AddTodoForm
+    , addTodo : Maybe AddTodoForm
     }
 
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = initialTodoList, addTodo = Off }
+    { todoList = initialTodoList, addTodo = Nothing }
 
 
 cacheDecoder : JD.Decoder Cache
@@ -133,7 +134,7 @@ cacheDecoder =
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
-        |> hardcoded Off
+        |> hardcoded Nothing
 
 
 cacheModel : Model -> Cmd msg
@@ -153,7 +154,7 @@ cacheModel model =
                 ]
 
         modelEncoder : Model -> Value
-        modelEncoder { todoList, addTodoToggle } =
+        modelEncoder { todoList, maybeAddTodoForm } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
                 ]
@@ -195,29 +196,9 @@ type alias AddTodoForm =
     {}
 
 
-type Toggle a
-    = On a
-    | Off
-
-
-unpackToggle : (() -> a) -> (b -> a) -> Toggle b -> a
-unpackToggle default func toggle =
-    case toggle of
-        On a ->
-            func a
-
-        Off ->
-            default ()
-
-
-unwrapToggle : a -> (b -> a) -> Toggle b -> a
-unwrapToggle default func toggle =
-    unpackToggle (always default) func toggle
-
-
 type alias Model =
     { todoList : List Todo
-    , addTodoToggle : Toggle AddTodoForm
+    , maybeAddTodoForm : Maybe AddTodoForm
     , route : Route
     }
 
@@ -233,7 +214,7 @@ init flags =
         model : Model
         model =
             { todoList = cache.todoList
-            , addTodoToggle = cache.addTodo
+            , maybeAddTodoForm = cache.addTodo
             , route = RouteProject (ProjectId "1")
             }
     in
@@ -254,18 +235,18 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | SetAddTodoToggle (Toggle AddTodoForm)
+    | SetAddTodoToggle (Maybe AddTodoForm)
     | Save
     | ChangeRouteTo Route
 
 
 setAddTodoForm : AddTodoForm -> Msg
 setAddTodoForm form =
-    SetAddTodoToggle (On form)
+    SetAddTodoToggle (Just form)
 
 
 closeForm =
-    SetAddTodoToggle Off
+    SetAddTodoToggle Nothing
 
 
 doneChecked : TodoId -> Bool -> Msg
@@ -290,19 +271,19 @@ update msg model =
         SetAddTodoToggle addTodo ->
             let
                 newModel =
-                    { model | addTodoToggle = addTodo }
+                    { model | maybeAddTodoForm = addTodo }
             in
             ( newModel, cacheModel newModel )
 
         Save ->
-            model.addTodoToggle
-                |> unwrapToggle ( model, Cmd.none )
+            model.maybeAddTodoForm
+                |> MX.unwrap ( model, Cmd.none )
                     (\_ ->
                         let
                             newModel =
                                 { model
                                     | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
-                                    , addTodoToggle = Off
+                                    , maybeAddTodoForm = Nothing
                                 }
                         in
                         ( newModel, cacheModel newModel )
@@ -391,7 +372,7 @@ viewPage model route =
     case route of
         RouteInbox ->
             [ viewTodoList model.todoList
-            , viewAddTodo model.addTodoToggle
+            , viewAddTodo model.maybeAddTodoForm
             ]
 
         RouteToday ->
@@ -421,16 +402,16 @@ addTodoFormClicked =
     {} |> setAddTodoForm
 
 
-viewAddTodo : Toggle AddTodoForm -> H.Html Msg
+viewAddTodo : Maybe AddTodoForm -> H.Html Msg
 viewAddTodo addTodo =
     case addTodo of
-        On _ ->
+        Just _ ->
             col [ A.class "pa1" ]
                 [ col [ A.class "pv1" ] [ ipt2 "New Todo Title" (\_ -> NoOp) ]
                 , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
                 ]
 
-        Off ->
+        Nothing ->
             row [ A.class "pa1" ] [ btn2 "add todo" addTodoFormClicked ]
 
 
