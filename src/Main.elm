@@ -11,7 +11,6 @@ import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
-import Maybe as MX
 import Maybe.Extra as MX
 import Random
 import Task
