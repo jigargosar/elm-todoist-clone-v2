@@ -483,20 +483,18 @@ viewAddTodo addTodo =
             H.text ""
 
 
-viewEditTodoForm config todo =
-    col [ A.class "pa1" ]
-        [ col [ A.class "pv1" ]
-            [ ipt2 todo.title
-                config.titleChanged
-            ]
-        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
-        ]
+viewEditTodoForm config =
+    viewTodoForm config
 
 
-viewAddTodoForm config fields =
+viewAddTodoForm config =
+    viewTodoForm config
+
+
+viewTodoForm config { title } =
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
-            [ ipt2 fields.title config.titleChanged
+            [ ipt2 title config.titleChanged
             ]
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
