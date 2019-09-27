@@ -69,17 +69,18 @@ type alias Todo =
     , title : String
     , isDone : Bool
     , isDeleted : Bool
+    , maybeProjectId : Maybe ProjectId
     }
 
 
 createMockTodo : String -> String -> Todo
 createMockTodo id title =
-    Todo (TodoId id) title False False
+    Todo (TodoId id) title False False Nothing
 
 
 todoFromFields : AddTodoFields -> Todo
 todoFromFields { newTodoId, title } =
-    Todo newTodoId title False False
+    Todo newTodoId title False False Nothing
 
 
 initialTodoList =
@@ -137,6 +138,7 @@ cacheDecoder =
                 |> required "title" JD.string
                 |> required "isDone" JD.bool
                 |> optional "isDeleted" JD.bool False
+                |> optional "maybeProjectId" (JD.string |> JD.map (ProjectId >> Just)) Nothing
     in
     JD.succeed Cache
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
