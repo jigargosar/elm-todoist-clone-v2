@@ -101,8 +101,8 @@ createMockTodo id title =
 
 
 todoFromFields : AddTodoFields -> Todo
-todoFromFields { newTodoId, title } =
-    Todo newTodoId title False False Nothing
+todoFromFields { newTodoId, title, maybeProjectId } =
+    Todo newTodoId title False False maybeProjectId
 
 
 initialTodoList =
