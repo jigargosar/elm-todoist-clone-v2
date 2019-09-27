@@ -512,12 +512,22 @@ viewTodoForm config { title } =
         [ col [ A.class "pv1" ]
             [ ipt2 title config.titleChanged
             ]
-        , H.select [ E.onInput (Debug.log "selectInput" >> (\_ -> NoOp)) ]
-            [ H.option [ A.value "foo" ] [ H.text "opt1" ]
-            , H.option [ A.value "bar", A.selected True ] [ H.text "opt2" ]
-            ]
+        , viewProjectSelect
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
         ]
+
+
+projectIdToValueAttr (ProjectId str) =
+    A.value str
+
+
+viewProjectSelect =
+    let
+        viewOpt { id, title } =
+            H.option [ projectIdToValueAttr id ] [ H.text title ]
+    in
+    H.select []
+        (H.option [] [ H.text "Inbox" ] :: List.map viewOpt initialProjectList)
 
 
 main : Program Flags Model Msg
