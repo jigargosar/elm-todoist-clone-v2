@@ -494,10 +494,45 @@ viewRoute model route =
             viewTodoListForMaybeProjectId Nothing model
 
         RouteToday ->
-            viewRoute model RouteInbox
+            viewTodoListDueAt model.today model
 
         RouteProject projectId ->
             viewTodoListForMaybeProjectId (Just projectId) model
+
+
+viewTodoListDueAt today { todoList, maybeTodoForm } =
+    let
+        filteredTodoList =
+            List.filter (propEq .maybeDueDate (Just today)) todoList
+
+        viewFilteredTodoList : List (H.Html Msg)
+        viewFilteredTodoList =
+            List.map
+                (\todo ->
+                    case maybeTodoForm of
+                        Just (EditTodoForm editTodo) ->
+                            if todo.id == editTodo.id then
+                                viewEditTodoForm editTodo
+
+                            else
+                                viewTodo DueDateItemLayout todo
+
+                        _ ->
+                            viewTodo DueDateItemLayout todo
+                )
+                filteredTodoList
+
+        viewAddTodoItem =
+            case maybeTodoForm of
+                Just (AddTodoForm fields) ->
+                    viewAddTodoForm fields
+
+                _ ->
+                    row [ A.class "pa1" ]
+                        [ btn2 "add todo" (AddTodoFormClicked Nothing) ]
+    in
+    viewFilteredTodoList
+        ++ [ viewAddTodoItem ]
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
