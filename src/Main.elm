@@ -153,7 +153,7 @@ cacheModel model =
                 ]
 
         modelEncoder : Model -> Value
-        modelEncoder { todoList, addTodo } =
+        modelEncoder { todoList, addTodoToggle } =
             object
                 [ ( "todoList", JE.list todoEncoder todoList )
                 ]
@@ -217,7 +217,7 @@ unwrapToggle default func toggle =
 
 type alias Model =
     { todoList : List Todo
-    , addTodo : Toggle AddTodoForm
+    , addTodoToggle : Toggle AddTodoForm
     , route : Route
     }
 
@@ -233,7 +233,7 @@ init flags =
         model : Model
         model =
             { todoList = cache.todoList
-            , addTodo = cache.addTodo
+            , addTodoToggle = cache.addTodo
             , route = RouteProject (ProjectId "1")
             }
     in
@@ -290,19 +290,19 @@ update msg model =
         SetAddTodoToggle addTodo ->
             let
                 newModel =
-                    { model | addTodo = addTodo }
+                    { model | addTodoToggle = addTodo }
             in
             ( newModel, cacheModel newModel )
 
         Save ->
-            model.addTodo
+            model.addTodoToggle
                 |> unwrapToggle ( model, Cmd.none )
                     (\_ ->
                         let
                             newModel =
                                 { model
                                     | todoList = upsertById mockTodoForAddTodoFormSave model.todoList
-                                    , addTodo = Off
+                                    , addTodoToggle = Off
                                 }
                         in
                         ( newModel, cacheModel newModel )
@@ -391,7 +391,7 @@ viewPage model route =
     case route of
         RouteInbox ->
             [ viewTodoList model.todoList
-            , viewAddTodo model.addTodo
+            , viewAddTodo model.addTodoToggle
             ]
 
         RouteToday ->
