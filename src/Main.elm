@@ -76,8 +76,9 @@ createMockTodo id title =
     Todo (TodoId id) title False False
 
 
-todoFromFields id { title } =
-    Todo id title False False
+todoFromFields : AddTodoFields -> Todo
+todoFromFields { newTodoId, title } =
+    Todo newTodoId title False False
 
 
 initialTodoList =
@@ -196,7 +197,7 @@ type alias Flags =
 
 
 type alias AddTodoFields =
-    { id : TodoId, title : String }
+    { newTodoId : TodoId, title : String }
 
 
 type TodoForm
@@ -250,7 +251,6 @@ type Msg
     | AddTodoFormClicked
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
-    | AddTodoAndCloseFormAndCache AddTodoFields TodoId
     | ChangeRouteTo Route
     | ResetModel
 
@@ -298,7 +298,7 @@ update msg model =
             ( newModel, cacheModel newModel )
 
         AddTodoFormClicked ->
-            ( model, todoIdGen |> Random.generate (\todoId -> setTodoForm (AddTodoForm { id = todoId, title = "" })) )
+            ( model, todoIdGen |> Random.generate (\todoId -> setTodoForm (AddTodoForm { newTodoId = todoId, title = "" })) )
 
         SetMaybeTodoForm addTodo ->
             let
@@ -307,17 +307,12 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        AddTodoAndCloseFormAndCache fields todoId ->
-            upsertTodoAndCloseFormAndCache (todoFromFields todoId fields) model
-
         Save ->
             case model.maybeTodoForm of
                 Just form ->
                     case form of
                         AddTodoForm fields ->
-                            ( model
-                            , Random.generate (AddTodoAndCloseFormAndCache fields) todoIdGen
-                            )
+                            upsertTodoAndCloseFormAndCache (todoFromFields fields) model
 
                         EditTodoForm editingTodo ->
                             upsertTodoAndCloseFormAndCache editingTodo model
