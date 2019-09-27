@@ -18,9 +18,8 @@ button {
 button:focus,
 input:focus {
   outline-offset: 1px;
-  outline: dodgerblue solid medium;
+  outline: var(--primary-color) solid medium;
 }
-
 
 .ph1 {
   padding-left: var(--spc1);
