@@ -580,7 +580,7 @@ viewTodoListDueOn dueDate { today, todoList, maybeTodoForm } =
         filteredTodoList =
             todoList |> List.filter filterPredicate
     in
-    col [] [ H.text <| humanDate dueDate today ]
+    col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
         ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just dueDate)) maybeTodoForm ]
 
@@ -648,17 +648,17 @@ viewTodo layout todo =
             , E.onClick (editTodoClicked todo)
             ]
             [ H.text todo.title ]
-        , todo.maybeDueDate
-            |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
-                (\dueDate ->
-                    row [ A.class "self-start pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
-                )
-        , if layout == ProjectItemLayout then
-            H.text ""
+        , case layout of
+            ProjectItemLayout ->
+                todo.maybeDueDate
+                    |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
+                        (\dueDate ->
+                            row [ A.class "self-start pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
+                        )
 
-          else
-            row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-                [ H.text <| todoProjectTitle todo ]
+            DueDateItemLayout ->
+                row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
+                    [ H.text <| todoProjectTitle todo ]
         ]
 
 
