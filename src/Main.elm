@@ -358,9 +358,6 @@ update msg model =
     let
         noOp =
             Return.singleton model
-
-        unwrapMaybeWithinModel getMaybeProp func m =
-            getMaybeProp m |> MX.unwrap noOp (\v -> func v m)
     in
     case msg of
         NoOp ->
@@ -405,10 +402,14 @@ update msg model =
             Return.singleton { model | maybeTodoForm = addTodo }
 
         Save ->
-            unwrapMaybeWithinModel .maybeTodoForm saveForm
+            unwrapMaybeWithinModel .maybeTodoForm saveForm model
 
         Cancel ->
             Return.singleton { model | maybeTodoForm = Nothing }
+
+
+unwrapMaybeWithinModel getMaybeProp func model =
+    getMaybeProp model |> MX.unwrap ( model, Cmd.none ) (\v -> func v model)
 
 
 type alias HasSeed a =
