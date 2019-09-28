@@ -383,6 +383,18 @@ update msg model =
             )
 
 
+updateTodoFormFields msg fields =
+    case msg of
+        TodoFormTitleChanged title ->
+            { fields | title = title }
+
+        TodoFormDueDateChanged maybeDueDate ->
+            { fields | maybeDueDate = maybeDueDate }
+
+        TodoFormProjectIdChanged maybeProjectId ->
+            { fields | maybeProjectId = maybeProjectId }
+
+
 updateTodoForm : TodoFormMsg -> TodoForm -> Model -> ( Model, Cmd Msg )
 updateTodoForm todoFormMsg _ model =
     let
@@ -394,32 +406,14 @@ updateTodoForm todoFormMsg _ model =
                 Just form ->
                     case form of
                         AddTodoForm addTodoFields ->
-                            AddTodoForm
-                                (case todoFormMsg of
-                                    TodoFormTitleChanged title ->
-                                        { addTodoFields | title = title }
-
-                                    TodoFormDueDateChanged maybeDueDate ->
-                                        { addTodoFields | maybeDueDate = maybeDueDate }
-
-                                    TodoFormProjectIdChanged maybeProjectId ->
-                                        { addTodoFields | maybeProjectId = maybeProjectId }
-                                )
-                                |> Just
+                            Just <|
+                                AddTodoForm <|
+                                    updateTodoFormFields todoFormMsg addTodoFields
 
                         EditTodoForm todo ->
-                            EditTodoForm
-                                (case todoFormMsg of
-                                    TodoFormTitleChanged title ->
-                                        { todo | title = title }
-
-                                    TodoFormDueDateChanged maybeDueDate ->
-                                        { todo | maybeDueDate = maybeDueDate }
-
-                                    TodoFormProjectIdChanged maybeProjectId ->
-                                        { todo | maybeProjectId = maybeProjectId }
-                                )
-                                |> Just
+                            Just <|
+                                EditTodoForm <|
+                                    updateTodoFormFields todoFormMsg todo
     in
     ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
 
