@@ -409,10 +409,10 @@ handleSave form model =
         ( todo, newModel ) =
             case form of
                 AddTodoForm fields ->
-                    Random.step
-                        (Random.map (\todoId -> todoFromFields todoId fields) todoIdGen)
-                        model.seed
-                        |> Tuple.mapSecond (\seed -> { model | seed = seed })
+                    Random.step todoIdGen model.seed
+                        |> Tuple.mapBoth
+                            (\todoId -> todoFromFields todoId fields)
+                            (\seed -> { model | seed = seed })
 
                 EditTodoForm editingTodo ->
                     ( editingTodo, model )
