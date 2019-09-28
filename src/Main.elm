@@ -290,6 +290,10 @@ mapTodoList func model =
     { model | todoList = func model.todoList }
 
 
+setTodoForm form model =
+    { model | maybeTodoForm = Just form }
+
+
 
 -- UPDATE
 
@@ -299,22 +303,13 @@ type Msg
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
+    | EditTodoClicked Todo
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | Cancel
     | ChangeRouteTo Route
     | ResetModel
     | GotToday Date
-
-
-setTodoForm : TodoForm -> Msg
-setTodoForm form =
-    SetMaybeTodoForm (Just form)
-
-
-editTodoClicked : Todo -> Msg
-editTodoClicked todo =
-    setTodoForm (EditTodoForm todo)
 
 
 closeForm =
@@ -347,16 +342,20 @@ update msg model =
             )
 
         AddTodoClicked maybeProjectId maybeDueDate ->
-            ( { model
-                | maybeTodoForm =
-                    Just <|
-                        AddTodoForm
-                            { title = ""
-                            , maybeProjectId = maybeProjectId
-                            , maybeDueDate = maybeDueDate
-                            , initialDueDate = maybeDueDate
-                            }
-              }
+            ( model
+                |> setTodoForm
+                    (AddTodoForm
+                        { title = ""
+                        , maybeProjectId = maybeProjectId
+                        , maybeDueDate = maybeDueDate
+                        , initialDueDate = maybeDueDate
+                        }
+                    )
+            , Cmd.none
+            )
+
+        EditTodoClicked todo ->
+            ( model |> setTodoForm (EditTodoForm todo)
             , Cmd.none
             )
 
@@ -661,7 +660,7 @@ viewTodo today layout todo =
             ]
         , row
             [ A.class "pa1 flex-grow-1"
-            , E.onClick (editTodoClicked todo)
+            , E.onClick (EditTodoClicked todo)
             ]
             [ H.text todo.title ]
         , case layout of
