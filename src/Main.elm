@@ -591,7 +591,7 @@ viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
             todoList |> List.filter filterPredicate
     in
     col [] [ H.text "OverDue" ]
-        :: viewInlineEditableTodoList DueDateItemLayout model filteredTodoList
+        :: viewEditableTodoList DueDateItemLayout model filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -607,7 +607,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
             todoList |> List.filter filterPredicate
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
-        :: viewInlineEditableTodoList DueDateItemLayout model filteredTodoList
+        :: viewEditableTodoList DueDateItemLayout model filteredTodoList
         ++ [ getAddTodoFormWithInitialDueDateEq dueDate maybeTodoForm
                 |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just dueDate))) viewAddTodoForm
            ]
@@ -640,22 +640,17 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
-    viewInlineEditableTodoList ProjectItemLayout model filteredTodoList
+    viewEditableTodoList ProjectItemLayout model filteredTodoList
         ++ [ getAddTodoForm maybeTodoForm
                 |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewAddTodoForm
            ]
 
 
-viewInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
-viewInlineEditableTodoList layout model =
-    viewKeyedInlineEditableTodoList layout model
+viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
+viewEditableTodoList layout model =
+    keyed todoToIdString (viewEditableTodoItem layout model)
         >> colKeyed []
         >> List.singleton
-
-
-viewKeyedInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
-viewKeyedInlineEditableTodoList layout model =
-    keyed todoToIdString (viewEditableTodoItem layout model)
 
 
 todoToIdString : Todo -> String
