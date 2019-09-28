@@ -418,7 +418,7 @@ handleSave form model =
                     ( editingTodo, model )
     in
     ( { newModel
-        | todoList = upsertById todo model.todoList
+        | todoList = upsertById todo newModel.todoList
         , maybeTodoForm = Nothing
       }
     , Cmd.none
