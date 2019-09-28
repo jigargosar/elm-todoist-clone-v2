@@ -540,13 +540,8 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
                         getEditTodoFormTodoId todo.id maybeTodoForm
                             |> MX.unpack (\_ -> viewTodo DueDateItemLayout todo) viewEditTodoForm
                     )
-
-        viewAddTodoItem =
-            getAddTodoForm maybeTodoForm
-                |> MX.unwrap viewAddTodoButton viewAddTodoForm
     in
-    viewFilteredTodoList
-        ++ [ viewAddTodoItem ]
+    viewFilteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
@@ -571,18 +566,8 @@ viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
                             viewTodo ProjectItemLayout todo
                 )
                 filteredTodoList
-
-        viewAddTodoItem =
-            case maybeTodoForm of
-                Just (AddTodoForm fields) ->
-                    viewAddTodoForm fields
-
-                _ ->
-                    row [ A.class "pa1" ]
-                        [ btn2 "add todo" (AddTodoFormClicked maybeProjectId) ]
     in
-    viewFilteredTodoList
-        ++ [ viewAddTodoItem ]
+    viewFilteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
 
 
 type TodoItemLayout
@@ -633,6 +618,11 @@ viewEditTodoForm fields =
             }
     in
     viewTodoForm config fields
+
+
+viewAddTodoItem maybeTodoForm =
+    getAddTodoForm maybeTodoForm
+        |> MX.unwrap viewAddTodoButton viewAddTodoForm
 
 
 viewAddTodoButton =
