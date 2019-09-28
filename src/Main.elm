@@ -305,7 +305,7 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | AddTodoFormClicked (Maybe ProjectId)
+    | AddTodoFormClicked (Maybe ProjectId) (Maybe Date)
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | ChangeRouteTo Route
@@ -359,7 +359,7 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        AddTodoFormClicked maybeProjectId ->
+        AddTodoFormClicked maybeProjectId maybeDueDate ->
             ( model
             , todoIdGen
                 |> Random.generate
@@ -369,7 +369,7 @@ update msg model =
                                 { newTodoId = todoId
                                 , title = ""
                                 , maybeProjectId = maybeProjectId
-                                , maybeDueDate = Nothing
+                                , maybeDueDate = maybeDueDate
                                 }
                             )
                     )
@@ -538,7 +538,7 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
             todoList |> List.filter filterPredicate
     in
     viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
-        ++ [ viewAddTodoItem maybeTodoForm ]
+        ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just today)) maybeTodoForm ]
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
@@ -548,7 +548,7 @@ viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
     viewInlineEditableTodoList ProjectItemLayout maybeTodoForm filteredTodoList
-        ++ [ viewAddTodoItem maybeTodoForm ]
+        ++ [ viewAddTodoItem (AddTodoFormClicked maybeProjectId Nothing) maybeTodoForm ]
 
 
 viewInlineEditableTodoList : TodoItemLayout -> Maybe TodoForm -> List Todo -> List (H.Html Msg)
@@ -563,6 +563,13 @@ viewInlineEditableTodoList layout maybeTodoForm =
 type TodoItemLayout
     = ProjectItemLayout
     | DueDateItemLayout
+
+
+todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
+todoProjectTitle { maybeProjectId } =
+    initialProjectList
+        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
+        |> MX.unwrap "Inbox" .title
 
 
 viewTodo : TodoItemLayout -> Todo -> H.Html Msg
@@ -590,18 +597,22 @@ viewTodo layout todo =
         ]
 
 
-todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
-todoProjectTitle { maybeProjectId } =
-    initialProjectList
-        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
-        |> MX.unwrap "Inbox" .title
+viewAddTodoItem : Msg -> Maybe TodoForm -> H.Html Msg
+viewAddTodoItem onClick maybeTodoForm =
+    getAddTodoForm maybeTodoForm
+        |> MX.unwrap (viewAddTodoButton onClick) viewAddTodoForm
 
 
-viewEditTodoForm : Todo -> H.Html Msg
-viewEditTodoForm fields =
+viewAddTodoButton : Msg -> H.Html Msg
+viewAddTodoButton onClick =
+    row [ A.class "pa1" ]
+        [ btn2 "add todo" onClick ]
+
+
+viewAddTodoForm fields =
     let
         setForm =
-            setTodoForm << EditTodoForm
+            setTodoForm << AddTodoForm
 
         config =
             { titleChanged = \title -> setForm { fields | title = title }
@@ -612,20 +623,11 @@ viewEditTodoForm fields =
     viewTodoForm config fields
 
 
-viewAddTodoItem maybeTodoForm =
-    getAddTodoForm maybeTodoForm
-        |> MX.unwrap viewAddTodoButton viewAddTodoForm
-
-
-viewAddTodoButton =
-    row [ A.class "pa1" ]
-        [ btn2 "add todo" (AddTodoFormClicked Nothing) ]
-
-
-viewAddTodoForm fields =
+viewEditTodoForm : Todo -> H.Html Msg
+viewEditTodoForm fields =
     let
         setForm =
-            setTodoForm << AddTodoForm
+            setTodoForm << EditTodoForm
 
         config =
             { titleChanged = \title -> setForm { fields | title = title }
