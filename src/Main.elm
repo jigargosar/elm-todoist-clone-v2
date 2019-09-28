@@ -807,8 +807,8 @@ viewProjectSelect maybeProjectId projectIdChanged =
 main : Program Flags Model Msg
 main =
     Browser.element
-        { init = init
-        , update = \msg model -> update msg model |> Return.effect_ cacheModel
+        { init = \f -> init f |> Return.effect_ cacheModel_
+        , update = \msg model -> update msg model |> Return.effect_ cacheModel_
         , view = view
         , subscriptions = subscriptions
         }
