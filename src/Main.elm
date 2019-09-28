@@ -523,6 +523,7 @@ getEditTodoFormTodoId todoId =
     getEditTodoForm >> MX.filter (idEq todoId)
 
 
+viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
 viewTodoListDueAt today { todoList, maybeTodoForm } =
     let
         filterPredicate =
