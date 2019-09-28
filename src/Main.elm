@@ -363,7 +363,7 @@ update msg model =
 
         TodoFormMsg subMsg ->
             let
-                func =
+                mapperFunc =
                     updateTodoFormFields subMsg
             in
             ( model
@@ -371,10 +371,10 @@ update msg model =
                     (\form ->
                         case form of
                             AddTodoForm addTodoFields ->
-                                AddTodoForm <| func addTodoFields
+                                AddTodoForm <| mapperFunc addTodoFields
 
                             EditTodoForm todo ->
-                                EditTodoForm <| func todo
+                                EditTodoForm <| mapperFunc todo
                     )
             , Cmd.none
             )
