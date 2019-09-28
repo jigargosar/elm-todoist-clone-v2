@@ -409,6 +409,11 @@ updateTodoForm todoFormMsg model =
     ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
 
 
+mapTodoForm : (a -> a) -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
+mapTodoForm func model =
+    { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
+
+
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
 saveTodoForm form model =
     let
