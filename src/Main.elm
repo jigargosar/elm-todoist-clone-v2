@@ -596,7 +596,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewInlineEditableTodoList DueDateItemLayout model filteredTodoList
-        ++ [ getAddTodoForm maybeTodoForm
+        ++ [ getAddTodoFormWithInitialDueDateEq dueDate maybeTodoForm
                 |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just dueDate))) viewAddTodoForm
            ]
 
