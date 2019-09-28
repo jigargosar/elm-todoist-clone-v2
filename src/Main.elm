@@ -358,6 +358,9 @@ update msg model =
     let
         noOp =
             Return.singleton model
+
+        unwrapMaybeWithinModel getMaybeProp func m =
+            getMaybeProp m |> MX.unwrap noOp (\v -> func v m)
     in
     case msg of
         NoOp ->
@@ -402,7 +405,7 @@ update msg model =
             Return.singleton { model | maybeTodoForm = addTodo }
 
         Save ->
-            model.maybeTodoForm |> MX.unwrap noOp (saveFormIn model)
+            unwrapMaybeWithinModel .maybeTodoForm saveForm
 
         Cancel ->
             Return.singleton { model | maybeTodoForm = Nothing }
@@ -418,8 +421,8 @@ generate generator model =
         |> Tuple.mapSecond (\seed -> { model | seed = seed })
 
 
-saveFormIn : Model -> TodoForm -> Return.Return Msg Model
-saveFormIn model form =
+saveForm : TodoForm -> Model -> Return.Return Msg Model
+saveForm form model =
     let
         todoGen : Random.Generator Todo
         todoGen =
