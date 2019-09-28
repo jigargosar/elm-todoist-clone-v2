@@ -569,11 +569,11 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
 
 
 viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
-viewTodoListDueAt today { todoList, maybeTodoForm } =
+viewTodoListDueAt dueDate { todoList, maybeTodoForm } =
     let
         filterPredicate =
             allPass
-                [ propEq .maybeDueDate (Just today)
+                [ propEq .maybeDueDate (Just dueDate)
                 , propEq .isDone False
                 ]
 
@@ -582,7 +582,7 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
     in
     col [] [ H.text "Today" ]
         :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
-        ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just today)) maybeTodoForm ]
+        ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just dueDate)) maybeTodoForm ]
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
