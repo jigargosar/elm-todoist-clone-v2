@@ -590,6 +590,7 @@ viewTodo layout todo =
         ]
 
 
+todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
 todoProjectTitle { maybeProjectId } =
     initialProjectList
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
