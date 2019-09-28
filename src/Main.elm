@@ -392,7 +392,7 @@ update msg model =
         Save ->
             case model.maybeTodoForm of
                 Just form ->
-                    handleSave form model
+                    saveTodoForm form model
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -403,8 +403,8 @@ update msg model =
             )
 
 
-handleSave : TodoForm -> Model -> ( Model, Cmd Msg )
-handleSave form model =
+saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
+saveTodoForm form model =
     let
         ( todo, newModel ) =
             case form of
