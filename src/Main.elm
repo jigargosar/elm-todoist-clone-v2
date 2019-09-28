@@ -655,7 +655,12 @@ viewInlineEditableTodoList layout model =
 
 viewKeyedInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
 viewKeyedInlineEditableTodoList layout model =
-    keyed (.id >> todoIdToString) (viewEditableTodoItem layout model)
+    keyed todoToIdString (viewEditableTodoItem layout model)
+
+
+todoToIdString : Todo -> String
+todoToIdString { id } =
+    todoIdToString id
 
 
 keyed : (item -> String) -> (item -> html) -> List item -> List ( String, html )
