@@ -15,7 +15,7 @@ import Maybe.Extra as MX
 import Random
 import Task
 import Time
-import UI exposing (btn2, checkbox3, col, ipt2, row)
+import UI exposing (btn1, btn2, checkbox3, col, ipt2, row)
 
 
 type Route
@@ -676,6 +676,7 @@ viewTodo today layout todo =
             DueDateItemLayout ->
                 row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
                     [ H.text <| todoProjectTitle todo ]
+        , btn1 "X"
         ]
 
 
