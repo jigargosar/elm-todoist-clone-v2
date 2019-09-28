@@ -243,6 +243,14 @@ type alias AddTodoFields =
     }
 
 
+type alias HasTodoFormFields a =
+    { a
+        | title : String
+        , maybeProjectId : Maybe ProjectId
+        , maybeDueDate : Maybe Date
+    }
+
+
 type TodoForm
     = AddTodoForm AddTodoFields
     | EditTodoForm Todo
