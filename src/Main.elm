@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, idEq, propEq, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, anyPass, idEq, propEq, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import Html
@@ -536,10 +536,25 @@ getAddTodoForm maybeForm =
             Nothing
 
 
-viewNext7DaysTodoList model =
+viewNext7DaysTodoList { today, todoList } =
     let
-        _ =
-            1
+        dateRange : Int -> Int -> List Date
+        dateRange from to =
+            List.range from to
+                |> List.map (\ct -> Date.add Date.Days ct today)
+
+        filterDueOn : Date -> List Todo -> List Todo
+        filterDueOn date =
+            List.filter
+                (allPass
+                    [ propEq .maybeDueDate (Just date)
+                    , propEq .isDone False
+                    ]
+                )
+
+        groupedTodoList =
+            dateRange 0 6
+                |> List.map (\date -> ( date, filterDueOn date todoList ))
     in
     []
 
