@@ -531,17 +531,10 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
                 , propEq .isDone False
                 ]
 
-        viewFilteredTodoList : List (H.Html Msg)
-        viewFilteredTodoList =
-            todoList
-                |> List.filter filterPredicate
-                |> List.map
-                    (\todo ->
-                        getEditTodoFormTodoId todo.id maybeTodoForm
-                            |> MX.unpack (\_ -> viewTodo DueDateItemLayout todo) viewEditTodoForm
-                    )
+        filteredTodoList =
+            todoList |> List.filter filterPredicate
     in
-    viewFilteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
+    viewInlineEditableTodoList maybeTodoForm filteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
