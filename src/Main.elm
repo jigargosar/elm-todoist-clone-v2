@@ -235,6 +235,7 @@ type alias AddTodoFields =
     { title : String
     , maybeProjectId : Maybe ProjectId
     , maybeDueDate : Maybe Date
+    , initialDueDate : Maybe Date
     }
 
 
@@ -370,6 +371,7 @@ update msg model =
                             { title = ""
                             , maybeProjectId = maybeProjectId
                             , maybeDueDate = maybeDueDate
+                            , initialDueDate = maybeDueDate
                             }
               }
             , Cmd.none
