@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, anyPass, idEq, propEq, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, idEq, propEq, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import Html
