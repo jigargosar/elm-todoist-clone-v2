@@ -263,6 +263,7 @@ type alias Model =
     , route : Route
     , zone : Time.Zone
     , today : Date
+    , seed : Random.Seed
     }
 
 
@@ -275,6 +276,7 @@ defaultModel =
     , route = RouteNext7Days
     , zone = Time.utc
     , today = Date.fromRataDie 0
+    , seed = Random.initialSeed 0
     }
 
 
@@ -288,7 +290,7 @@ init flags =
 
         model : Model
         model =
-            { defaultModel | todoList = cache.todoList }
+            { defaultModel | todoList = cache.todoList, seed = Random.initialSeed flags.now }
     in
     initModel model
 
