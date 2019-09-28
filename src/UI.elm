@@ -33,9 +33,14 @@ checkbox3 bool onCheck attrs =
         []
 
 
+btn3 : String -> msg -> List (H.Attribute msg) -> H.Html msg
+btn3 title msg attrs =
+    H.button ([ E.onClick msg, A.class "ph2 pv1 color-primary" ] ++ attrs) [ H.text title ]
+
+
 btn2 : String -> msg -> H.Html msg
 btn2 title msg =
-    H.button [ E.onClick msg, A.class "ph2 pv1 color-primary" ] [ H.text title ]
+    btn3 title msg []
 
 
 btn1 : String -> H.Html msg

@@ -15,7 +15,7 @@ import Maybe.Extra as MX
 import Random
 import Task
 import Time
-import UI exposing (btn1, btn2, checkbox3, col, ipt2, row)
+import UI exposing (btn1, btn2, btn3, checkbox3, col, ipt2, row)
 
 
 type Route
@@ -665,7 +665,7 @@ todoProjectTitle { maybeProjectId } =
 
 viewTodo : Date -> TodoItemLayout -> Todo -> H.Html Msg
 viewTodo today layout todo =
-    row []
+    row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
             ]
@@ -685,7 +685,7 @@ viewTodo today layout todo =
             DueDateItemLayout ->
                 row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
                     [ H.text <| todoProjectTitle todo ]
-        , btn2 "X" (DeleteTodo todo.id)
+        , row [ A.class "child absolute right-0 bg-white-90" ] [ btn2 "X" (DeleteTodo todo.id) ]
         ]
 
 
