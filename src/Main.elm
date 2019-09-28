@@ -534,7 +534,8 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
         filteredTodoList =
             todoList |> List.filter filterPredicate
     in
-    viewInlineEditableTodoList maybeTodoForm filteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
+    viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
+        ++ [ viewAddTodoItem maybeTodoForm ]
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
@@ -542,20 +543,17 @@ viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
     let
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
-
-        viewFilteredTodoList : List (H.Html Msg)
-        viewFilteredTodoList =
-            viewInlineEditableTodoList maybeTodoForm filteredTodoList
     in
-    viewFilteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
+    viewInlineEditableTodoList ProjectItemLayout maybeTodoForm filteredTodoList
+        ++ [ viewAddTodoItem maybeTodoForm ]
 
 
-viewInlineEditableTodoList : Maybe TodoForm -> List Todo -> List (H.Html Msg)
-viewInlineEditableTodoList maybeTodoForm =
+viewInlineEditableTodoList : TodoItemLayout -> Maybe TodoForm -> List Todo -> List (H.Html Msg)
+viewInlineEditableTodoList layout maybeTodoForm =
     List.map
         (\todo ->
             getEditTodoFormTodoId todo.id maybeTodoForm
-                |> MX.unpack (\_ -> viewTodo ProjectItemLayout todo) viewEditTodoForm
+                |> MX.unpack (\_ -> viewTodo layout todo) viewEditTodoForm
         )
 
 
