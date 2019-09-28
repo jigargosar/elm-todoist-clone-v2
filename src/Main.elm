@@ -292,11 +292,11 @@ init flags =
         model =
             { defaultModel | todoList = cache.todoList, seed = Random.initialSeed flags.now }
     in
-    initModel model
+    refreshModel model
 
 
-initModel : Model -> ( Model, Cmd Msg )
-initModel model =
+refreshModel : Model -> ( Model, Cmd Msg )
+refreshModel model =
     ( model, getToday )
 
 
@@ -352,13 +352,13 @@ update msg model =
             ( model, Cmd.none )
 
         ResetModel ->
-            initModel defaultModel
+            refreshModel defaultModel
 
         GotToday today ->
             ( { model | today = today }, Cmd.none )
 
         ChangeRouteTo route ->
-            initModel { model | route = route, maybeTodoForm = Nothing }
+            refreshModel { model | route = route, maybeTodoForm = Nothing }
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
