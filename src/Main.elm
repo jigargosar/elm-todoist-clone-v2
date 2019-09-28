@@ -558,8 +558,7 @@ viewNext7DaysTodoList model =
             List.range from to
                 |> List.map (\ct -> Date.add Date.Days ct model.today)
     in
-    dateRange 0 6
-        |> List.concatMap (\date -> viewTodoListDueOn date model)
+    dateRange 0 6 |> List.concatMap (\date -> viewTodoListDueOn date model)
 
 
 viewTodoListDueTodayWithOverDue model =
