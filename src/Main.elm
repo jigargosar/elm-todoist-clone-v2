@@ -402,12 +402,7 @@ update msg model =
                 |> Return.singleton
 
         Save ->
-            case model.maybeTodoForm of
-                Just form ->
-                    handleSave form model
-
-                Nothing ->
-                    noOp
+            model.maybeTodoForm |> MX.unwrap noOp (saveFormIn model)
 
         Cancel ->
             Return.singleton { model | maybeTodoForm = Nothing }
@@ -416,7 +411,7 @@ update msg model =
             upsertTodoOnSaveClicked todo model
 
 
-handleSave form model =
+saveFormIn model form =
     case form of
         AddTodoForm fields ->
             ( model
