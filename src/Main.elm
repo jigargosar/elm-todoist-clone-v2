@@ -362,7 +362,22 @@ update msg model =
             )
 
         TodoFormMsg subMsg ->
-            updateTodoForm subMsg model
+            let
+                func =
+                    updateTodoFormFields subMsg
+            in
+            ( model
+                |> mapTodoForm
+                    (\form ->
+                        case form of
+                            AddTodoForm addTodoFields ->
+                                AddTodoForm <| func addTodoFields
+
+                            EditTodoForm todo ->
+                                EditTodoForm <| func todo
+                    )
+            , Cmd.none
+            )
 
         Save ->
             case model.maybeTodoForm of
@@ -389,24 +404,6 @@ updateTodoFormFields msg fields =
 
         TodoFormProjectIdChanged maybeProjectId ->
             { fields | maybeProjectId = maybeProjectId }
-
-
-updateTodoForm : TodoFormMsg -> Model -> ( Model, Cmd Msg )
-updateTodoForm todoFormMsg model =
-    let
-        newTodoForm =
-            model.maybeTodoForm
-                |> Maybe.map
-                    (\form ->
-                        case form of
-                            AddTodoForm addTodoFields ->
-                                AddTodoForm <| updateTodoFormFields todoFormMsg addTodoFields
-
-                            EditTodoForm todo ->
-                                EditTodoForm <| updateTodoFormFields todoFormMsg todo
-                    )
-    in
-    ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
 
 
 mapTodoForm : (a -> a) -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
