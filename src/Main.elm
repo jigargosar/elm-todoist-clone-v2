@@ -599,8 +599,11 @@ humanDate date today =
     else if date == addDays 1 then
         "Tomorrow"
 
-    else
+    else if Date.year date == Date.year today then
         Date.format "ddd MMM" date
+
+    else
+        Date.format "ddd MMM YYYY" date
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
