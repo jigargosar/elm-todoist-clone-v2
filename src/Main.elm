@@ -256,7 +256,9 @@ defaultModel : Model
 defaultModel =
     { todoList = initialTodoList
     , maybeTodoForm = Nothing
-    , route = RouteProject (ProjectId "1")
+
+    --    , route = RouteProject (ProjectId "1")
+    , route = RouteToday
     , zone = Time.utc
     , today = Date.fromRataDie 0
     }
@@ -527,7 +529,6 @@ getAddTodoForm maybeForm =
 
 viewTodoListDueTodayWithOverDue model =
     viewOverDueTodoList model
-        ++ [ col [] [ H.text "Today" ] ]
         ++ viewTodoListDueAt model.today model
 
 
@@ -543,7 +544,7 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
         filteredTodoList =
             todoList |> List.filter filterPredicate
     in
-    viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
+    col [] [ H.text "OverDue" ] :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
 
 
 viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
@@ -558,7 +559,8 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
         filteredTodoList =
             todoList |> List.filter filterPredicate
     in
-    viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
+    col [] [ H.text "Today" ]
+        :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
         ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just today)) maybeTodoForm ]
 
 
