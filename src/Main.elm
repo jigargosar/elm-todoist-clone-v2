@@ -547,8 +547,8 @@ viewNext7DaysTodoList { today, todoList } =
         filterDueOn date =
             List.filter
                 (allPass
-                    [ propEq .maybeDueDate (Just date)
-                    , propEq .isDone False
+                    [ propEq .isDone False
+                    , propEq .maybeDueDate (Just date)
                     ]
                 )
 
