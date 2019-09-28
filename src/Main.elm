@@ -259,7 +259,7 @@ defaultModel =
     , maybeTodoForm = Nothing
 
     --    , route = RouteProject (ProjectId "1")
-    , route = RouteToday
+    , route = RouteNext7Days
     , zone = Time.utc
     , today = Date.fromRataDie 0
     }
@@ -436,6 +436,7 @@ viewNav { route } =
         navItems =
             [ NavInbox
             , NavToday
+            , NavNext7Days
             , NavProjects
                 (initialProjectList |> List.map NavProject)
             ]
@@ -450,6 +451,7 @@ type NavProject
 type NavItem
     = NavInbox
     | NavToday
+    | NavNext7Days
     | NavProjects (List NavProject)
 
 
@@ -465,6 +467,9 @@ viewNavItem route item =
 
         NavToday ->
             navBtnHelp "Today" RouteToday
+
+        NavNext7Days ->
+            navBtnHelp "Next 7 Days" RouteNext7Days
 
         NavProjects list ->
             col []
