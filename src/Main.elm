@@ -544,7 +544,8 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
         filteredTodoList =
             todoList |> List.filter filterPredicate
     in
-    col [] [ H.text "OverDue" ] :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
+    col [] [ H.text "OverDue" ]
+        :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
 
 
 viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
