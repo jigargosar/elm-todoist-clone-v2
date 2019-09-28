@@ -298,10 +298,10 @@ setTodoForm form model =
 -- UPDATE
 
 
-type TodoFormMsg
-    = TodoFormTitleChanged String
-    | TodoFormDueDateChanged (Maybe Date)
-    | TodoFormProjectIdChanged (Maybe ProjectId)
+type PatchTodoForm
+    = TitleChanged String
+    | DueDateChanged (Maybe Date)
+    | ProjectIdChanged (Maybe ProjectId)
 
 
 type Msg
@@ -310,7 +310,7 @@ type Msg
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | EditTodoClicked Todo
-    | TodoFormMsg TodoFormMsg
+    | PatchTodoForm PatchTodoForm
     | Save
     | Cancel
     | ChangeRouteTo Route
@@ -361,7 +361,7 @@ update msg model =
             , Cmd.none
             )
 
-        TodoFormMsg subMsg ->
+        PatchTodoForm subMsg ->
             let
                 mapperFunc =
                     updateTodoFormFields subMsg
@@ -393,16 +393,16 @@ update msg model =
             )
 
 
-updateTodoFormFields : TodoFormMsg -> HasTodoFormFields a -> HasTodoFormFields a
+updateTodoFormFields : PatchTodoForm -> HasTodoFormFields a -> HasTodoFormFields a
 updateTodoFormFields msg fields =
     case msg of
-        TodoFormTitleChanged title ->
+        TitleChanged title ->
             { fields | title = title }
 
-        TodoFormDueDateChanged maybeDueDate ->
+        DueDateChanged maybeDueDate ->
             { fields | maybeDueDate = maybeDueDate }
 
-        TodoFormProjectIdChanged maybeProjectId ->
+        ProjectIdChanged maybeProjectId ->
             { fields | maybeProjectId = maybeProjectId }
 
 
@@ -719,10 +719,10 @@ viewAddTodoButton onClick =
 viewTodoForm { title, maybeProjectId, maybeDueDate } =
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
-            [ ipt2 title (TodoFormMsg << TodoFormTitleChanged)
+            [ ipt2 title (PatchTodoForm << TitleChanged)
             ]
-        , viewProjectSelect maybeProjectId (TodoFormMsg << TodoFormProjectIdChanged)
-        , viewDueDateInput maybeDueDate (TodoFormMsg << TodoFormDueDateChanged)
+        , viewProjectSelect maybeProjectId (PatchTodoForm << ProjectIdChanged)
+        , viewDueDateInput maybeDueDate (PatchTodoForm << DueDateChanged)
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" Cancel ]
         ]
 
