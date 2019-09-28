@@ -308,7 +308,7 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
-    | AddTodoFormClicked (Maybe ProjectId) (Maybe Date)
+    | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | UpsertTodoOnSaveClicked Todo
@@ -363,7 +363,7 @@ update msg model =
             in
             ( newModel, cacheModel newModel )
 
-        AddTodoFormClicked maybeProjectId maybeDueDate ->
+        AddTodoClicked maybeProjectId maybeDueDate ->
             ( { model
                 | maybeTodoForm =
                     Just <|
@@ -545,6 +545,11 @@ getAddTodoForm maybeForm =
             Nothing
 
 
+getAddTodoFormWithInitialDueDateEq : Date -> Maybe TodoForm -> Maybe AddTodoFields
+getAddTodoFormWithInitialDueDateEq date =
+    getAddTodoForm >> MX.filter (propEq .initialDueDate (Just date))
+
+
 viewNext7DaysTodoList model =
     let
         dateRange : Int -> Int -> List Date
@@ -591,7 +596,9 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewInlineEditableTodoList DueDateItemLayout model filteredTodoList
-        ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just dueDate)) maybeTodoForm ]
+        ++ [ getAddTodoForm maybeTodoForm
+                |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just dueDate))) viewAddTodoForm
+           ]
 
 
 humanDate date today =
@@ -622,7 +629,9 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
     viewInlineEditableTodoList ProjectItemLayout model filteredTodoList
-        ++ [ viewAddTodoItem (AddTodoFormClicked maybeProjectId Nothing) maybeTodoForm ]
+        ++ [ getAddTodoForm maybeTodoForm
+                |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewAddTodoForm
+           ]
 
 
 viewInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
@@ -671,16 +680,9 @@ viewTodo today layout todo =
         ]
 
 
-viewAddTodoItem : Msg -> Maybe TodoForm -> H.Html Msg
-viewAddTodoItem onClick maybeTodoForm =
-    getAddTodoForm maybeTodoForm
-        |> MX.unwrap (viewAddTodoButton onClick) viewAddTodoForm
-
-
 viewAddTodoButton : Msg -> H.Html Msg
 viewAddTodoButton onClick =
-    row [ A.class "pa1" ]
-        [ btn2 "add todo" onClick ]
+    row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
 
 
 viewAddTodoForm fields =
