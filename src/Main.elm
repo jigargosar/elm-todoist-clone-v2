@@ -378,7 +378,7 @@ update msg model =
             )
 
 
-updateTodoFormFields : TodoFormMsg -> { b | title : String, maybeDueDate : Maybe Date, maybeProjectId : Maybe ProjectId } -> { b | title : String, maybeDueDate : Maybe Date, maybeProjectId : Maybe ProjectId }
+updateTodoFormFields : TodoFormMsg -> HasTodoFormFields a -> HasTodoFormFields a
 updateTodoFormFields msg fields =
     case msg of
         TodoFormTitleChanged title ->
