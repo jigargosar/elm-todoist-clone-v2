@@ -297,14 +297,7 @@ init flags =
 
 initModel : Model -> ( Model, Cmd Msg )
 initModel model =
-    ( model
-    , Cmd.batch [ getZone, getToday ]
-    )
-
-
-getZone : Cmd Msg
-getZone =
-    Time.here |> Task.perform GotZone
+    ( model, getToday )
 
 
 getToday =
@@ -330,7 +323,6 @@ type Msg
     | Cancel
     | ChangeRouteTo Route
     | ResetModel
-    | GotZone Time.Zone
     | GotToday Date
 
 
@@ -355,101 +347,82 @@ doneChecked todoId isDone =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        noOp =
-            Return.singleton model
-    in
     case msg of
         NoOp ->
-            noOp
+            ( model, Cmd.none )
 
         ResetModel ->
             initModel defaultModel
 
-        GotZone zone ->
-            Return.singleton { model | zone = zone }
-
         GotToday today ->
-            Return.singleton { model | today = today }
+            ( { model | today = today }, Cmd.none )
 
         ChangeRouteTo route ->
             initModel { model | route = route, maybeTodoForm = Nothing }
 
         DeleteTodo todoId ->
-            model
-                |> mapTodoList (List.filter (idEq todoId >> not))
-                |> Return.singleton
+            ( model |> mapTodoList (List.filter (idEq todoId >> not))
+            , Cmd.none
+            )
 
         PatchTodo todoId todoPatch ->
-            model
-                |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
-                |> Return.singleton
+            ( model |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
+            , Cmd.none
+            )
 
         AddTodoClicked maybeProjectId maybeDueDate ->
-            Return.singleton
-                { model
-                    | maybeTodoForm =
-                        Just <|
-                            AddTodoForm
-                                { title = ""
-                                , maybeProjectId = maybeProjectId
-                                , maybeDueDate = maybeDueDate
-                                , initialDueDate = maybeDueDate
-                                }
-                }
+            ( { model
+                | maybeTodoForm =
+                    Just <|
+                        AddTodoForm
+                            { title = ""
+                            , maybeProjectId = maybeProjectId
+                            , maybeDueDate = maybeDueDate
+                            , initialDueDate = maybeDueDate
+                            }
+              }
+            , Cmd.none
+            )
 
         SetMaybeTodoForm addTodo ->
-            Return.singleton { model | maybeTodoForm = addTodo }
+            ( { model | maybeTodoForm = addTodo }
+            , Cmd.none
+            )
 
         Save ->
-            unwrapMaybeWithinModel .maybeTodoForm saveForm model
+            case model.maybeTodoForm of
+                Just form ->
+                    handleSave form model
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         Cancel ->
-            Return.singleton { model | maybeTodoForm = Nothing }
+            ( { model | maybeTodoForm = Nothing }
+            , Cmd.none
+            )
 
 
-unwrapMaybeWithinModel getMaybeProp func model =
-    getMaybeProp model |> MX.unwrap ( model, Cmd.none ) (\v -> func v model)
-
-
-type alias HasSeed a =
-    { a | seed : Random.Seed }
-
-
-generate : Random.Generator a -> HasSeed b -> ( a, HasSeed b )
-generate generator model =
-    Random.step generator model.seed
-        |> Tuple.mapSecond (\seed -> { model | seed = seed })
-
-
-saveForm : TodoForm -> Model -> Return.Return Msg Model
-saveForm form model =
+handleSave : TodoForm -> Model -> ( Model, Cmd Msg )
+handleSave form model =
     let
-        todoGen : Random.Generator Todo
-        todoGen =
+        ( todo, newModel ) =
             case form of
                 AddTodoForm fields ->
-                    todoIdGen
-                        |> Random.map (\todoId -> todoFromFields todoId fields)
+                    Random.step
+                        (Random.map (\todoId -> todoFromFields todoId fields) todoIdGen)
+                        model.seed
+                        |> Tuple.mapSecond (\seed -> { model | seed = seed })
 
                 EditTodoForm editingTodo ->
-                    Random.constant editingTodo
+                    ( editingTodo, model )
     in
-    generate todoGen model
-        |> uncurry upsertTodo
-
-
-upsertTodo todo model =
-    { model
+    ( { newModel
         | todoList = upsertById todo model.todoList
         , maybeTodoForm = Nothing
-    }
-        |> Return.singleton
-
-
-uncurry : (a -> b -> c) -> ( a, b ) -> c
-uncurry func ( a, b ) =
-    func a b
+      }
+    , Cmd.none
+    )
 
 
 subscriptions : Model -> Sub msg
