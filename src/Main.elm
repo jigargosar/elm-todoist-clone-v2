@@ -354,18 +354,22 @@ doneChecked todoId isDone =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        noOp =
+            Return.singleton model
+    in
     case msg of
         NoOp ->
-            ( model, Cmd.none )
+            noOp
 
         ResetModel ->
             initModel defaultModel
 
         GotZone zone ->
-            ( { model | zone = zone }, Cmd.none )
+            Return.singleton { model | zone = zone }
 
         GotToday today ->
-            ( { model | today = today }, Cmd.none )
+            Return.singleton { model | today = today }
 
         ChangeRouteTo route ->
             initModel { model | route = route, maybeTodoForm = Nothing }
@@ -381,18 +385,17 @@ update msg model =
                 |> Return.singleton
 
         AddTodoClicked maybeProjectId maybeDueDate ->
-            ( { model
-                | maybeTodoForm =
-                    Just <|
-                        AddTodoForm
-                            { title = ""
-                            , maybeProjectId = maybeProjectId
-                            , maybeDueDate = maybeDueDate
-                            , initialDueDate = maybeDueDate
-                            }
-              }
-            , Cmd.none
-            )
+            Return.singleton
+                { model
+                    | maybeTodoForm =
+                        Just <|
+                            AddTodoForm
+                                { title = ""
+                                , maybeProjectId = maybeProjectId
+                                , maybeDueDate = maybeDueDate
+                                , initialDueDate = maybeDueDate
+                                }
+                }
 
         SetMaybeTodoForm addTodo ->
             { model | maybeTodoForm = addTodo }
@@ -404,11 +407,10 @@ update msg model =
                     handleSave form model
 
                 Nothing ->
-                    ( model, Cmd.none )
+                    noOp
 
         Cancel ->
-            { model | maybeTodoForm = Nothing }
-                |> Return.singleton
+            Return.singleton { model | maybeTodoForm = Nothing }
 
         UpsertTodoOnSaveClicked todo ->
             upsertTodoOnSaveClicked todo model
