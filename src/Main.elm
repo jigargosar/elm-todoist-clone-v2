@@ -298,7 +298,7 @@ setTodoForm form model =
 -- UPDATE
 
 
-type PatchTodoForm
+type PatchTodoFields
     = TitleChanged String
     | DueDateChanged (Maybe Date)
     | ProjectIdChanged (Maybe ProjectId)
@@ -310,7 +310,7 @@ type Msg
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | EditTodoClicked Todo
-    | PatchTodoForm PatchTodoForm
+    | PatchTodoForm PatchTodoFields
     | Save
     | Cancel
     | ChangeRouteTo Route
@@ -393,7 +393,7 @@ update msg model =
             )
 
 
-updateTodoFormFields : PatchTodoForm -> HasTodoFormFields a -> HasTodoFormFields a
+updateTodoFormFields : PatchTodoFields -> HasTodoFormFields a -> HasTodoFormFields a
 updateTodoFormFields msg fields =
     case msg of
         TitleChanged title ->
