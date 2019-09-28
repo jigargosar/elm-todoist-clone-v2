@@ -15,7 +15,7 @@ import Maybe.Extra as MX
 import Random
 import Task
 import Time
-import UI exposing (btn1, btn2, btn3, checkbox3, col, ipt2, row)
+import UI exposing (btn1, btn2, btn3, checkbox3, col, colKeyed, ipt2, row)
 
 
 type Route
@@ -89,6 +89,10 @@ todoIdGen =
 
 todoIdEncoder (TodoId v) =
     JE.string v
+
+
+todoIdToString (TodoId id) =
+    id
 
 
 type alias Todo =
@@ -646,9 +650,13 @@ viewInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Htm
 viewInlineEditableTodoList layout { today, maybeTodoForm } =
     List.map
         (\todo ->
-            getEditTodoFormForTodoId todo.id maybeTodoForm
+            ( todoIdToString todo.id
+            , getEditTodoFormForTodoId todo.id maybeTodoForm
                 |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
+            )
         )
+        >> colKeyed []
+        >> List.singleton
 
 
 type TodoItemLayout

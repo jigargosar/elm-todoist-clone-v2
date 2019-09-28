@@ -6,6 +6,7 @@ import Html
 import Html.Styled as H exposing (div)
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
+import Html.Styled.Keyed as HK
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
@@ -14,6 +15,11 @@ import Json.Encode as JE exposing (Value, encode, object)
 col : List (H.Attribute msg) -> List (H.Html msg) -> H.Html msg
 col attrs =
     H.div (A.class "flex flex-column" :: attrs)
+
+
+colKeyed : List (H.Attribute msg) -> List ( String, H.Html msg ) -> H.Html msg
+colKeyed attrs =
+    HK.node "div" (A.class "flex flex-column" :: attrs)
 
 
 row : List (H.Attribute msg) -> List (H.Html msg) -> H.Html msg
