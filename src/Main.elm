@@ -432,13 +432,20 @@ saveFormIn model form =
                     Random.constant editingTodo
     in
     generate todoGen model
-        |> (\( todo, newModel ) ->
-                { newModel
-                    | todoList = upsertById todo model.todoList
-                    , maybeTodoForm = Nothing
-                }
-                    |> Return.singleton
-           )
+        |> uncurry upsertTodo
+
+
+upsertTodo todo model =
+    { model
+        | todoList = upsertById todo model.todoList
+        , maybeTodoForm = Nothing
+    }
+        |> Return.singleton
+
+
+uncurry : (a -> b -> c) -> ( a, b ) -> c
+uncurry func ( a, b ) =
+    func a b
 
 
 subscriptions : Model -> Sub msg
