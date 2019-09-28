@@ -328,7 +328,6 @@ type Msg
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
     | Cancel
-    | UpsertTodoOnSaveClicked Todo
     | ChangeRouteTo Route
     | ResetModel
     | GotZone Time.Zone
@@ -408,9 +407,6 @@ update msg model =
         Cancel ->
             Return.singleton { model | maybeTodoForm = Nothing }
 
-        UpsertTodoOnSaveClicked todo ->
-            upsertTodoOnSaveClicked todo model
-
 
 type alias HasSeed a =
     { a | seed : Random.Seed }
@@ -422,31 +418,27 @@ generate generator model =
         |> Tuple.mapSecond (\seed -> { model | seed = seed })
 
 
-uncurry func ( a, b ) =
-    func a b
-
-
+saveFormIn : Model -> TodoForm -> Return.Return Msg Model
 saveFormIn model form =
-    case form of
-        AddTodoForm fields ->
-            let
-                todoGenerator =
+    let
+        todoGen : Random.Generator Todo
+        todoGen =
+            case form of
+                AddTodoForm fields ->
                     todoIdGen
                         |> Random.map (\todoId -> todoFromFields todoId fields)
-            in
-            generate todoGenerator model
-                |> uncurry upsertTodoOnSaveClicked
 
-        EditTodoForm editingTodo ->
-            upsertTodoOnSaveClicked editingTodo model
-
-
-upsertTodoOnSaveClicked todo model =
-    { model
-        | todoList = upsertById todo model.todoList
-        , maybeTodoForm = Nothing
-    }
-        |> Return.singleton
+                EditTodoForm editingTodo ->
+                    Random.constant editingTodo
+    in
+    generate todoGen model
+        |> (\( todo, newModel ) ->
+                { newModel
+                    | todoList = upsertById todo model.todoList
+                    , maybeTodoForm = Nothing
+                }
+                    |> Return.singleton
+           )
 
 
 subscriptions : Model -> Sub msg
