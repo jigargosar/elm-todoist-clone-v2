@@ -647,7 +647,14 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
 
 viewInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
-viewInlineEditableTodoList layout { today, maybeTodoForm } =
+viewInlineEditableTodoList layout model =
+    viewKeyedInlineEditableTodoList layout model
+        >> colKeyed []
+        >> List.singleton
+
+
+viewKeyedInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
+viewKeyedInlineEditableTodoList layout { today, maybeTodoForm } =
     List.map
         (\todo ->
             ( todoIdToString todo.id
@@ -655,8 +662,6 @@ viewInlineEditableTodoList layout { today, maybeTodoForm } =
                 |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
             )
         )
-        >> colKeyed []
-        >> List.singleton
 
 
 type TodoItemLayout
