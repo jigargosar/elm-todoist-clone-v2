@@ -16,7 +16,7 @@ import Random
 import Return
 import Task
 import Time
-import UI exposing (btn1, btn2, btn3, checkbox3, col, colKeyed, ipt2, row)
+import UI exposing (btn2, checkbox3, col, colKeyed, ipt2, row)
 
 
 type Route
@@ -371,20 +371,14 @@ update msg model =
             initModel { model | route = route, maybeTodoForm = Nothing }
 
         DeleteTodo todoId ->
-            let
-                newModel =
-                    model
-                        |> mapTodoList (List.filter (idEq todoId >> not))
-            in
-            ( newModel, Cmd.none )
+            model
+                |> mapTodoList (List.filter (idEq todoId >> not))
+                |> Return.singleton
 
         PatchTodo todoId todoPatch ->
-            let
-                newModel =
-                    model
-                        |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
-            in
-            ( newModel, Cmd.none )
+            model
+                |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
+                |> Return.singleton
 
         AddTodoClicked maybeProjectId maybeDueDate ->
             ( { model
@@ -401,11 +395,8 @@ update msg model =
             )
 
         SetMaybeTodoForm addTodo ->
-            let
-                newModel =
-                    { model | maybeTodoForm = addTodo }
-            in
-            ( newModel, Cmd.none )
+            { model | maybeTodoForm = addTodo }
+                |> Return.singleton
 
         Save ->
             case model.maybeTodoForm of
@@ -416,11 +407,8 @@ update msg model =
                     ( model, Cmd.none )
 
         Cancel ->
-            let
-                newModel =
-                    { model | maybeTodoForm = Nothing }
-            in
-            ( newModel, Cmd.none )
+            { model | maybeTodoForm = Nothing }
+                |> Return.singleton
 
         UpsertTodoOnSaveClicked todo ->
             upsertTodoOnSaveClicked todo model
@@ -442,14 +430,11 @@ handleSave form model =
 
 
 upsertTodoOnSaveClicked todo model =
-    let
-        newModel =
-            { model
-                | todoList = upsertById todo model.todoList
-                , maybeTodoForm = Nothing
-            }
-    in
-    ( newModel, Cmd.none )
+    { model
+        | todoList = upsertById todo model.todoList
+        , maybeTodoForm = Nothing
+    }
+        |> Return.singleton
 
 
 subscriptions : Model -> Sub msg
