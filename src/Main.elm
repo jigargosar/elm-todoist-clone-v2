@@ -537,7 +537,7 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
     let
         filterPredicate =
             allPass
-                [ propEq .maybeDueDate (Just today)
+                [ .maybeDueDate >> MX.unwrap False (\dueDate -> Date.compare dueDate today == LT)
                 , propEq .isDone False
                 ]
 
