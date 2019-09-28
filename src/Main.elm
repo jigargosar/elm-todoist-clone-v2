@@ -553,7 +553,7 @@ viewTodoListDueTodayWithOverDue model =
 
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
-viewOverDueTodoList { today, todoList, maybeTodoForm } =
+viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
     let
         filterPredicate =
             allPass
@@ -565,11 +565,11 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
             todoList |> List.filter filterPredicate
     in
     col [] [ H.text "OverDue" ]
-        :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
+        :: viewInlineEditableTodoList DueDateItemLayout model filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
-viewTodoListDueOn dueDate { today, todoList, maybeTodoForm } =
+viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     let
         filterPredicate =
             allPass
@@ -581,7 +581,7 @@ viewTodoListDueOn dueDate { today, todoList, maybeTodoForm } =
             todoList |> List.filter filterPredicate
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
-        :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
+        :: viewInlineEditableTodoList DueDateItemLayout model filteredTodoList
         ++ [ viewAddTodoItem (AddTodoFormClicked Nothing (Just dueDate)) maybeTodoForm ]
 
 
@@ -607,21 +607,21 @@ humanDate date today =
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
-viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
+viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as model) =
     let
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
-    viewInlineEditableTodoList ProjectItemLayout maybeTodoForm filteredTodoList
+    viewInlineEditableTodoList ProjectItemLayout model filteredTodoList
         ++ [ viewAddTodoItem (AddTodoFormClicked maybeProjectId Nothing) maybeTodoForm ]
 
 
-viewInlineEditableTodoList : TodoItemLayout -> Maybe TodoForm -> List Todo -> List (H.Html Msg)
-viewInlineEditableTodoList layout maybeTodoForm =
+viewInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
+viewInlineEditableTodoList layout { today, maybeTodoForm } =
     List.map
         (\todo ->
             getEditTodoFormTodoId todo.id maybeTodoForm
-                |> MX.unpack (\_ -> viewTodo layout todo) viewEditTodoForm
+                |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
         )
 
 
@@ -637,8 +637,8 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
-viewTodo : TodoItemLayout -> Todo -> H.Html Msg
-viewTodo layout todo =
+viewTodo : Date -> TodoItemLayout -> Todo -> H.Html Msg
+viewTodo today layout todo =
     row []
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
@@ -653,7 +653,7 @@ viewTodo layout todo =
                 todo.maybeDueDate
                     |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
                         (\dueDate ->
-                            row [ A.class "self-start pa1 f7 code" ] [ H.text (Date.toIsoString dueDate) ]
+                            row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                         )
 
             DueDateItemLayout ->
