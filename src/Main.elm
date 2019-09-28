@@ -550,19 +550,12 @@ viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
     viewFilteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
 
 
+viewInlineEditableTodoList : Maybe TodoForm -> List Todo -> List (H.Html Msg)
 viewInlineEditableTodoList maybeTodoForm =
     List.map
         (\todo ->
-            case maybeTodoForm of
-                Just (EditTodoForm editTodo) ->
-                    if todo.id == editTodo.id then
-                        viewEditTodoForm editTodo
-
-                    else
-                        viewTodo ProjectItemLayout todo
-
-                _ ->
-                    viewTodo ProjectItemLayout todo
+            getEditTodoFormTodoId todo.id maybeTodoForm
+                |> MX.unpack (\_ -> viewTodo ProjectItemLayout todo) viewEditTodoForm
         )
 
 
@@ -602,6 +595,7 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
+viewEditTodoForm : Todo -> H.Html Msg
 viewEditTodoForm fields =
     let
         setForm =
