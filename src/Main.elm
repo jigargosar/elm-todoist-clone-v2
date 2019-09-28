@@ -298,7 +298,7 @@ setTodoForm form model =
 -- UPDATE
 
 
-type PatchTodoFields
+type TodoFormFieldPatch
     = TitleChanged String
     | DueDateChanged (Maybe Date)
     | ProjectIdChanged (Maybe ProjectId)
@@ -310,7 +310,7 @@ type Msg
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | EditTodoClicked Todo
-    | PatchTodoFields PatchTodoFields
+    | PatchTodoFormField TodoFormFieldPatch
     | Save
     | Cancel
     | ChangeRouteTo Route
@@ -361,7 +361,7 @@ update msg model =
             , Cmd.none
             )
 
-        PatchTodoFields subMsg ->
+        PatchTodoFormField subMsg ->
             let
                 mapperFunc =
                     updateTodoFormFields subMsg
@@ -393,7 +393,7 @@ update msg model =
             )
 
 
-updateTodoFormFields : PatchTodoFields -> HasTodoFormFields a -> HasTodoFormFields a
+updateTodoFormFields : TodoFormFieldPatch -> HasTodoFormFields a -> HasTodoFormFields a
 updateTodoFormFields msg fields =
     case msg of
         TitleChanged title ->
@@ -719,10 +719,10 @@ viewAddTodoButton onClick =
 viewTodoForm { title, maybeProjectId, maybeDueDate } =
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
-            [ ipt2 title (PatchTodoFields << TitleChanged)
+            [ ipt2 title (PatchTodoFormField << TitleChanged)
             ]
-        , viewProjectSelect maybeProjectId (PatchTodoFields << ProjectIdChanged)
-        , viewDueDateInput maybeDueDate (PatchTodoFields << DueDateChanged)
+        , viewProjectSelect maybeProjectId (PatchTodoFormField << ProjectIdChanged)
+        , viewDueDateInput maybeDueDate (PatchTodoFormField << DueDateChanged)
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" Cancel ]
         ]
 
