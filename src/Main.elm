@@ -398,8 +398,7 @@ update msg model =
                 }
 
         SetMaybeTodoForm addTodo ->
-            { model | maybeTodoForm = addTodo }
-                |> Return.singleton
+            Return.singleton { model | maybeTodoForm = addTodo }
 
         Save ->
             model.maybeTodoForm |> MX.unwrap noOp (saveFormIn model)
