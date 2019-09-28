@@ -494,7 +494,7 @@ viewRoute model route =
             viewTodoListForMaybeProjectId Nothing model
 
         RouteToday ->
-            viewTodoListDueAt model.today model
+            viewTodoListDueTodayWithOverDue model
 
         RouteProject projectId ->
             viewTodoListForMaybeProjectId (Just projectId) model
@@ -523,6 +523,27 @@ getAddTodoForm maybeForm =
 
         _ ->
             Nothing
+
+
+viewTodoListDueTodayWithOverDue model =
+    viewOverDueTodoList model
+        ++ [ col [] [ H.text "Today" ] ]
+        ++ viewTodoListDueAt model.today model
+
+
+viewOverDueTodoList : Model -> List (H.Html Msg)
+viewOverDueTodoList { today, todoList, maybeTodoForm } =
+    let
+        filterPredicate =
+            allPass
+                [ propEq .maybeDueDate (Just today)
+                , propEq .isDone False
+                ]
+
+        filteredTodoList =
+            todoList |> List.filter filterPredicate
+    in
+    viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
 
 
 viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
