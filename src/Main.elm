@@ -405,12 +405,10 @@ updateTodoForm todoFormMsg _ model =
                     (\form ->
                         case form of
                             AddTodoForm addTodoFields ->
-                                updateTodoFormFields todoFormMsg addTodoFields
-                                    |> AddTodoForm
+                                AddTodoForm <| updateTodoFormFields todoFormMsg addTodoFields
 
                             EditTodoForm todo ->
-                                updateTodoFormFields todoFormMsg todo
-                                    |> EditTodoForm
+                                EditTodoForm <| updateTodoFormFields todoFormMsg todo
                     )
     in
     ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
