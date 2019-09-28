@@ -383,6 +383,7 @@ update msg model =
             )
 
 
+updateTodoFormFields : TodoFormMsg -> { b | title : String, maybeDueDate : Maybe Date, maybeProjectId : Maybe ProjectId } -> { b | title : String, maybeDueDate : Maybe Date, maybeProjectId : Maybe ProjectId }
 updateTodoFormFields msg fields =
     case msg of
         TodoFormTitleChanged title ->
@@ -406,14 +407,14 @@ updateTodoForm todoFormMsg _ model =
                 Just form ->
                     case form of
                         AddTodoForm addTodoFields ->
-                            Just <|
-                                AddTodoForm <|
-                                    updateTodoFormFields todoFormMsg addTodoFields
+                            updateTodoFormFields todoFormMsg addTodoFields
+                                |> AddTodoForm
+                                |> Just
 
                         EditTodoForm todo ->
-                            Just <|
-                                EditTodoForm <|
-                                    updateTodoFormFields todoFormMsg todo
+                            updateTodoFormFields todoFormMsg todo
+                                |> EditTodoForm
+                                |> Just
     in
     ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
 
