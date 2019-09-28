@@ -685,7 +685,7 @@ viewTodo today layout todo =
             DueDateItemLayout ->
                 row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
                     [ H.text <| todoProjectTitle todo ]
-        , btn1 "X"
+        , btn2 "X" (DeleteTodo todo.id)
         ]
 
 
