@@ -13,6 +13,7 @@ import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
 import Random
+import Return
 import Task
 import Time
 import UI exposing (btn1, btn2, btn3, checkbox3, col, colKeyed, ipt2, row)
@@ -179,8 +180,8 @@ cacheDecoder =
         |> optional "todoList" (JD.list todoDecoder) initialTodoList
 
 
-cacheModel : Model -> Cmd msg
-cacheModel model =
+cacheModel_ : Model -> Cmd msg
+cacheModel_ model =
     let
         maybeEncoder =
             MX.unwrap JE.null
@@ -295,7 +296,7 @@ init flags =
 initModel : Model -> ( Model, Cmd Msg )
 initModel model =
     ( model
-    , Cmd.batch [ cacheModel model, getZone, getToday ]
+    , Cmd.batch [ getZone, getToday ]
     )
 
 
@@ -375,7 +376,7 @@ update msg model =
                     model
                         |> mapTodoList (List.filter (idEq todoId >> not))
             in
-            ( newModel, cacheModel newModel )
+            ( newModel, Cmd.none )
 
         PatchTodo todoId todoPatch ->
             let
@@ -383,7 +384,7 @@ update msg model =
                     model
                         |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
             in
-            ( newModel, cacheModel newModel )
+            ( newModel, Cmd.none )
 
         AddTodoClicked maybeProjectId maybeDueDate ->
             ( { model
@@ -404,7 +405,7 @@ update msg model =
                 newModel =
                     { model | maybeTodoForm = addTodo }
             in
-            ( newModel, cacheModel newModel )
+            ( newModel, Cmd.none )
 
         Save ->
             case model.maybeTodoForm of
@@ -419,7 +420,7 @@ update msg model =
                 newModel =
                     { model | maybeTodoForm = Nothing }
             in
-            ( newModel, cacheModel newModel )
+            ( newModel, Cmd.none )
 
         UpsertTodoOnSaveClicked todo ->
             upsertTodoOnSaveClicked todo model
@@ -448,7 +449,7 @@ upsertTodoOnSaveClicked todo model =
                 , maybeTodoForm = Nothing
             }
     in
-    ( newModel, cacheModel newModel )
+    ( newModel, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
@@ -807,7 +808,7 @@ main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
-        , update = update
+        , update = \msg model -> update msg model |> Return.effect_ cacheModel
         , view = view
         , subscriptions = subscriptions
         }
