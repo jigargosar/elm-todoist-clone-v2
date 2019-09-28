@@ -543,12 +543,7 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
 
         viewAddTodoItem =
             getAddTodoForm maybeTodoForm
-                |> MX.unpack
-                    (\_ ->
-                        row [ A.class "pa1" ]
-                            [ btn2 "add todo" (AddTodoFormClicked Nothing) ]
-                    )
-                    viewAddTodoForm
+                |> MX.unwrap viewAddTodoButton viewAddTodoForm
     in
     viewFilteredTodoList
         ++ [ viewAddTodoItem ]
@@ -638,6 +633,11 @@ viewEditTodoForm fields =
             }
     in
     viewTodoForm config fields
+
+
+viewAddTodoButton =
+    row [ A.class "pa1" ]
+        [ btn2 "add todo" (AddTodoFormClicked Nothing) ]
 
 
 viewAddTodoForm fields =
