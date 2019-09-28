@@ -552,22 +552,25 @@ viewTodoListForMaybeProjectId maybeProjectId { maybeTodoForm, todoList } =
 
         viewFilteredTodoList : List (H.Html Msg)
         viewFilteredTodoList =
-            List.map
-                (\todo ->
-                    case maybeTodoForm of
-                        Just (EditTodoForm editTodo) ->
-                            if todo.id == editTodo.id then
-                                viewEditTodoForm editTodo
-
-                            else
-                                viewTodo ProjectItemLayout todo
-
-                        _ ->
-                            viewTodo ProjectItemLayout todo
-                )
-                filteredTodoList
+            viewInlineEditableTodoList maybeTodoForm filteredTodoList
     in
     viewFilteredTodoList ++ [ viewAddTodoItem maybeTodoForm ]
+
+
+viewInlineEditableTodoList maybeTodoForm =
+    List.map
+        (\todo ->
+            case maybeTodoForm of
+                Just (EditTodoForm editTodo) ->
+                    if todo.id == editTodo.id then
+                        viewEditTodoForm editTodo
+
+                    else
+                        viewTodo ProjectItemLayout todo
+
+                _ ->
+                    viewTodo ProjectItemLayout todo
+        )
 
 
 type TodoItemLayout
