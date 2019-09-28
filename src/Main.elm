@@ -530,8 +530,8 @@ getEditTodoForm maybeForm =
             Nothing
 
 
-getEditTodoFormTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
-getEditTodoFormTodoId todoId =
+getEditTodoFormForTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
+getEditTodoFormForTodoId todoId =
     getEditTodoForm >> MX.filter (idEq todoId)
 
 
@@ -637,7 +637,7 @@ viewInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Htm
 viewInlineEditableTodoList layout { today, maybeTodoForm } =
     List.map
         (\todo ->
-            getEditTodoFormTodoId todo.id maybeTodoForm
+            getEditTodoFormForTodoId todo.id maybeTodoForm
                 |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
         )
 
