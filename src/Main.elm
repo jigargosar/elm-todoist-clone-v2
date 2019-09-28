@@ -412,16 +412,30 @@ update msg model =
             upsertTodoOnSaveClicked todo model
 
 
+type alias HasSeed a =
+    { a | seed : Random.Seed }
+
+
+generate : Random.Generator a -> HasSeed b -> ( a, HasSeed b )
+generate generator model =
+    Random.step generator model.seed
+        |> Tuple.mapSecond (\seed -> { model | seed = seed })
+
+
+uncurry func ( a, b ) =
+    func a b
+
+
 saveFormIn model form =
     case form of
         AddTodoForm fields ->
-            ( model
-            , Random.generate
-                (\todoId ->
-                    todoFromFields todoId fields |> UpsertTodoOnSaveClicked
-                )
-                todoIdGen
-            )
+            let
+                todoGenerator =
+                    todoIdGen
+                        |> Random.map (\todoId -> todoFromFields todoId fields)
+            in
+            generate todoGenerator model
+                |> uncurry upsertTodoOnSaveClicked
 
         EditTodoForm editingTodo ->
             upsertTodoOnSaveClicked editingTodo model
