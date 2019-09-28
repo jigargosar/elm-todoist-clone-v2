@@ -106,9 +106,9 @@ createMockTodo id title =
     Todo (TodoId id) title False False Nothing Nothing
 
 
-todoFromFields : AddTodoFields -> Todo
-todoFromFields { newTodoId, title, maybeProjectId, maybeDueDate } =
-    Todo newTodoId title False False maybeProjectId maybeDueDate
+todoFromFields : TodoId -> AddTodoFields -> Todo
+todoFromFields id { title, maybeProjectId, maybeDueDate } =
+    Todo id title False False maybeProjectId maybeDueDate
 
 
 initialTodoList =
@@ -232,8 +232,7 @@ type alias Flags =
 
 
 type alias AddTodoFields =
-    { newTodoId : TodoId
-    , title : String
+    { title : String
     , maybeProjectId : Maybe ProjectId
     , maybeDueDate : Maybe Date
     }
@@ -311,6 +310,7 @@ type Msg
     | AddTodoFormClicked (Maybe ProjectId) (Maybe Date)
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
+    | UpsertTodoOnSaveClicked Todo
     | ChangeRouteTo Route
     | ResetModel
     | GotZone Time.Zone
@@ -363,19 +363,16 @@ update msg model =
             ( newModel, cacheModel newModel )
 
         AddTodoFormClicked maybeProjectId maybeDueDate ->
-            ( model
-            , todoIdGen
-                |> Random.generate
-                    (\todoId ->
-                        setTodoForm
-                            (AddTodoForm
-                                { newTodoId = todoId
-                                , title = ""
-                                , maybeProjectId = maybeProjectId
-                                , maybeDueDate = maybeDueDate
-                                }
-                            )
-                    )
+            ( { model
+                | maybeTodoForm =
+                    Just <|
+                        AddTodoForm
+                            { title = ""
+                            , maybeProjectId = maybeProjectId
+                            , maybeDueDate = maybeDueDate
+                            }
+              }
+            , Cmd.none
             )
 
         SetMaybeTodoForm addTodo ->
@@ -393,17 +390,27 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
+        UpsertTodoOnSaveClicked todo ->
+            upsertTodoOnSaveClicked todo model
+
 
 handleSave form model =
+    case form of
+        AddTodoForm fields ->
+            ( model
+            , Random.generate
+                (\todoId ->
+                    todoFromFields todoId fields |> UpsertTodoOnSaveClicked
+                )
+                todoIdGen
+            )
+
+        EditTodoForm editingTodo ->
+            upsertTodoOnSaveClicked editingTodo model
+
+
+upsertTodoOnSaveClicked todo model =
     let
-        todo =
-            case form of
-                AddTodoForm fields ->
-                    todoFromFields fields
-
-                EditTodoForm editingTodo ->
-                    editingTodo
-
         newModel =
             { model
                 | todoList = upsertById todo model.todoList
