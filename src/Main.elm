@@ -500,6 +500,7 @@ viewRoute model route =
             viewTodoListForMaybeProjectId (Just projectId) model
 
 
+getEditTodoForm : Maybe TodoForm -> Maybe Todo
 getEditTodoForm maybeForm =
     case maybeForm of
         Just (EditTodoForm editTodo) ->
@@ -509,6 +510,12 @@ getEditTodoForm maybeForm =
             Nothing
 
 
+getEditTodoFormTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
+getEditTodoFormTodoId todoId =
+    getEditTodoForm >> MX.filter (idEq todoId)
+
+
+getAddTodoForm : Maybe TodoForm -> Maybe AddTodoFields
 getAddTodoForm maybeForm =
     case maybeForm of
         Just (AddTodoForm fields) ->
@@ -516,11 +523,6 @@ getAddTodoForm maybeForm =
 
         _ ->
             Nothing
-
-
-getEditTodoFormTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
-getEditTodoFormTodoId todoId =
-    getEditTodoForm >> MX.filter (idEq todoId)
 
 
 viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
