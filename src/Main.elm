@@ -550,6 +550,7 @@ getAddTodoFormWithInitialDueDateEq date =
     getAddTodoForm >> MX.filter (propEq .initialDueDate (Just date))
 
 
+viewNext7DaysTodoList : Model -> List (H.Html Msg)
 viewNext7DaysTodoList model =
     let
         dateRange : Int -> Int -> List Date
