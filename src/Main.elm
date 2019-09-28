@@ -125,25 +125,6 @@ initialTodoList =
     ]
 
 
-type TodoPatch
-    = SetDone Bool
-    | SetDeleted Bool
-    | TodoPatches (List TodoPatch)
-
-
-patchTodo : TodoPatch -> Todo -> Todo
-patchTodo patch todo =
-    case patch of
-        SetDone isDone ->
-            { todo | isDone = isDone }
-
-        TodoPatches patches ->
-            List.foldl patchTodo todo patches
-
-        SetDeleted isDeleted ->
-            { todo | isDeleted = isDeleted }
-
-
 
 -- CACHE
 
@@ -315,7 +296,7 @@ mapTodoList func model =
 
 type Msg
     = NoOp
-    | PatchTodo TodoId TodoPatch
+    | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | SetMaybeTodoForm (Maybe TodoForm)
@@ -340,11 +321,6 @@ closeForm =
     SetMaybeTodoForm Nothing
 
 
-doneChecked : TodoId -> Bool -> Msg
-doneChecked todoId isDone =
-    PatchTodo todoId (SetDone isDone)
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -365,8 +341,8 @@ update msg model =
             , Cmd.none
             )
 
-        PatchTodo todoId todoPatch ->
-            ( model |> mapTodoList (updateWhenIdEq todoId (patchTodo todoPatch))
+        SetTodoIsDone todoId isDone ->
+            ( model |> mapTodoList (updateWhenIdEq todoId (\todo -> { todo | isDone = isDone }))
             , Cmd.none
             )
 
@@ -681,7 +657,7 @@ viewTodo : Date -> TodoItemLayout -> Todo -> H.Html Msg
 viewTodo today layout todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
-            [ checkbox3 todo.isDone (doneChecked todo.id) [ A.class "sz-24" ]
+            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
             ]
         , row
             [ A.class "pa1 flex-grow-1"
