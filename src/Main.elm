@@ -654,14 +654,18 @@ viewInlineEditableTodoList layout model =
 
 
 viewKeyedInlineEditableTodoList : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
-viewKeyedInlineEditableTodoList layout { today, maybeTodoForm } =
-    List.map
-        (\todo ->
-            ( todoIdToString todo.id
-            , getEditTodoFormForTodoId todo.id maybeTodoForm
-                |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
-            )
-        )
+viewKeyedInlineEditableTodoList layout model =
+    keyed (.id >> todoIdToString) (viewEditableTodoItem layout model)
+
+
+keyed : (item -> String) -> (item -> html) -> List item -> List ( String, html )
+keyed keyF renderF =
+    List.map (\item -> ( keyF item, renderF item ))
+
+
+viewEditableTodoItem layout { today, maybeTodoForm } todo =
+    getEditTodoFormForTodoId todo.id maybeTodoForm
+        |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
 
 
 type TodoItemLayout
