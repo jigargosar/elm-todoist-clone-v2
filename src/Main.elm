@@ -544,12 +544,12 @@ viewNext7DaysTodoList model =
                 |> List.map (\ct -> Date.add Date.Days ct model.today)
     in
     dateRange 0 6
-        |> List.concatMap (\date -> viewTodoListDueAt date model)
+        |> List.concatMap (\date -> viewTodoListDueOn date model)
 
 
 viewTodoListDueTodayWithOverDue model =
     viewOverDueTodoList model
-        ++ viewTodoListDueAt model.today model
+        ++ viewTodoListDueOn model.today model
 
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
@@ -568,8 +568,8 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
         :: viewInlineEditableTodoList DueDateItemLayout maybeTodoForm filteredTodoList
 
 
-viewTodoListDueAt : Date -> Model -> List (H.Html Msg)
-viewTodoListDueAt dueDate { todoList, maybeTodoForm } =
+viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
+viewTodoListDueOn dueDate { todoList, maybeTodoForm } =
     let
         filterPredicate =
             allPass
