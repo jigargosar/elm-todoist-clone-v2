@@ -324,6 +324,7 @@ type Msg
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
+    | Cancel
     | UpsertTodoOnSaveClicked Todo
     | ChangeRouteTo Route
     | ResetModel
@@ -412,6 +413,13 @@ update msg model =
 
                 Nothing ->
                     ( model, Cmd.none )
+
+        Cancel ->
+            let
+                newModel =
+                    { model | maybeTodoForm = Nothing }
+            in
+            ( newModel, cacheModel newModel )
 
         UpsertTodoOnSaveClicked todo ->
             upsertTodoOnSaveClicked todo model
