@@ -608,8 +608,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList DueDateItemLayout model filteredTodoList
-        ++ [ viewAddTodoItemForDueDate dueDate maybeTodoForm
-           ]
+        ++ [ viewAddTodoItemForDueDate dueDate maybeTodoForm ]
 
 
 viewAddTodoItemForDueDate date maybeTodoForm =
@@ -645,9 +644,13 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
     viewEditableTodoList ProjectItemLayout model filteredTodoList
-        ++ [ getAddTodoForm maybeTodoForm
-                |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewAddTodoForm
+        ++ [ viewAddTodoItemForProject maybeProjectId maybeTodoForm
            ]
+
+
+viewAddTodoItemForProject maybeProjectId maybeTodoForm =
+    getAddTodoForm maybeTodoForm
+        |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewAddTodoForm
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
