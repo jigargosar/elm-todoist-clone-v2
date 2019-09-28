@@ -562,8 +562,7 @@ viewNext7DaysTodoList model =
 
 
 viewTodoListDueTodayWithOverDue model =
-    viewOverDueTodoList model
-        ++ viewTodoListDueOn model.today model
+    viewOverDueTodoList model ++ viewTodoListDueOn model.today model
 
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
