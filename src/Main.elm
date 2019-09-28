@@ -400,21 +400,18 @@ updateTodoForm : TodoFormMsg -> TodoForm -> Model -> ( Model, Cmd Msg )
 updateTodoForm todoFormMsg _ model =
     let
         newTodoForm =
-            case model.maybeTodoForm of
-                Nothing ->
-                    Nothing
+            model.maybeTodoForm
+                |> Maybe.map
+                    (\form ->
+                        case form of
+                            AddTodoForm addTodoFields ->
+                                updateTodoFormFields todoFormMsg addTodoFields
+                                    |> AddTodoForm
 
-                Just form ->
-                    case form of
-                        AddTodoForm addTodoFields ->
-                            updateTodoFormFields todoFormMsg addTodoFields
-                                |> AddTodoForm
-                                |> Just
-
-                        EditTodoForm todo ->
-                            updateTodoFormFields todoFormMsg todo
-                                |> EditTodoForm
-                                |> Just
+                            EditTodoForm todo ->
+                                updateTodoFormFields todoFormMsg todo
+                                    |> EditTodoForm
+                    )
     in
     ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
 
