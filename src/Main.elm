@@ -536,27 +536,15 @@ getAddTodoForm maybeForm =
             Nothing
 
 
-viewNext7DaysTodoList { today, todoList } =
+viewNext7DaysTodoList model =
     let
         dateRange : Int -> Int -> List Date
         dateRange from to =
             List.range from to
-                |> List.map (\ct -> Date.add Date.Days ct today)
-
-        filterDueOn : Date -> List Todo -> List Todo
-        filterDueOn date =
-            List.filter
-                (allPass
-                    [ propEq .isDone False
-                    , propEq .maybeDueDate (Just date)
-                    ]
-                )
-
-        groupedTodoList =
-            dateRange 0 6
-                |> List.map (\date -> ( date, filterDueOn date todoList ))
+                |> List.map (\ct -> Date.add Date.Days ct model.today)
     in
-    []
+    dateRange 0 6
+        |> List.concatMap (\date -> viewTodoListDueAt date model)
 
 
 viewTodoListDueTodayWithOverDue model =
