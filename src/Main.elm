@@ -500,7 +500,7 @@ viewRoute model route =
             viewTodoListForMaybeProjectId (Just projectId) model
 
 
-getEditingTodo maybeForm =
+getEditTodoForm maybeForm =
     case maybeForm of
         Just (EditTodoForm editTodo) ->
             Just editTodo
@@ -509,7 +509,7 @@ getEditingTodo maybeForm =
             Nothing
 
 
-getAddTodoFields maybeForm =
+getAddTodoForm maybeForm =
     case maybeForm of
         Just (AddTodoForm fields) ->
             Just fields
@@ -518,9 +518,9 @@ getAddTodoFields maybeForm =
             Nothing
 
 
-getEditTodoFormForTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
-getEditTodoFormForTodoId todoId =
-    getEditingTodo >> MX.filter (idEq todoId)
+getEditTodoFormTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
+getEditTodoFormTodoId todoId =
+    getEditTodoForm >> MX.filter (idEq todoId)
 
 
 viewTodoListDueAt today { todoList, maybeTodoForm } =
@@ -537,18 +537,18 @@ viewTodoListDueAt today { todoList, maybeTodoForm } =
                 |> List.filter filterPredicate
                 |> List.map
                     (\todo ->
-                        getEditTodoFormForTodoId todo.id maybeTodoForm
+                        getEditTodoFormTodoId todo.id maybeTodoForm
                             |> MX.unpack (\_ -> viewTodo DueDateItemLayout todo) viewEditTodoForm
                     )
 
         viewAddTodoItem =
-            case maybeTodoForm of
-                Just (AddTodoForm fields) ->
-                    viewAddTodoForm fields
-
-                _ ->
-                    row [ A.class "pa1" ]
-                        [ btn2 "add todo" (AddTodoFormClicked Nothing) ]
+            getAddTodoForm maybeTodoForm
+                |> MX.unpack
+                    (\_ ->
+                        row [ A.class "pa1" ]
+                            [ btn2 "add todo" (AddTodoFormClicked Nothing) ]
+                    )
+                    viewAddTodoForm
     in
     viewFilteredTodoList
         ++ [ viewAddTodoItem ]
