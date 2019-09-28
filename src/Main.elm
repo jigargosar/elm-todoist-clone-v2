@@ -362,12 +362,7 @@ update msg model =
             )
 
         TodoFormMsg subMsg ->
-            case model.maybeTodoForm of
-                Just form ->
-                    updateTodoForm subMsg form model
-
-                Nothing ->
-                    ( model, Cmd.none )
+            updateTodoForm subMsg model
 
         Save ->
             case model.maybeTodoForm of
@@ -396,8 +391,8 @@ updateTodoFormFields msg fields =
             { fields | maybeProjectId = maybeProjectId }
 
 
-updateTodoForm : TodoFormMsg -> TodoForm -> Model -> ( Model, Cmd Msg )
-updateTodoForm todoFormMsg _ model =
+updateTodoForm : TodoFormMsg -> Model -> ( Model, Cmd Msg )
+updateTodoForm todoFormMsg model =
     let
         newTodoForm =
             model.maybeTodoForm
