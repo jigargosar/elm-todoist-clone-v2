@@ -308,6 +308,7 @@ mapTodoList func model =
 type Msg
     = NoOp
     | PatchTodo TodoId TodoPatch
+    | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | SetMaybeTodoForm (Maybe TodoForm)
     | Save
@@ -354,6 +355,14 @@ update msg model =
 
         ChangeRouteTo route ->
             initModel { model | route = route, maybeTodoForm = Nothing }
+
+        DeleteTodo todoId ->
+            let
+                newModel =
+                    model
+                        |> mapTodoList (List.filter (idEq todoId >> not))
+            in
+            ( newModel, cacheModel newModel )
 
         PatchTodo todoId todoPatch ->
             let
