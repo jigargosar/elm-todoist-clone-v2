@@ -22,6 +22,7 @@ type Route
     = RouteInbox
     | RouteToday
     | RouteProject ProjectId
+    | RouteNext7Days
 
 
 
@@ -501,6 +502,9 @@ viewRoute model route =
         RouteProject projectId ->
             viewTodoListForMaybeProjectId (Just projectId) model
 
+        RouteNext7Days ->
+            viewNext7DaysTodoList model
+
 
 getEditTodoForm : Maybe TodoForm -> Maybe Todo
 getEditTodoForm maybeForm =
@@ -525,6 +529,14 @@ getAddTodoForm maybeForm =
 
         _ ->
             Nothing
+
+
+viewNext7DaysTodoList model =
+    let
+        _ =
+            1
+    in
+    []
 
 
 viewTodoListDueTodayWithOverDue model =
