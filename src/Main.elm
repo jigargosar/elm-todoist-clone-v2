@@ -298,22 +298,24 @@ setTodoForm form model =
 -- UPDATE
 
 
+type TodoFormMsg
+    = TodoFormTitleChanged String
+    | TodoFormDueDateChanged (Maybe Date)
+    | TodoFormProjectIdChanged (Maybe ProjectId)
+
+
 type Msg
     = NoOp
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | EditTodoClicked Todo
-    | SetMaybeTodoForm (Maybe TodoForm)
+    | TodoFormMsg TodoFormMsg
     | Save
     | Cancel
     | ChangeRouteTo Route
     | ResetModel
     | GotToday Date
-
-
-closeForm =
-    SetMaybeTodoForm Nothing
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -359,10 +361,13 @@ update msg model =
             , Cmd.none
             )
 
-        SetMaybeTodoForm addTodo ->
-            ( { model | maybeTodoForm = addTodo }
-            , Cmd.none
-            )
+        TodoFormMsg subMsg ->
+            case model.maybeTodoForm of
+                Just form ->
+                    updateTodoForm subMsg form model
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         Save ->
             case model.maybeTodoForm of
@@ -376,6 +381,47 @@ update msg model =
             ( { model | maybeTodoForm = Nothing }
             , Cmd.none
             )
+
+
+updateTodoForm : TodoFormMsg -> TodoForm -> Model -> ( Model, Cmd Msg )
+updateTodoForm todoFormMsg _ model =
+    let
+        newTodoForm =
+            case model.maybeTodoForm of
+                Nothing ->
+                    Nothing
+
+                Just form ->
+                    case form of
+                        AddTodoForm addTodoFields ->
+                            AddTodoForm
+                                (case todoFormMsg of
+                                    TodoFormTitleChanged title ->
+                                        { addTodoFields | title = title }
+
+                                    TodoFormDueDateChanged maybeDueDate ->
+                                        { addTodoFields | maybeDueDate = maybeDueDate }
+
+                                    TodoFormProjectIdChanged maybeProjectId ->
+                                        { addTodoFields | maybeProjectId = maybeProjectId }
+                                )
+                                |> Just
+
+                        EditTodoForm todo ->
+                            EditTodoForm
+                                (case todoFormMsg of
+                                    TodoFormTitleChanged title ->
+                                        { todo | title = title }
+
+                                    TodoFormDueDateChanged maybeDueDate ->
+                                        { todo | maybeDueDate = maybeDueDate }
+
+                                    TodoFormProjectIdChanged maybeProjectId ->
+                                        { todo | maybeProjectId = maybeProjectId }
+                                )
+                                |> Just
+    in
+    ( { model | maybeTodoForm = newTodoForm }, Cmd.none )
 
 
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
@@ -578,7 +624,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
 
 viewAddTodoItemForDueDate date maybeTodoForm =
     getAddTodoFormWithInitialDueDateEq date maybeTodoForm
-        |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewAddTodoForm
+        |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewTodoForm
 
 
 humanDate date today =
@@ -615,7 +661,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
 viewAddTodoItemForProject maybeProjectId maybeTodoForm =
     getAddTodoForm maybeTodoForm
-        |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewAddTodoForm
+        |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewTodoForm
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
@@ -637,7 +683,7 @@ keyed keyF renderF =
 
 viewEditableTodoItem layout { today, maybeTodoForm } todo =
     getEditTodoFormForTodoId todo.id maybeTodoForm
-        |> MX.unpack (\_ -> viewTodo today layout todo) viewEditTodoForm
+        |> MX.unpack (\_ -> viewTodo today layout todo) viewTodoForm
 
 
 type TodoItemLayout
@@ -683,43 +729,14 @@ viewAddTodoButton onClick =
     row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
 
 
-viewAddTodoForm fields =
-    let
-        setForm =
-            setTodoForm << AddTodoForm
-
-        config =
-            { titleChanged = \title -> setForm { fields | title = title }
-            , projectIdChanged = \maybeProjectId -> setForm { fields | maybeProjectId = maybeProjectId }
-            , dueDateChanged = \maybeDueDate -> setForm { fields | maybeDueDate = maybeDueDate }
-            }
-    in
-    viewTodoForm config fields
-
-
-viewEditTodoForm : Todo -> H.Html Msg
-viewEditTodoForm fields =
-    let
-        setForm =
-            setTodoForm << EditTodoForm
-
-        config =
-            { titleChanged = \title -> setForm { fields | title = title }
-            , projectIdChanged = \maybeProjectId -> setForm { fields | maybeProjectId = maybeProjectId }
-            , dueDateChanged = \maybeDueDate -> setForm { fields | maybeDueDate = maybeDueDate }
-            }
-    in
-    viewTodoForm config fields
-
-
-viewTodoForm config { title, maybeProjectId, maybeDueDate } =
+viewTodoForm { title, maybeProjectId, maybeDueDate } =
     col [ A.class "pa1" ]
         [ col [ A.class "pv1" ]
-            [ ipt2 title config.titleChanged
+            [ ipt2 title (TodoFormMsg << TodoFormTitleChanged)
             ]
-        , viewProjectSelect maybeProjectId config.projectIdChanged
-        , viewDueDateInput maybeDueDate config.dueDateChanged
-        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" closeForm ]
+        , viewProjectSelect maybeProjectId (TodoFormMsg << TodoFormProjectIdChanged)
+        , viewDueDateInput maybeDueDate (TodoFormMsg << TodoFormDueDateChanged)
+        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" Cancel ]
         ]
 
 
