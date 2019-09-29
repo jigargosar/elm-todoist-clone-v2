@@ -1,4 +1,4 @@
-module TodoForm exposing (TodoForm, createConfig, init, viewTodoForm)
+module TodoForm exposing (Config, TodoForm, createConfig, init, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H

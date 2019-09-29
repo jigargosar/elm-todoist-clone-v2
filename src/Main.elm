@@ -542,9 +542,14 @@ viewAddTodoItemForDueDate date maybeTodoForm =
         |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewTodoForm
 
 
+todoFormConfig : TodoForm.Config Msg
+todoFormConfig =
+    TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
+
+
+viewTodoForm : TodoForm -> H.Html Msg
 viewTodoForm todoForm =
-    --    TodoForm.viewTodoForm { onSave = Save, onCancel = Cancel, toMsg=(\_ -> NoOp) } todoForm
-    row [] []
+    TodoForm.viewTodoForm todoFormConfig todoForm
 
 
 humanDate date today =
