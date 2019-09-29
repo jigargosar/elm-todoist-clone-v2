@@ -321,10 +321,7 @@ updateTodo oldTodo newTodo model =
     in
     { model
         | todoList =
-            List.foldl
-                (\t -> updateWhenIdEq t.id (always t))
-                model.todoList
-                projectTodoList
+            List.foldl upsertById model.todoList projectTodoList
     }
 
 
