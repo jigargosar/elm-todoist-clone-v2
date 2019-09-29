@@ -634,9 +634,6 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
 
-        maybeAddTodoFormWithIndex =
-            getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
-
         lastIndex =
             List.length filteredTodoList - 1
 
