@@ -33,10 +33,6 @@ type Route
 
 
 
---    | Next7Days
---    | Search
--- PROJECT
--- TODO_
 -- CACHE
 
 
