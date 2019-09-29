@@ -35,14 +35,6 @@ type Route
 --    | Next7Days
 --    | Search
 -- PROJECT
-
-
-projectIdToValueAttr : ProjectId -> H.Attribute msg
-projectIdToValueAttr =
-    A.value << ProjectId.toString
-
-
-
 -- TODO_
 -- CACHE
 
@@ -631,7 +623,7 @@ viewTodoForm { title, maybeProjectId, maybeDueDate } =
         [ col [ A.class "pv1" ]
             [ ipt2 title (PatchTodoFormField << TitleChanged)
             ]
-        , viewProjectSelect maybeProjectId (PatchTodoFormField << ProjectIdChanged)
+        , Project.viewSelectOne maybeProjectId (PatchTodoFormField << ProjectIdChanged)
         , viewDueDateInput maybeDueDate (PatchTodoFormField << DueDateChanged)
         , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" Cancel ]
         ]
@@ -649,21 +641,6 @@ viewDueDateInput maybeDueDate dueDateChanged =
         , E.onInput (Date.fromIsoString >> Result.toMaybe >> dueDateChanged)
         ]
         []
-
-
-viewProjectSelect maybeProjectId projectIdChanged =
-    let
-        viewOpt { id, title } =
-            H.option
-                [ A.selected (maybeProjectId == Just id)
-                , projectIdToValueAttr id
-                ]
-                [ H.text title ]
-    in
-    H.select [ E.onInput (ProjectId.fromString >> projectIdChanged) ]
-        (H.option [] [ H.text "Inbox" ]
-            :: List.map viewOpt Project.mockProjects
-        )
 
 
 main : Program Flags Model Msg
