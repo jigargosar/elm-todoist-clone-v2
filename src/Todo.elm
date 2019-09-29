@@ -89,6 +89,6 @@ mockList =
     , createMockTodo "2" "Submit assignment"
     , createMockTodo "3" "Check Facebook"
     , createMockTodo "4" "Go to movies"
-    , createMockTodo "5" "Get Milk!!"
+    , createMockTodo "5" "Get Coffee"
     ]
         |> List.filterMap identity
