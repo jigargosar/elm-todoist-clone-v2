@@ -1,33 +1,37 @@
 const fs = require('fs')
 
-fs.writeFileSync(
-  './src/ProjectId.elm',
-  `
-module ProjectId exposing (ProjectId, encoder, decoder, toString ,fromString)
+function genId(name) {
+  fs.writeFileSync(
+    `./src/${name}.elm`,
+    `
+module ${name} exposing (${name}, encoder, decoder, toString ,fromString)
 
 import Json.Encode as JE exposing(Value)
 import Json.Decode as JD exposing(Decoder)
 
-type ProjectId =
-    ProjectId String
+type ${name} =
+    ${name} String
     
 
-encoder: ProjectId -> Value
-encoder (ProjectId v) = 
+encoder: ${name} -> Value
+encoder (${name} v) = 
     JE.string v
 
-decoder: Decoder ProjectId
+decoder: Decoder ${name}
 decoder = 
-  JD.map ProjectId JD.string
+  JD.map ${name} JD.string
   
-toString: ProjectId -> String
-toString (ProjectId s) = 
+toString: ${name} -> String
+toString (${name} s) = 
   s
   
-fromString: String -> Maybe ProjectId
+fromString: String -> Maybe ${name}
 fromString =
   String.trim
-  >> \\s -> if String.isEmpty s then Nothing else Just (ProjectId s)  
+  >> \\s -> if String.isEmpty s then Nothing else Just (${name} s)  
 `,
-  { encoding: 'UTF-8', flag:'w' },
-)
+    { encoding: 'UTF-8', flag: 'w' },
+  )
+}
+
+genId('ProjectId')
