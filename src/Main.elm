@@ -13,6 +13,7 @@ import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
+import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
 import Return
@@ -39,29 +40,6 @@ type Route
 projectIdToValueAttr : ProjectId -> H.Attribute msg
 projectIdToValueAttr =
     A.value << ProjectId.toString
-
-
-type alias Project =
-    { id : ProjectId
-    , title : String
-    , isDeleted : Bool
-    }
-
-
-createMockProject : String -> String -> Maybe Project
-createMockProject id title =
-    ProjectId.fromString id
-        |> Maybe.map (\projectId -> Project projectId title False)
-
-
-initialProjectList : List Project
-initialProjectList =
-    [ createMockProject "1" "Build Utils"
-    , createMockProject "2" "Publish Post"
-    , createMockProject "3" "Complete Story"
-    , createMockProject "4" "Exam Prep"
-    ]
-        |> List.filterMap identity
 
 
 
@@ -395,7 +373,7 @@ viewNav { route } =
             , NavToday
             , NavNext7Days
             , NavProjects
-                (initialProjectList |> List.map NavProject)
+                (Project.mockProjects |> List.map NavProject)
             ]
     in
     navItems |> List.map (viewNavItem route)
@@ -612,7 +590,7 @@ type TodoItemLayout
 
 todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
 todoProjectTitle { maybeProjectId } =
-    initialProjectList
+    Project.mockProjects
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
         |> MX.unwrap "Inbox" .title
 
@@ -684,7 +662,7 @@ viewProjectSelect maybeProjectId projectIdChanged =
     in
     H.select [ E.onInput (ProjectId.fromString >> projectIdChanged) ]
         (H.option [] [ H.text "Inbox" ]
-            :: List.map viewOpt initialProjectList
+            :: List.map viewOpt Project.mockProjects
         )
 
 
