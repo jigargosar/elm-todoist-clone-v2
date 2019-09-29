@@ -6,13 +6,14 @@ const fs = require('fs')
 const cli = meow(
   `
 	Usage
-	  $ genId <name>
+	  $ genId <name> [... <more names>]
   
   Options:
     <name> - Name of the Id type, e.g. ProjectId
 
   Examples
 	  $ genId ProjectId
+	  $ genId ProjectId TodoId
 	  
 `,
   {
@@ -22,9 +23,9 @@ const cli = meow(
 
 const name = cli.input[0]
 
-if (!name) return cli.showHelp()
+if (cli.input.length === 0 ) return cli.showHelp()
 
-genId(name)
+cli.input.forEach(genId)
 
 function genId(name) {
   fs.writeFileSync(
