@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "start": "webpack-dev-server",
-    "genId": "node src/genId.js"
+    "genId": "node src/genId.js TodoId"
   },
   "keywords": [],
   "author": "",

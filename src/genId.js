@@ -55,9 +55,10 @@ fromString: String -> Maybe ${name}
 fromString =
   String.trim
   >> \\s -> if String.isEmpty s then Nothing else Just (${name} s)  
+
 `,
     { encoding: 'UTF-8', flag: 'w' },
   )
 }
-console.log('process.argv', process.argv)
-genId('ProjectId')
+
+
