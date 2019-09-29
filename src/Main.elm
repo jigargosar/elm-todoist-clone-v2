@@ -129,8 +129,8 @@ type alias Flags =
 
 
 type TodoFormMeta
-    = AddTodoForm (Maybe Date)
-    | EditTodoForm Todo
+    = AddTodoMeta (Maybe Date)
+    | EditTodoMeta Todo
 
 
 type alias TodoFormWithMeta =
@@ -241,7 +241,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( TodoForm.init "" maybeProjectId maybeDueDate
-                    , AddTodoForm maybeDueDate
+                    , AddTodoMeta maybeDueDate
                     )
             , Cmd.none
             )
@@ -250,7 +250,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( TodoForm.init "" maybeProjectId maybeDueDate
-                    , EditTodoForm todo
+                    , EditTodoMeta todo
                     )
             , Cmd.none
             )
@@ -289,10 +289,10 @@ saveTodoForm ( form, meta ) model =
 
         ( todo, newModel ) =
             case meta of
-                AddTodoForm _ ->
+                AddTodoMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
-                EditTodoForm editingTodo ->
+                EditTodoMeta editingTodo ->
                     ( Todo.patchWithPartial (TodoForm.toPartial form) editingTodo
                     , model
                     )
@@ -410,7 +410,7 @@ viewRoute model route =
 getEditTodoFormForTodoId : TodoId -> Maybe ( a, TodoFormMeta ) -> Maybe a
 getEditTodoFormForTodoId todoId maybeForm =
     case maybeForm of
-        Just ( form, EditTodoForm { id } ) ->
+        Just ( form, EditTodoMeta { id } ) ->
             if id == todoId then
                 Just form
 
@@ -424,7 +424,7 @@ getEditTodoFormForTodoId todoId maybeForm =
 getAddTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoForm maybeForm =
     case maybeForm of
-        Just ( form, AddTodoForm _ ) ->
+        Just ( form, AddTodoMeta _ ) ->
             Just form
 
         _ ->
@@ -434,7 +434,7 @@ getAddTodoForm maybeForm =
 getAddTodoFormWithInitialDueDateEq : Date -> Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoFormWithInitialDueDateEq date maybeForm =
     case maybeForm of
-        Just ( form, AddTodoForm (Just date_) ) ->
+        Just ( form, AddTodoMeta (Just date_) ) ->
             if date_ == date then
                 Just form
 
