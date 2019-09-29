@@ -332,8 +332,7 @@ updateTodo oldTodo newTodo model =
             List.filter (idEq oldTodo.id >> not) model.todoList
     in
     { model
-        | todoList =
-            List.foldl upsertById todoListWithoutOldTodo projectTodoList
+        | todoList = List.foldl upsertById todoListWithoutOldTodo projectTodoList
     }
 
 
@@ -345,11 +344,7 @@ insertTodo todo model =
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
     { model
-        | todoList =
-            List.foldl
-                (\t -> updateWhenIdEq t.id (always t))
-                (todo :: model.todoList)
-                projectTodoList
+        | todoList = List.foldl upsertById model.todoList projectTodoList
     }
 
 
