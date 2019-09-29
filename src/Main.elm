@@ -20,6 +20,7 @@ import Return
 import Task
 import Time
 import Todo exposing (Todo)
+import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
 import UI exposing (btn2, checkbox3, col, colKeyed, ipt2, row)
 
@@ -143,14 +144,18 @@ type alias HasTodoFormFields a =
     }
 
 
-type TodoForm
-    = AddTodoForm AddTodoFields
-    | EditTodoForm Todo
+type TodoFormMeta
+    = AddTodoForm (Maybe Date)
+    | EditTodoForm TodoId
+
+
+type alias TodoForm_ =
+    { form : TodoForm, meta : TodoFormMeta }
 
 
 type alias Model =
     { todoList : List Todo
-    , maybeTodoForm : Maybe TodoForm
+    , maybeTodoForm : Maybe TodoForm_
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -220,7 +225,7 @@ type Msg
     | DeleteTodo TodoId
     | AddTodoClicked (Maybe ProjectId) (Maybe Date)
     | EditTodoClicked Todo
-    | PatchTodoFormField TodoFormFieldPatch
+    | PatchTodoForm TodoForm
     | Save
     | Cancel
     | ChangeRouteTo Route
@@ -256,35 +261,26 @@ update msg model =
         AddTodoClicked maybeProjectId maybeDueDate ->
             ( model
                 |> setTodoForm
-                    (AddTodoForm
-                        { title = ""
-                        , maybeProjectId = maybeProjectId
-                        , maybeDueDate = maybeDueDate
-                        , initialDueDate = maybeDueDate
-                        }
-                    )
+                    { form = TodoForm.init "" maybeProjectId maybeDueDate
+                    , meta = AddTodoForm maybeDueDate
+                    }
             , Cmd.none
             )
 
-        EditTodoClicked todo ->
-            ( model |> setTodoForm (EditTodoForm todo)
+        EditTodoClicked { id, maybeProjectId, maybeDueDate } ->
+            ( model
+                |> setTodoForm
+                    { form = TodoForm.init "" maybeProjectId maybeDueDate
+                    , meta = EditTodoForm id
+                    }
             , Cmd.none
             )
 
-        PatchTodoFormField subMsg ->
-            let
-                mapperFunc =
-                    updateTodoFormFields subMsg
-            in
+        PatchTodoForm todoForm ->
             ( model
                 |> mapTodoForm
-                    (\form ->
-                        case form of
-                            AddTodoForm addTodoFields ->
-                                AddTodoForm <| mapperFunc addTodoFields
-
-                            EditTodoForm todo ->
-                                EditTodoForm <| mapperFunc todo
+                    (\todoForm_ ->
+                        { todoForm_ | form = todoForm }
                     )
             , Cmd.none
             )
@@ -321,23 +317,24 @@ mapTodoForm func model =
     { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
 
 
-saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
+saveTodoForm : TodoForm_ -> Model -> ( Model, Cmd Msg )
 saveTodoForm form model =
-    let
-        ( todo, newModel ) =
-            case form of
-                AddTodoForm fields ->
-                    HasSeed.step (Todo.generatorFromPartial fields) model
-
-                EditTodoForm editingTodo ->
-                    ( editingTodo, model )
-    in
-    ( { newModel
-        | todoList = upsertById todo newModel.todoList
-        , maybeTodoForm = Nothing
-      }
-    , Cmd.none
-    )
+    --    let
+    --        ( todo, newModel ) =
+    --            case form.meta of
+    --                AddTodoForm _ ->
+    --                    HasSeed.step (Todo.generatorFromPartial fields) model
+    --
+    --                EditTodoForm todoId ->
+    --                    ( editingTodo, model )
+    --    in
+    --    ( { newModel
+    --        | todoList = upsertById todo newModel.todoList
+    --        , maybeTodoForm = Nothing
+    --      }
+    --    , Cmd.none
+    --    )
+    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
@@ -438,34 +435,57 @@ viewRoute model route =
             viewNext7DaysTodoList model
 
 
-getEditTodoForm : Maybe TodoForm -> Maybe Todo
-getEditTodoForm maybeForm =
+getEditTodoFormForTodoId : TodoId -> Maybe { a | meta : TodoFormMeta, form : b } -> Maybe b
+getEditTodoFormForTodoId todoId maybeForm =
     case maybeForm of
-        Just (EditTodoForm editTodo) ->
-            Just editTodo
+        Just form_ ->
+            case form_.meta of
+                EditTodoForm todoId_ ->
+                    if todoId_ == todoId then
+                        Just form_.form
+
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
 
         _ ->
             Nothing
 
 
-getEditTodoFormForTodoId : TodoId -> Maybe TodoForm -> Maybe Todo
-getEditTodoFormForTodoId todoId =
-    getEditTodoForm >> MX.filter (idEq todoId)
-
-
-getAddTodoForm : Maybe TodoForm -> Maybe AddTodoFields
+getAddTodoForm : Maybe { a | meta : TodoFormMeta, form : b } -> Maybe b
 getAddTodoForm maybeForm =
     case maybeForm of
-        Just (AddTodoForm fields) ->
-            Just fields
+        Just form_ ->
+            case form_.meta of
+                AddTodoForm _ ->
+                    Just form_.form
+
+                _ ->
+                    Nothing
 
         _ ->
             Nothing
 
 
-getAddTodoFormWithInitialDueDateEq : Date -> Maybe TodoForm -> Maybe AddTodoFields
-getAddTodoFormWithInitialDueDateEq date =
-    getAddTodoForm >> MX.filter (propEq .initialDueDate (Just date))
+getAddTodoFormWithInitialDueDateEq : Date -> Maybe { a | meta : TodoFormMeta, form : b } -> Maybe b
+getAddTodoFormWithInitialDueDateEq date maybeForm =
+    case maybeForm of
+        Just form_ ->
+            case form_.meta of
+                AddTodoForm (Just date_) ->
+                    if date_ == date then
+                        Just form_.form
+
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
+
+        _ ->
+            Nothing
 
 
 viewNext7DaysTodoList : Model -> List (H.Html Msg)
@@ -516,9 +536,15 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
         ++ [ viewAddTodoItemForDueDate dueDate maybeTodoForm ]
 
 
+viewAddTodoItemForDueDate : Date -> Maybe { a | meta : TodoFormMeta, form : b } -> H.Html Msg
 viewAddTodoItemForDueDate date maybeTodoForm =
     getAddTodoFormWithInitialDueDateEq date maybeTodoForm
         |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewTodoForm
+
+
+viewTodoForm todoForm =
+    --    TodoForm.viewTodoForm { onSave = Save, onCancel = Cancel, toMsg=(\_ -> NoOp) } todoForm
+    row [] []
 
 
 humanDate date today =
@@ -616,31 +642,6 @@ viewTodo today layout todo =
 viewAddTodoButton : Msg -> H.Html Msg
 viewAddTodoButton onClick =
     row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
-
-
-viewTodoForm { title, maybeProjectId, maybeDueDate } =
-    col [ A.class "pa1" ]
-        [ col [ A.class "pv1" ]
-            [ ipt2 title (PatchTodoFormField << TitleChanged)
-            ]
-        , Project.viewSelectOne maybeProjectId (PatchTodoFormField << ProjectIdChanged)
-        , viewDueDateInput maybeDueDate (PatchTodoFormField << DueDateChanged)
-        , row [ A.class "pv1" ] [ btn2 "Save" Save, btn2 "Cancel" Cancel ]
-        ]
-
-
-viewDueDateInput maybeDueDate dueDateChanged =
-    let
-        dateVal =
-            maybeDueDate
-                |> MX.unwrap "" Date.toIsoString
-    in
-    H.input
-        [ A.type_ "date"
-        , A.value dateVal
-        , E.onInput (Date.fromIsoString >> Result.toMaybe >> dueDateChanged)
-        ]
-        []
 
 
 main : Program Flags Model Msg
