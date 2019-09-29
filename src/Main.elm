@@ -102,8 +102,8 @@ type alias Flags =
 
 
 type TodoFormMeta
-    = AddTodoWithDueDateMeta Date
-    | InsertTodoMeta Int
+    = AddDueAtTodoMeta Date
+    | InsertProjectTodoMeta Int
     | EditTodoMeta Todo
 
 
@@ -273,7 +273,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( TodoForm.init "" Nothing (Just dueDate)
-                    , AddTodoWithDueDateMeta dueDate
+                    , AddDueAtTodoMeta dueDate
                     )
             , Cmd.none
             )
@@ -283,7 +283,7 @@ update msg model =
                 |> setTodoForm
                     ( getInsertTodoForm model.maybeTodoForm
                         |> Maybe.withDefault (TodoForm.init "" maybeProjectId Nothing)
-                    , InsertTodoMeta idx
+                    , InsertProjectTodoMeta idx
                     )
             , Cmd.none
             )
@@ -329,10 +329,10 @@ saveTodoForm ( form, meta ) model =
 
         ( todo, newModel ) =
             case meta of
-                InsertTodoMeta _ ->
+                InsertProjectTodoMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
-                AddTodoWithDueDateMeta _ ->
+                AddDueAtTodoMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
                 EditTodoMeta editingTodo ->
@@ -517,7 +517,7 @@ getEditTodoFormForTodoId todoId maybeForm =
 getInsertTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getInsertTodoForm maybeForm =
     case maybeForm of
-        Just ( form, InsertTodoMeta _ ) ->
+        Just ( form, InsertProjectTodoMeta _ ) ->
             Just form
 
         _ ->
@@ -527,7 +527,7 @@ getInsertTodoForm maybeForm =
 getAddTodoFormWithInitialDueDateEq : Date -> Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoFormWithInitialDueDateEq date maybeForm =
     case maybeForm of
-        Just ( form, AddTodoWithDueDateMeta date_ ) ->
+        Just ( form, AddDueAtTodoMeta date_ ) ->
             if date_ == date then
                 Just form
 
@@ -643,7 +643,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             viewProjectTodoItem maybeProjectId model.today
     in
     case maybeTodoForm of
-        Just ( form, InsertTodoMeta formIdx ) ->
+        Just ( form, InsertProjectTodoMeta formIdx ) ->
             let
                 formHtml =
                     viewTodoForm form
