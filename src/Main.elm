@@ -690,9 +690,9 @@ viewEditableTodoList layout model =
         >> List.singleton
 
 
-keyed : (item -> String) -> (item -> html) -> List item -> List ( String, html )
+keyed : (item -> String) -> (Int -> item -> html) -> List item -> List ( String, html )
 keyed keyF renderF =
-    List.map (\item -> ( keyF item, renderF item ))
+    List.indexedMap (\idx item -> ( keyF item, renderF idx item ))
 
 
 viewKeyedEditableTodoItems : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
@@ -700,10 +700,10 @@ viewKeyedEditableTodoItems layout model =
     keyed (.id >> TodoId.toString) (viewEditableTodoItem layout model)
 
 
-viewEditableTodoItem : TodoItemLayout -> Model -> Todo -> H.Html Msg
-viewEditableTodoItem layout { today, maybeTodoForm } todo =
+viewEditableTodoItem : TodoItemLayout -> Model -> Int -> Todo -> H.Html Msg
+viewEditableTodoItem layout { today, maybeTodoForm } idx todo =
     getEditTodoFormForTodoId todo.id maybeTodoForm
-        |> MX.unpack (\_ -> viewTodo today layout todo) viewTodoForm
+        |> MX.unpack (\_ -> viewTodo idx today layout todo) viewTodoForm
 
 
 type TodoItemLayout
@@ -718,8 +718,8 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
-viewTodo : Date -> TodoItemLayout -> Todo -> H.Html Msg
-viewTodo today layout todo =
+viewTodo : Int -> Date -> TodoItemLayout -> Todo -> H.Html Msg
+viewTodo idx today layout todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -743,7 +743,9 @@ viewTodo today layout todo =
         , row [ A.class "child absolute right-0 bg-white-90" ]
             (case layout of
                 ProjectItemLayout ->
-                    [ btn2 "UP" (MoveUp todo.id), btn2 "DN" (MoveDown todo.id) ]
+                    [ btn2 "UP" (MoveUp todo.id)
+                    , btn2 "DN" (MoveDown todo.id)
+                    ]
 
                 DueDateItemLayout ->
                     []
