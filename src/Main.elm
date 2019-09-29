@@ -688,6 +688,7 @@ viewTodo today layout todo =
                     [ H.text <| todoProjectTitle todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "UP" (MoveUp todo.id)
+            , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
             ]
         ]
