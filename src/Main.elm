@@ -175,6 +175,7 @@ type Msg
     = NoOp
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
+    | MoveUp TodoId
     | AddTodoOnDueDateClicked Date
     | AddTodoInMaybeProjectIdClicked (Maybe ProjectId)
     | EditTodoClicked Todo
@@ -203,6 +204,15 @@ update msg model =
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
+            , Cmd.none
+            )
+
+        MoveUp todoId ->
+            ( model
+                |> mapTodoList
+                    (updateWhenIdEq todoId
+                        (\todo -> { todo | projectSortIdx = min 0 (todo.projectSortIdx - 1) })
+                    )
             , Cmd.none
             )
 
@@ -633,7 +643,10 @@ viewTodo today layout todo =
             DueDateItemLayout ->
                 row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
                     [ H.text <| todoProjectTitle todo ]
-        , row [ A.class "child absolute right-0 bg-white-90" ] [ btn2 "X" (DeleteTodo todo.id) ]
+        , row [ A.class "child absolute right-0 bg-white-90" ]
+            [ btn2 "X" (DeleteTodo todo.id)
+            , btn2 "X" (DeleteTodo todo.id)
+            ]
         ]
 
 
