@@ -178,7 +178,7 @@ type Msg
     | MoveUp TodoId
     | MoveDown TodoId
     | AddTodoOnDueDateClicked Date
-    | AddTodoInMaybeProjectIdClicked (Maybe ProjectId)
+    | AddTodoInMaybeProjectIdClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | PatchTodoForm TodoForm
     | Save
@@ -278,11 +278,11 @@ update msg model =
             , Cmd.none
             )
 
-        AddTodoInMaybeProjectIdClicked maybeProjectId ->
+        AddTodoInMaybeProjectIdClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
                     ( TodoForm.init "" maybeProjectId Nothing
-                    , AddTodoInMaybeProjectIdMeta 0 maybeProjectId
+                    , AddTodoInMaybeProjectIdMeta idx maybeProjectId
                     )
             , Cmd.none
             )
@@ -637,11 +637,15 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
     in
     viewEditableTodoList ProjectItemLayout model filteredTodoList
         ++ (case maybeAddTodoFormWithIndex of
-                Just _ ->
-                    []
+                Just ( i, form ) ->
+                    if i == -1 then
+                        [ viewTodoForm form ]
+
+                    else
+                        []
 
                 Nothing ->
-                    [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId) ]
+                    [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
            )
 
 
