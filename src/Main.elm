@@ -683,21 +683,12 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
 
 
 viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
-viewEditableTodoList model =
-    keyed (.id >> TodoId.toString) (\_ -> viewEditableTodoItem model)
-        >> colKeyed []
-        >> List.singleton
-
-
-keyed : (item -> String) -> (Int -> item -> html) -> List item -> List ( String, html )
-keyed keyF renderF =
-    List.indexedMap (\idx item -> ( keyF item, renderF idx item ))
-
-
-viewEditableTodoItem : Model -> Todo -> H.Html Msg
-viewEditableTodoItem { maybeTodoFormWithMeta } todo =
-    getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
-        |> MX.unpack (\_ -> viewDueDateTodoItem todo) viewTodoForm
+viewEditableTodoList { maybeTodoFormWithMeta } =
+    List.map
+        (\todo ->
+            getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
+                |> MX.unpack (\_ -> viewDueDateTodoItem todo) viewTodoForm
+        )
 
 
 todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
