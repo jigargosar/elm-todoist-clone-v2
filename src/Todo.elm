@@ -1,7 +1,8 @@
-module Todo exposing (Todo, fromPartial, mockList)
+module Todo exposing (Todo, fromPartial, generatorFromPartial, mockList)
 
 import Date exposing (Date)
 import ProjectId exposing (ProjectId)
+import Random
 import TodoId exposing (TodoId)
 
 
@@ -26,6 +27,12 @@ type alias Partial a =
 fromPartial : TodoId -> Partial a -> Todo
 fromPartial id { title, maybeProjectId, maybeDueDate } =
     Todo id title False False maybeProjectId maybeDueDate
+
+
+generatorFromPartial : Partial a -> Random.Generator Todo
+generatorFromPartial partial =
+    TodoId.generator
+        |> Random.map (\id -> fromPartial id partial)
 
 
 createMockTodo : String -> String -> Maybe Todo

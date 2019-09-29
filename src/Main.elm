@@ -357,9 +357,7 @@ saveTodoForm form model =
         ( todo, newModel ) =
             case form of
                 AddTodoForm fields ->
-                    HasSeed.step TodoId.generator model
-                        |> Tuple.mapFirst
-                            (\todoId -> Todo.fromPartial todoId fields)
+                    HasSeed.step (Todo.generatorFromPartial fields) model
 
                 EditTodoForm editingTodo ->
                     ( editingTodo, model )
