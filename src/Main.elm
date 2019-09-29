@@ -103,7 +103,7 @@ type alias Flags =
 
 type TodoFormMeta
     = AddTodoWithDueDateMeta Date
-    | AddTodoInMaybeProjectIdMeta Int (Maybe ProjectId)
+    | InsertTodoMeta Int
     | EditTodoMeta Todo
 
 
@@ -281,10 +281,9 @@ update msg model =
         InsertTodoInMaybeProjectIdClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    ( getAddTodoFormWithInitialProjectId maybeProjectId model.maybeTodoForm
-                        |> Maybe.map Tuple.second
+                    ( getInsertTodoForm model.maybeTodoForm
                         |> Maybe.withDefault (TodoForm.init "" maybeProjectId Nothing)
-                    , AddTodoInMaybeProjectIdMeta idx maybeProjectId
+                    , InsertTodoMeta idx
                     )
             , Cmd.none
             )
@@ -330,7 +329,7 @@ saveTodoForm ( form, meta ) model =
 
         ( todo, newModel ) =
             case meta of
-                AddTodoInMaybeProjectIdMeta _ _ ->
+                InsertTodoMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
                 AddTodoWithDueDateMeta _ ->
@@ -515,15 +514,11 @@ getEditTodoFormForTodoId todoId maybeForm =
             Nothing
 
 
-getAddTodoFormWithInitialProjectId : Maybe ProjectId -> Maybe ( a, TodoFormMeta ) -> Maybe ( Int, a )
-getAddTodoFormWithInitialProjectId maybeProjectId maybeForm =
+getInsertTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
+getInsertTodoForm maybeForm =
     case maybeForm of
-        Just ( form, AddTodoInMaybeProjectIdMeta idx maybeProjectId_ ) ->
-            if maybeProjectId == maybeProjectId_ then
-                Just ( idx, form )
-
-            else
-                Nothing
+        Just ( form, InsertTodoMeta _ ) ->
+            Just form
 
         _ ->
             Nothing
@@ -648,7 +643,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             viewProjectTodoItem maybeProjectId model.today
     in
     case maybeTodoForm of
-        Just ( form, AddTodoInMaybeProjectIdMeta formIdx _ ) ->
+        Just ( form, InsertTodoMeta formIdx ) ->
             let
                 formHtml =
                     viewTodoForm form
@@ -689,7 +684,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
 viewEditableTodoList layout model =
-    keyed (.id >> TodoId.toString) (viewEditableTodoItem layout model)
+    keyed (.id >> TodoId.toString) (\_ -> viewEditableTodoItem layout model)
         >> colKeyed []
         >> List.singleton
 
@@ -699,15 +694,10 @@ keyed keyF renderF =
     List.indexedMap (\idx item -> ( keyF item, renderF idx item ))
 
 
-viewKeyedEditableTodoItems : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
-viewKeyedEditableTodoItems layout model =
-    keyed (.id >> TodoId.toString) (viewEditableTodoItem layout model)
-
-
-viewEditableTodoItem : TodoItemLayout -> Model -> Int -> Todo -> H.Html Msg
-viewEditableTodoItem layout { today, maybeTodoForm } idx todo =
+viewEditableTodoItem : TodoItemLayout -> Model -> Todo -> H.Html Msg
+viewEditableTodoItem layout { today, maybeTodoForm } todo =
     getEditTodoFormForTodoId todo.id maybeTodoForm
-        |> MX.unpack (\_ -> viewTodo idx today layout todo) viewTodoForm
+        |> MX.unpack (\_ -> viewTodo today layout todo) viewTodoForm
 
 
 type TodoItemLayout
@@ -748,8 +738,8 @@ viewProjectTodoItem maybeProject today idx todo =
         ]
 
 
-viewTodo : Int -> Date -> TodoItemLayout -> Todo -> H.Html Msg
-viewTodo idx today layout todo =
+viewTodo : Date -> TodoItemLayout -> Todo -> H.Html Msg
+viewTodo today layout todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
