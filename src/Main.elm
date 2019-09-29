@@ -558,6 +558,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
            ]
 
 
+viewAddTodoItemForProject : Maybe ProjectId -> Maybe TodoFormWithMeta -> H.Html Msg
 viewAddTodoItemForProject maybeProjectId maybeTodoForm =
     getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
         |> MX.unwrap (viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId)) viewTodoForm
