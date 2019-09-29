@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, colKeyed, row)
+import UI exposing (btn2, checkbox3, col, row)
 
 
 type Route
