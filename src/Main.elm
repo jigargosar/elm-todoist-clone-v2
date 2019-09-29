@@ -554,14 +554,11 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
     in
     viewEditableTodoList ProjectItemLayout model filteredTodoList
-        ++ [ viewAddTodoItemForProject maybeProjectId maybeTodoForm
+        ++ [ getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
+                |> MX.unwrap
+                    (viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId))
+                    viewTodoForm
            ]
-
-
-viewAddTodoItemForProject : Maybe ProjectId -> Maybe TodoFormWithMeta -> H.Html Msg
-viewAddTodoItemForProject maybeProjectId maybeTodoForm =
-    getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
-        |> MX.unwrap (viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId)) viewTodoForm
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
