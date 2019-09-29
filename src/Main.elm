@@ -657,10 +657,6 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             viewKeyedEditableTodoItems ProjectItemLayout model filteredTodoList
                 |> List.indexedMap
                     (\currentIdx html ->
-                        let
-                            _ =
-                                Debug.log "currentIdx" currentIdx
-                        in
                         if
                             (formIdx < 0 || formIdx > lastIndex)
                                 && (currentIdx == lastIndex)
