@@ -208,13 +208,32 @@ update msg model =
             )
 
         MoveUp todoId ->
-            ( model
-                |> mapTodoList
-                    (updateWhenIdEq todoId
-                        (\todo -> { todo | projectSortIdx = max 0 (todo.projectSortIdx - 1) })
-                    )
-            , Cmd.none
-            )
+            let
+                newModel =
+                    LX.find (idEq todoId) model.todoList
+                        |> Maybe.map
+                            (\todo ->
+                                let
+                                    projectTodoList =
+                                        sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
+
+                                    idx =
+                                        LX.findIndex (idEq todo.id) projectTodoList |> Maybe.withDefault -1
+
+                                    prevIdx =
+                                        idx - 1
+
+                                    updatedProjectTodoList =
+                                        LX.swapAt idx prevIdx projectTodoList
+                                            |> List.indexedMap (\i t -> { t | projectSortIdx = i })
+                                in
+                                { model
+                                    | todoList = List.foldl upsertById model.todoList updatedProjectTodoList
+                                }
+                            )
+                        |> Maybe.withDefault model
+            in
+            ( newModel, Cmd.none )
 
         SetTodoIsDone todoId isDone ->
             ( model |> mapTodoList (updateWhenIdEq todoId (\todo -> { todo | isDone = isDone }))
