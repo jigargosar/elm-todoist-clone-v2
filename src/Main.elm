@@ -590,14 +590,9 @@ viewAddTodoItemForProject maybeProjectId maybeTodoForm =
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
 viewEditableTodoList layout model =
-    keyed todoToIdString (viewEditableTodoItem layout model)
+    keyed (.id >> TodoId.toString) (viewEditableTodoItem layout model)
         >> colKeyed []
         >> List.singleton
-
-
-todoToIdString : Todo -> String
-todoToIdString { id } =
-    TodoId.toString id
 
 
 keyed : (item -> String) -> (item -> html) -> List item -> List ( String, html )
