@@ -61,6 +61,5 @@ fromString: String -> Maybe ${name}
 fromString =
   String.trim
   >> \\s -> if String.isEmpty s then Nothing else Just (${name} s)  
-
 `
 }
