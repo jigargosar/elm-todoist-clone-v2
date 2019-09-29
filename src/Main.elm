@@ -106,9 +106,9 @@ type alias Todo =
     }
 
 
-createMockTodo : String -> String -> Todo
+createMockTodo : String -> String -> Maybe Todo
 createMockTodo id title =
-    Todo (TodoId id) title False False Nothing Nothing
+    Just <| Todo (TodoId id) title False False Nothing Nothing
 
 
 todoFromFields : TodoId -> AddTodoFields -> Todo
@@ -116,6 +116,7 @@ todoFromFields id { title, maybeProjectId, maybeDueDate } =
     Todo id title False False maybeProjectId maybeDueDate
 
 
+initialTodoList : List Todo
 initialTodoList =
     [ createMockTodo "1" "Get Milk!!"
     , createMockTodo "2" "Submit assignment"
@@ -123,6 +124,7 @@ initialTodoList =
     , createMockTodo "4" "Go to movies"
     , createMockTodo "5" "Get Milk!!"
     ]
+        |> List.filterMap identity
 
 
 
