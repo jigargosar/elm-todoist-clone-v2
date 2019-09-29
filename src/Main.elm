@@ -211,7 +211,7 @@ update msg model =
             ( model
                 |> mapTodoList
                     (updateWhenIdEq todoId
-                        (\todo -> { todo | projectSortIdx = min 0 (todo.projectSortIdx - 1) })
+                        (\todo -> { todo | projectSortIdx = max 0 (todo.projectSortIdx - 1) })
                     )
             , Cmd.none
             )
@@ -297,9 +297,10 @@ saveTodoForm ( form, meta ) model =
     )
 
 
-todoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
-todoListForMaybeProjectId maybeProjectId =
+sortedTodoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
+sortedTodoListForMaybeProjectId maybeProjectId =
     List.filter (propEq .maybeProjectId maybeProjectId)
+        >> List.sortBy .projectSortIdx
 
 
 upsertTodoAndUpdateSortIndices : Todo -> Model -> Model
@@ -318,13 +319,13 @@ updateTodo oldTodo newTodo model =
         projectTodoList =
             if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
                 (newTodo
-                    :: todoListForMaybeProjectId newTodo.maybeProjectId model.todoList
+                    :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId model.todoList
                 )
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
             else
                 model.todoList
-                    |> todoListForMaybeProjectId newTodo.maybeProjectId
+                    |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
         todoListWithoutOldTodo =
@@ -339,7 +340,7 @@ updateTodo oldTodo newTodo model =
 insertTodo todo model =
     let
         projectTodoList =
-            todoListForMaybeProjectId todo.maybeProjectId model.todoList
+            sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
                 |> (::) todo
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
@@ -581,8 +582,7 @@ viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
 viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as model) =
     let
         filteredTodoList =
-            List.filter (propEq .maybeProjectId maybeProjectId) todoList
-                |> List.sortBy .projectSortIdx
+            sortedTodoListForMaybeProjectId maybeProjectId model.todoList
     in
     viewEditableTodoList ProjectItemLayout model filteredTodoList
         ++ [ getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
@@ -644,7 +644,7 @@ viewTodo today layout todo =
                 row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
                     [ H.text <| todoProjectTitle todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "X" (DeleteTodo todo.id)
+            [ btn2 "UP" (MoveUp todo.id)
             , btn2 "X" (DeleteTodo todo.id)
             ]
         ]
