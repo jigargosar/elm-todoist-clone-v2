@@ -597,37 +597,6 @@ viewEditableTodoList { maybeTodoFormWithMeta } =
         )
 
 
-todoFormConfig : TodoForm.Config Msg
-todoFormConfig =
-    TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
-
-
-viewTodoForm : TodoForm -> H.Html Msg
-viewTodoForm =
-    TodoForm.viewTodoForm todoFormConfig
-
-
-humanDate date today =
-    let
-        addDays ct =
-            Date.add Date.Days ct today
-    in
-    if date == addDays -1 then
-        "Yesterday"
-
-    else if date == addDays 0 then
-        "Today"
-
-    else if date == addDays 1 then
-        "Tomorrow"
-
-    else if Date.year date == Date.year today then
-        Date.format "ddd MMM" date
-
-    else
-        Date.format "ddd MMM YYYY" date
-
-
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
 viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList } as model) =
     let
@@ -687,13 +656,6 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                 ++ [ viewAddTodoButton (InsertTodoInProjectClicked -1 maybeProjectId) ]
 
 
-todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
-todoProjectTitle { maybeProjectId } =
-    Project.mockProjects
-        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
-        |> MX.unwrap "Inbox" .title
-
-
 viewProjectTodoItem : Maybe ProjectId -> Date -> Int -> Todo -> H.Html Msg
 viewProjectTodoItem maybeProject today idx todo =
     row [ A.class "hide-child relative" ]
@@ -738,9 +700,47 @@ viewDueDateTodoItem todo =
         ]
 
 
+todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
+todoProjectTitle { maybeProjectId } =
+    Project.mockProjects
+        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
+        |> MX.unwrap "Inbox" .title
+
+
 viewAddTodoButton : Msg -> H.Html Msg
 viewAddTodoButton onClick =
     row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
+
+
+todoFormConfig : TodoForm.Config Msg
+todoFormConfig =
+    TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
+
+
+viewTodoForm : TodoForm -> H.Html Msg
+viewTodoForm =
+    TodoForm.viewTodoForm todoFormConfig
+
+
+humanDate date today =
+    let
+        addDays ct =
+            Date.add Date.Days ct today
+    in
+    if date == addDays -1 then
+        "Yesterday"
+
+    else if date == addDays 0 then
+        "Today"
+
+    else if date == addDays 1 then
+        "Tomorrow"
+
+    else if Date.year date == Date.year today then
+        Date.format "ddd MMM" date
+
+    else
+        Date.format "ddd MMM YYYY" date
 
 
 main : Program Flags Model Msg
