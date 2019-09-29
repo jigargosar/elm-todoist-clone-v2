@@ -318,10 +318,13 @@ updateTodo oldTodo newTodo model =
                 model.todoList
                     |> todoListForMaybeProjectId newTodo.maybeProjectId
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+
+        todoListWithoutOldTodo =
+            List.filter (idEq oldTodo.id >> not) model.todoList
     in
     { model
         | todoList =
-            List.foldl upsertById model.todoList projectTodoList
+            List.foldl upsertById todoListWithoutOldTodo projectTodoList
     }
 
 
