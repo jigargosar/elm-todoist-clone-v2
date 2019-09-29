@@ -17,6 +17,7 @@ import Random
 import Return
 import Task
 import Time
+import Todo exposing (Todo)
 import TodoId exposing (TodoId)
 import UI exposing (btn2, checkbox3, col, colKeyed, ipt2, row)
 
@@ -64,41 +65,6 @@ initialProjectList =
 
 
 -- TODO_
-
-
-type alias Todo =
-    { id : TodoId
-    , title : String
-    , isDone : Bool
-    , isDeleted : Bool
-    , maybeProjectId : Maybe ProjectId
-    , maybeDueDate : Maybe Date
-    }
-
-
-createMockTodo : String -> String -> Maybe Todo
-createMockTodo id title =
-    TodoId.fromString id
-        |> Maybe.map (\todoId -> Todo todoId title False False Nothing Nothing)
-
-
-todoFromFields : TodoId -> AddTodoFields -> Todo
-todoFromFields id { title, maybeProjectId, maybeDueDate } =
-    Todo id title False False maybeProjectId maybeDueDate
-
-
-initialTodoList : List Todo
-initialTodoList =
-    [ createMockTodo "1" "Get Milk!!"
-    , createMockTodo "2" "Submit assignment"
-    , createMockTodo "3" "Check Facebook"
-    , createMockTodo "4" "Go to movies"
-    , createMockTodo "5" "Get Milk!!"
-    ]
-        |> List.filterMap identity
-
-
-
 -- CACHE
 
 
@@ -112,7 +78,7 @@ type alias Cache =
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = initialTodoList }
+    { todoList = Todo.mockList }
 
 
 cacheDecoder : JD.Decoder Cache
