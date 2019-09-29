@@ -646,35 +646,21 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
         isLastIdx idx =
             idx == lastIndex
     in
-    --    viewEditableTodoList ProjectItemLayout model filteredTodoList
-    --        ++ (case maybeAddTodoFormWithIndex of
-    --                Just ( i, form ) ->
-    --                    if i == -1 || i >= List.length filteredTodoList then
-    --                        [ viewTodoForm form ]
-    --
-    --                    else
-    --                        []
-    --
-    --                Nothing ->
-    --                    [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
-    --           )
     case maybeAddTodoFormWithIndex of
         Just ( formIdx, form ) ->
             let
                 formHtml =
-                    ( "viewAddTodoForm", viewTodoForm form )
+                    viewTodoForm form
             in
             filteredTodoList
                 |> List.indexedMap
                     (\currentIdx todo ->
                         let
                             editableTodoHtml =
-                                ( TodoId.toString todo.id
-                                , getEditTodoFormForTodoId todo.id maybeTodoForm
+                                getEditTodoFormForTodoId todo.id maybeTodoForm
                                     |> MX.unpack
                                         (\_ -> viewProjectTodoItem maybeProjectId currentIdx model.today todo)
                                         viewTodoForm
-                                )
                         in
                         if currentIdx == formIdx then
                             [ formHtml, editableTodoHtml ]
@@ -686,22 +672,16 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                             [ editableTodoHtml ]
                     )
                 |> List.concat
-                >> colKeyed []
-                >> List.singleton
 
         Nothing ->
             (filteredTodoList
                 |> List.indexedMap
                     (\currentIdx todo ->
-                        ( TodoId.toString todo.id
-                        , getEditTodoFormForTodoId todo.id maybeTodoForm
+                        getEditTodoFormForTodoId todo.id maybeTodoForm
                             |> MX.unpack
                                 (\_ -> viewProjectTodoItem maybeProjectId currentIdx model.today todo)
                                 viewTodoForm
-                        )
                     )
-                >> colKeyed []
-                >> List.singleton
             )
                 ++ [ viewAddTodoButton (InsertTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
 
