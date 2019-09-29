@@ -570,7 +570,7 @@ viewOverDueTodoList ({ today, todoList, maybeTodoFormWithMeta } as model) =
 
     else
         col [] [ H.text "OverDue" ]
-            :: viewEditableTodoList DueDateItemLayout model filteredTodoList
+            :: viewEditableTodoList model filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -586,7 +586,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
             todoList |> List.filter filterPredicate
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
-        :: viewEditableTodoList DueDateItemLayout model filteredTodoList
+        :: viewEditableTodoList model filteredTodoList
         ++ [ getAddTodoFormWithInitialDueDateEq dueDate maybeTodoFormWithMeta
                 |> MX.unwrap (viewAddTodoButton (AddTodoOnDueDateClicked dueDate)) viewTodoForm
            ]
@@ -682,9 +682,9 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                 ++ [ viewAddTodoButton (InsertTodoInProjectClicked -1 maybeProjectId) ]
 
 
-viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
-viewEditableTodoList layout model =
-    keyed (.id >> TodoId.toString) (\_ -> viewEditableTodoItem layout model)
+viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
+viewEditableTodoList model =
+    keyed (.id >> TodoId.toString) (\_ -> viewEditableTodoItem model)
         >> colKeyed []
         >> List.singleton
 
@@ -694,15 +694,10 @@ keyed keyF renderF =
     List.indexedMap (\idx item -> ( keyF item, renderF idx item ))
 
 
-viewEditableTodoItem : TodoItemLayout -> Model -> Todo -> H.Html Msg
-viewEditableTodoItem layout { today, maybeTodoFormWithMeta } todo =
+viewEditableTodoItem : Model -> Todo -> H.Html Msg
+viewEditableTodoItem { maybeTodoFormWithMeta } todo =
     getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
-        |> MX.unpack (\_ -> viewTodo today layout todo) viewTodoForm
-
-
-type TodoItemLayout
-    = ProjectItemLayout
-    | DueDateItemLayout
+        |> MX.unpack (\_ -> viewDueDateTodoItem todo) viewTodoForm
 
 
 todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
@@ -738,8 +733,8 @@ viewProjectTodoItem maybeProject today idx todo =
         ]
 
 
-viewTodo : Date -> TodoItemLayout -> Todo -> H.Html Msg
-viewTodo today layout todo =
+viewDueDateTodoItem : Todo -> H.Html Msg
+viewDueDateTodoItem todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -749,28 +744,10 @@ viewTodo today layout todo =
             , E.onClick (EditTodoClicked todo)
             ]
             [ H.text todo.title ]
-        , case layout of
-            ProjectItemLayout ->
-                todo.maybeDueDate
-                    |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
-                        (\dueDate ->
-                            row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
-                        )
-
-            DueDateItemLayout ->
-                row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-                    [ H.text <| todoProjectTitle todo ]
+        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
+            [ H.text <| todoProjectTitle todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            (case layout of
-                ProjectItemLayout ->
-                    [ btn2 "UP" (MoveUp todo.id)
-                    , btn2 "DN" (MoveDown todo.id)
-                    ]
-
-                DueDateItemLayout ->
-                    []
-                        ++ [ btn2 "X" (DeleteTodo todo.id) ]
-            )
+            [ btn2 "X" (DeleteTodo todo.id) ]
         ]
 
 
