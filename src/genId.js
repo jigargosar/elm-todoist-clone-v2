@@ -21,8 +21,6 @@ const cli = meow(
   },
 )
 
-const name = cli.input[0]
-
 if (cli.input.length === 0) return cli.showHelp()
 
 cli.input.forEach(genId)
@@ -31,7 +29,13 @@ function genId(name) {
   const filePath = `./src/${name}.elm`
   fs.writeFileSync(
     filePath,
-    `
+    idFileCode(name),
+    { encoding: 'UTF-8', flag: 'w' },
+  )
+}
+
+function idFileCode(name) {
+  return `
 module ${name} exposing (${name}, encoder, decoder, toString ,fromString)
 
 import Json.Encode as JE exposing(Value)
@@ -58,7 +62,5 @@ fromString =
   String.trim
   >> \\s -> if String.isEmpty s then Nothing else Just (${name} s)  
 
-`,
-    { encoding: 'UTF-8', flag: 'w' },
-  )
+`
 }
