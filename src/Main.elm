@@ -656,20 +656,17 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                 |> List.indexedMap
                     (\currentIdx todo ->
                         let
-                            editableTodoHtml =
-                                getEditTodoFormForTodoId todo.id maybeTodoForm
-                                    |> MX.unpack
-                                        (\_ -> viewProjectTodoItem maybeProjectId currentIdx model.today todo)
-                                        viewTodoForm
+                            todoItemHtml =
+                                viewProjectTodoItem maybeProjectId model.today currentIdx todo
                         in
                         if currentIdx == formIdx then
-                            [ formHtml, editableTodoHtml ]
+                            [ formHtml, todoItemHtml ]
 
                         else if isLastIdx currentIdx && isIndexOutOfBounds formIdx then
-                            [ editableTodoHtml, formHtml ]
+                            [ todoItemHtml, formHtml ]
 
                         else
-                            [ editableTodoHtml ]
+                            [ todoItemHtml ]
                     )
                 |> List.concat
 
@@ -681,18 +678,13 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                             viewTodoForm form
 
                         else
-                            viewProjectTodoItem maybeProjectId currentIdx model.today todo
+                            viewProjectTodoItem maybeProjectId model.today currentIdx todo
                     )
 
         _ ->
             (filteredTodoList
                 |> List.indexedMap
-                    (\currentIdx todo ->
-                        getEditTodoFormForTodoId todo.id maybeTodoForm
-                            |> MX.unpack
-                                (\_ -> viewProjectTodoItem maybeProjectId currentIdx model.today todo)
-                                viewTodoForm
-                    )
+                    (viewProjectTodoItem maybeProjectId model.today)
             )
                 ++ [ viewAddTodoButton (InsertTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
 
@@ -732,8 +724,8 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
-viewProjectTodoItem : Maybe ProjectId -> Int -> Date -> Todo -> H.Html Msg
-viewProjectTodoItem maybeProject idx today todo =
+viewProjectTodoItem : Maybe ProjectId -> Date -> Int -> Todo -> H.Html Msg
+viewProjectTodoItem maybeProject today idx todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
