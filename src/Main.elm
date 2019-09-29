@@ -299,18 +299,24 @@ updateSortIndices =
         >> List.concat
 
 
+todoListForMaybeProjectId maybeProjectId =
+    List.filter (propEq .maybeProjectId maybeProjectId)
+
+
 upsertTodoAndUpdateSortIndices todo model =
-    let
-        _ =
-            LX.gatherEqualsBy .maybeProjectId model.todoList
-                |> List.map
-                    ((\( fst, rest ) -> fst :: rest)
-                        >> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
-                    )
-    in
-    { model
-        | todoList = upsertById todo model.todoList
-    }
+    if List.any (idEq todo.id) model.todoList then
+        updateTodo todo model
+
+    else
+        insertTodo todo model
+
+
+updateTodo todo model =
+    { model | todoList = updateWhenIdEq todo.id (always todo) model.todoList }
+
+
+insertTodo todo model =
+    { model | todoList = updateWhenIdEq todo.id (always todo) model.todoList }
 
 
 
