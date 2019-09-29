@@ -646,8 +646,8 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
         isLastIdx idx =
             idx == lastIndex
 
-        viewProjectTodoItem_ : Int -> Todo -> H.Html Msg
-        viewProjectTodoItem_ =
+        viewTodoItem : Int -> Todo -> H.Html Msg
+        viewTodoItem =
             viewProjectTodoItem maybeProjectId model.today
     in
     case maybeTodoForm of
@@ -661,7 +661,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                     (\currentIdx todo ->
                         let
                             todoItemHtml =
-                                viewProjectTodoItem_ currentIdx todo
+                                viewTodoItem currentIdx todo
                         in
                         if currentIdx == formIdx then
                             [ formHtml, todoItemHtml ]
@@ -682,11 +682,11 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                             viewTodoForm form
 
                         else
-                            viewProjectTodoItem_ currentIdx todo
+                            viewTodoItem currentIdx todo
                     )
 
         _ ->
-            List.indexedMap viewProjectTodoItem_ filteredTodoList
+            List.indexedMap viewTodoItem filteredTodoList
                 ++ [ viewAddTodoButton (InsertTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
 
 
