@@ -57,6 +57,6 @@ viewSelectOne maybeProjectId onChange =
                 [ H.text title ]
     in
     H.select [ E.onInput (ProjectId.fromString >> onChange) ]
-        (H.option [ A.value "" ] [ H.text "Inbox" ]
+        (H.option [ A.value " " ] [ H.text "Inbox" ]
             :: List.map viewOpt mockProjects
         )
