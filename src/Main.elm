@@ -374,6 +374,7 @@ updateTodo oldTodo newTodo model =
             else
                 model.todoList
                     |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
+                    |> updateWhenIdEq newTodo.id (always newTodo)
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
         todoListWithoutOldTodo =
