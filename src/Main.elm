@@ -670,7 +670,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                                 ( TodoId.toString todo.id
                                 , getEditTodoFormForTodoId todo.id maybeTodoForm
                                     |> MX.unpack
-                                        (\_ -> viewProjectTodoItem currentIdx model.today todo)
+                                        (\_ -> viewProjectTodoItem maybeProjectId currentIdx model.today todo)
                                         viewTodoForm
                                 )
                         in
@@ -727,8 +727,8 @@ todoProjectTitle { maybeProjectId } =
         |> MX.unwrap "Inbox" .title
 
 
-viewProjectTodoItem : Int -> Date -> Todo -> H.Html Msg
-viewProjectTodoItem idx today todo =
+viewProjectTodoItem : Maybe ProjectId -> Int -> Date -> Todo -> H.Html Msg
+viewProjectTodoItem maybeProject idx today todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -744,7 +744,9 @@ viewProjectTodoItem idx today todo =
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                 )
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "UP" (MoveUp todo.id)
+            [ btn2 "Insert Above" (InsertTodoInMaybeProjectIdClicked idx maybeProject)
+            , btn2 "Insert Below" (InsertTodoInMaybeProjectIdClicked (idx + 1) maybeProject)
+            , btn2 "UP" (MoveUp todo.id)
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
             ]
