@@ -688,7 +688,19 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                 >> List.singleton
 
         Nothing ->
-            viewEditableTodoList ProjectItemLayout model filteredTodoList
+            (filteredTodoList
+                |> List.indexedMap
+                    (\currentIdx todo ->
+                        ( TodoId.toString todo.id
+                        , getEditTodoFormForTodoId todo.id maybeTodoForm
+                            |> MX.unpack
+                                (\_ -> viewProjectTodoItem maybeProjectId currentIdx model.today todo)
+                                viewTodoForm
+                        )
+                    )
+                >> colKeyed []
+                >> List.singleton
+            )
                 ++ [ viewAddTodoButton (InsertTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
 
 
