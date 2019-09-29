@@ -8,7 +8,7 @@ const cli = meow(
 	Usage
 	  $ genId <name>
 
-Examples
+  Examples
 	  $ genId ProjectId
 	  
 `,
