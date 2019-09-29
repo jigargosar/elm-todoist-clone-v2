@@ -23,13 +23,14 @@ const cli = meow(
 
 const name = cli.input[0]
 
-if (cli.input.length === 0 ) return cli.showHelp()
+if (cli.input.length === 0) return cli.showHelp()
 
 cli.input.forEach(genId)
 
 function genId(name) {
+  const filePath = `./src/${name}.elm`
   fs.writeFileSync(
-    `./src/${name}.elm`,
+    filePath,
     `
 module ${name} exposing (${name}, encoder, decoder, toString ,fromString)
 
@@ -61,5 +62,3 @@ fromString =
     { encoding: 'UTF-8', flag: 'w' },
   )
 }
-
-
