@@ -35,11 +35,11 @@ function genId(name) {
 }
 
 function idFileCode(name) {
-  return `
-module ${name} exposing (${name}, encoder, decoder, toString ,fromString)
+  return `module ${name} exposing (${name}, encoder, decoder, toString ,fromString, generator)
 
 import Json.Encode as JE exposing(Value)
 import Json.Decode as JD exposing(Decoder)
+import Random
 
 type ${name} =
     ${name} String
@@ -60,6 +60,13 @@ toString (${name} s) =
 fromString: String -> Maybe ${name}
 fromString =
   String.trim
-  >> \\s -> if String.isEmpty s then Nothing else Just (${name} s)  
+  >> \\s -> if String.isEmpty s then Nothing else Just (${name} s)
+
+generator: Random.Generator ${name}
+generator = 
+  Random.int (10 ^ 3) (10 ^ 5)
+  |> Random.map (String.fromInt >> (++) "${name}-" >> ${name})
+
+  
 `
 }
