@@ -646,8 +646,8 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
         isLastIdx idx =
             idx == lastIndex
     in
-    case maybeAddTodoFormWithIndex of
-        Just ( formIdx, form ) ->
+    case maybeTodoForm of
+        Just ( form, AddTodoInMaybeProjectIdMeta formIdx _ ) ->
             let
                 formHtml =
                     viewTodoForm form
@@ -673,7 +673,18 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                     )
                 |> List.concat
 
-        Nothing ->
+        Just ( form, EditTodoMeta editTodo ) ->
+            filteredTodoList
+                |> List.indexedMap
+                    (\currentIdx todo ->
+                        if editTodo.id == todo.id then
+                            viewTodoForm form
+
+                        else
+                            viewProjectTodoItem maybeProjectId currentIdx model.today todo
+                    )
+
+        _ ->
             (filteredTodoList
                 |> List.indexedMap
                     (\currentIdx todo ->
