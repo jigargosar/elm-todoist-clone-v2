@@ -304,15 +304,23 @@ todoListForMaybeProjectId maybeProjectId =
 
 
 upsertTodoAndUpdateSortIndices todo model =
-    if List.any (idEq todo.id) model.todoList then
-        updateTodo todo model
+    case LX.find (idEq todo.id) model.todoList of
+        Just existingTodo ->
+            updateTodo existingTodo todo model
 
-    else
-        insertTodo todo model
+        Nothing ->
+            insertTodo todo model
 
 
-updateTodo todo model =
+updateTodo existingTodo todo model =
     let
+        _ =
+            if existingTodo.maybeProjectId == todo.maybeProjectId then
+                1
+
+            else
+                2
+
         projectTodoList =
             todoListForMaybeProjectId todo.maybeProjectId model.todoList
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
