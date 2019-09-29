@@ -629,15 +629,6 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
 
-        lastIndex =
-            List.length filteredTodoList - 1
-
-        isIndexOutOfBounds idx =
-            idx < 0 || idx > lastIndex
-
-        isLastIdx idx =
-            idx == lastIndex
-
         viewTodoItem : Int -> Todo -> H.Html Msg
         viewTodoItem =
             viewProjectTodoItem maybeProjectId model.today
@@ -647,6 +638,15 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
             let
                 formHtml =
                     viewTodoForm form
+
+                lastIndex =
+                    List.length filteredTodoList - 1
+
+                isIndexOutOfBounds idx =
+                    idx < 0 || idx > lastIndex
+
+                isLastIdx idx =
+                    idx == lastIndex
             in
             filteredTodoList
                 |> List.indexedMap
