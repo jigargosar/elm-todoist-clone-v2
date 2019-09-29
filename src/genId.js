@@ -17,9 +17,11 @@ Examples
   },
 )
 
-genId(cli.input[0])
+const name = cli.input[0]
 
+if (!name) return cli.showHelp()
 
+genId(name)
 
 function genId(name) {
   fs.writeFileSync(
