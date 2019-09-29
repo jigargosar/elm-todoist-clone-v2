@@ -1,4 +1,25 @@
+#!/usr/bin/env node
+'use strict'
+const meow = require('meow')
 const fs = require('fs')
+
+const cli = meow(
+  `
+	Usage
+	  $ genId <name>
+
+Examples
+	  $ genId ProjectId
+	  
+`,
+  {
+    flags: {},
+  },
+)
+
+genId(cli.input[0])
+
+
 
 function genId(name) {
   fs.writeFileSync(

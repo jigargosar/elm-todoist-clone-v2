@@ -24,6 +24,7 @@
     "webpack": "^4.41.0"
   },
   "dependencies": {
+    "meow": "^5.0.0",
     "tachyons": "^4.11.1"
   }
 }
