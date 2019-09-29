@@ -1,4 +1,4 @@
-module Todo exposing (Todo, fromPartial, generatorFromPartial, mockList)
+module Todo exposing (Todo, generatorFromPartial, mockList)
 
 import Date exposing (Date)
 import ProjectId exposing (ProjectId)
