@@ -642,8 +642,8 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                 lastIndex =
                     List.length filteredTodoList - 1
 
-                isIndexOutOfBounds idx =
-                    idx < 0 || idx > lastIndex
+                isFormIndexOutOfBounds =
+                    formIdx < 0 || formIdx > lastIndex
 
                 isLastIdx idx =
                     idx == lastIndex
@@ -658,7 +658,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                         if currentIdx == formIdx then
                             [ formHtml, todoItemHtml ]
 
-                        else if isLastIdx currentIdx && isIndexOutOfBounds formIdx then
+                        else if isLastIdx currentIdx && isFormIndexOutOfBounds then
                             [ todoItemHtml, formHtml ]
 
                         else
