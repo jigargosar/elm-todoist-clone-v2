@@ -133,13 +133,13 @@ type TodoFormMeta
     | EditTodoForm Todo
 
 
-type alias TodoFormAndMeta =
-    { form : TodoForm, meta : TodoFormMeta }
+type alias TodoFormWithMeta =
+    ( TodoForm, TodoFormMeta )
 
 
 type alias Model =
     { todoList : List Todo
-    , maybeTodoForm : Maybe TodoFormAndMeta
+    , maybeTodoForm : Maybe TodoFormWithMeta
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -240,27 +240,25 @@ update msg model =
         AddTodoClicked maybeProjectId maybeDueDate ->
             ( model
                 |> setTodoForm
-                    { form = TodoForm.init "" maybeProjectId maybeDueDate
-                    , meta = AddTodoForm maybeDueDate
-                    }
+                    ( TodoForm.init "" maybeProjectId maybeDueDate
+                    , AddTodoForm maybeDueDate
+                    )
             , Cmd.none
             )
 
         EditTodoClicked ({ id, maybeProjectId, maybeDueDate } as todo) ->
             ( model
                 |> setTodoForm
-                    { form = TodoForm.init "" maybeProjectId maybeDueDate
-                    , meta = EditTodoForm todo
-                    }
+                    ( TodoForm.init "" maybeProjectId maybeDueDate
+                    , EditTodoForm todo
+                    )
             , Cmd.none
             )
 
         PatchTodoForm todoForm ->
             ( model
                 |> mapTodoForm
-                    (\todoForm_ ->
-                        { todoForm_ | form = todoForm }
-                    )
+                    (Tuple.mapFirst (always todoForm))
             , Cmd.none
             )
 
@@ -283,19 +281,19 @@ mapTodoForm func model =
     { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
 
 
-saveTodoForm : TodoFormAndMeta -> Model -> ( Model, Cmd Msg )
-saveTodoForm form_ model =
+saveTodoForm : TodoFormWithMeta -> Model -> ( Model, Cmd Msg )
+saveTodoForm ( form, meta ) model =
     let
         partial =
-            TodoForm.toPartial form_.form
+            TodoForm.toPartial form
 
         ( todo, newModel ) =
-            case form_.meta of
+            case meta of
                 AddTodoForm _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
                 EditTodoForm editingTodo ->
-                    ( Todo.patchWithPartial (TodoForm.toPartial form_.form) editingTodo
+                    ( Todo.patchWithPartial (TodoForm.toPartial form) editingTodo
                     , model
                     )
     in
@@ -409,54 +407,39 @@ viewRoute model route =
             viewNext7DaysTodoList model
 
 
-getEditTodoFormForTodoId : TodoId -> Maybe { a | meta : TodoFormMeta, form : b } -> Maybe b
+getEditTodoFormForTodoId : TodoId -> Maybe ( a, TodoFormMeta ) -> Maybe a
 getEditTodoFormForTodoId todoId maybeForm =
     case maybeForm of
-        Just form_ ->
-            case form_.meta of
-                EditTodoForm { id } ->
-                    if id == todoId then
-                        Just form_.form
+        Just ( form, EditTodoForm { id } ) ->
+            if id == todoId then
+                Just form
 
-                    else
-                        Nothing
-
-                _ ->
-                    Nothing
+            else
+                Nothing
 
         _ ->
             Nothing
 
 
-getAddTodoForm : Maybe { a | meta : TodoFormMeta, form : b } -> Maybe b
+getAddTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoForm maybeForm =
     case maybeForm of
-        Just form_ ->
-            case form_.meta of
-                AddTodoForm _ ->
-                    Just form_.form
-
-                _ ->
-                    Nothing
+        Just ( form, AddTodoForm _ ) ->
+            Just form
 
         _ ->
             Nothing
 
 
-getAddTodoFormWithInitialDueDateEq : Date -> Maybe { a | meta : TodoFormMeta, form : b } -> Maybe b
+getAddTodoFormWithInitialDueDateEq : Date -> Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoFormWithInitialDueDateEq date maybeForm =
     case maybeForm of
-        Just form_ ->
-            case form_.meta of
-                AddTodoForm (Just date_) ->
-                    if date_ == date then
-                        Just form_.form
+        Just ( form, AddTodoForm (Just date_) ) ->
+            if date_ == date then
+                Just form
 
-                    else
-                        Nothing
-
-                _ ->
-                    Nothing
+            else
+                Nothing
 
         _ ->
             Nothing
@@ -510,7 +493,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
         ++ [ viewAddTodoItemForDueDate dueDate maybeTodoForm ]
 
 
-viewAddTodoItemForDueDate : Date -> Maybe { a | meta : TodoFormMeta, form : TodoForm } -> H.Html Msg
+viewAddTodoItemForDueDate : Date -> Maybe TodoFormWithMeta -> H.Html Msg
 viewAddTodoItemForDueDate date maybeTodoForm =
     getAddTodoFormWithInitialDueDateEq date maybeTodoForm
         |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewTodoForm
