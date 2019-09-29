@@ -548,8 +548,8 @@ todoFormConfig =
 
 
 viewTodoForm : TodoForm -> H.Html Msg
-viewTodoForm todoForm =
-    TodoForm.viewTodoForm todoFormConfig todoForm
+viewTodoForm =
+    TodoForm.viewTodoForm todoFormConfig
 
 
 humanDate date today =
