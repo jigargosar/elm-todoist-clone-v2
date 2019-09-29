@@ -33,5 +33,5 @@ fromString =
     { encoding: 'UTF-8', flag: 'w' },
   )
 }
-
+console.log('process.argv', process.argv)
 genId('ProjectId')
