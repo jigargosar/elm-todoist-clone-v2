@@ -327,7 +327,19 @@ updateTodo todo model =
 
 
 insertTodo todo model =
-    { model | todoList = updateWhenIdEq todo.id (always todo) model.todoList }
+    let
+        projectTodoList =
+            todoListForMaybeProjectId todo.maybeProjectId model.todoList
+                |> (::) todo
+                |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+    in
+    { model
+        | todoList =
+            List.foldl
+                (\t -> updateWhenIdEq t.id (always t))
+                model.todoList
+                projectTodoList
+    }
 
 
 
