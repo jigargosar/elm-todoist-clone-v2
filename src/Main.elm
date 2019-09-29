@@ -62,24 +62,10 @@ cacheDecoder =
 cacheModel_ : Model -> Cmd msg
 cacheModel_ model =
     let
-        maybeEncoder =
-            MX.unwrap JE.null
-
-        todoEncoder : Todo -> Value
-        todoEncoder { id, title, isDone, isDeleted, maybeProjectId, maybeDueDate } =
-            object
-                [ ( "id", TodoId.encoder id )
-                , ( "title", JE.string title )
-                , ( "isDone", JE.bool isDone )
-                , ( "isDeleted", JE.bool isDeleted )
-                , ( "maybeProjectId", maybeEncoder ProjectId.encoder maybeProjectId )
-                , ( "maybeDueDate", maybeEncoder (Date.toIsoString >> JE.string) maybeDueDate )
-                ]
-
         modelEncoder : Model -> Value
         modelEncoder { todoList } =
             object
-                [ ( "todoList", JE.list todoEncoder todoList )
+                [ ( "todoList", JE.list Todo.encoder todoList )
                 ]
 
         modelValue =

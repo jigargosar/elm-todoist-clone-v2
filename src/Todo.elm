@@ -1,8 +1,10 @@
-module Todo exposing (Todo, decoder, generatorFromPartial, mockList, patchWithPartial)
+module Todo exposing (Todo, decoder, encoder, generatorFromPartial, mockList, patchWithPartial)
 
 import Date exposing (Date)
 import Json.Decode as JD
 import Json.Decode.Pipeline exposing (optional, required)
+import Json.Encode as JE exposing (Value, object)
+import Maybe.Extra as MX
 import ProjectId exposing (ProjectId)
 import Random
 import TodoId exposing (TodoId)
@@ -31,6 +33,23 @@ decoder =
             Nothing
         |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
         |> optional "projectSortIdx" JD.int 0
+
+
+maybeEncoder =
+    MX.unwrap JE.null
+
+
+encoder : Todo -> Value
+encoder { id, title, isDone, isDeleted, maybeProjectId, maybeDueDate, projectSortIdx } =
+    object
+        [ ( "id", TodoId.encoder id )
+        , ( "title", JE.string title )
+        , ( "isDone", JE.bool isDone )
+        , ( "isDeleted", JE.bool isDeleted )
+        , ( "maybeProjectId", maybeEncoder ProjectId.encoder maybeProjectId )
+        , ( "maybeDueDate", maybeEncoder (Date.toIsoString >> JE.string) maybeDueDate )
+        , ( "projectSortIdx", JE.int projectSortIdx )
+        ]
 
 
 type alias Partial a =
