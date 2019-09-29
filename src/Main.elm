@@ -239,9 +239,7 @@ update msg model =
             )
 
         PatchTodoForm todoForm ->
-            ( model
-                |> mapTodoForm
-                    (Tuple.mapFirst (always todoForm))
+            ( model |> mapTodoForm (Tuple.mapFirst (always todoForm))
             , Cmd.none
             )
 
