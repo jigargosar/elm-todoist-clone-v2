@@ -688,10 +688,14 @@ viewTodo today layout todo =
                 row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
                     [ H.text <| todoProjectTitle todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "UP" (MoveUp todo.id)
-            , btn2 "DN" (MoveDown todo.id)
-            , btn2 "X" (DeleteTodo todo.id)
-            ]
+            (case layout of
+                ProjectItemLayout ->
+                    [ btn2 "UP" (MoveUp todo.id), btn2 "DN" (MoveDown todo.id) ]
+
+                DueDateItemLayout ->
+                    []
+                        ++ [ btn2 "X" (DeleteTodo todo.id) ]
+            )
         ]
 
 
