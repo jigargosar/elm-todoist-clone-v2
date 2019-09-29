@@ -178,7 +178,7 @@ type Msg
     | MoveUp TodoId
     | MoveDown TodoId
     | AddTodoOnDueDateClicked Date
-    | AddTodoInMaybeProjectIdClicked Int (Maybe ProjectId)
+    | InsertTodoInMaybeProjectIdClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | PatchTodoForm TodoForm
     | Save
@@ -278,7 +278,7 @@ update msg model =
             , Cmd.none
             )
 
-        AddTodoInMaybeProjectIdClicked idx maybeProjectId ->
+        InsertTodoInMaybeProjectIdClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
                     ( TodoForm.init "" maybeProjectId Nothing
@@ -680,7 +680,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
         Nothing ->
             viewEditableTodoList ProjectItemLayout model filteredTodoList
-                ++ [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
+                ++ [ viewAddTodoButton (InsertTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
