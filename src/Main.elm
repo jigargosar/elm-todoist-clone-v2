@@ -176,6 +176,7 @@ type Msg
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | MoveUp TodoId
+    | MoveDown TodoId
     | AddTodoOnDueDateClicked Date
     | AddTodoInMaybeProjectIdClicked (Maybe ProjectId)
     | EditTodoClicked Todo
@@ -225,6 +226,34 @@ update msg model =
 
                                     updatedProjectTodoList =
                                         LX.swapAt idx prevIdx projectTodoList
+                                            |> List.indexedMap (\i t -> { t | projectSortIdx = i })
+                                in
+                                { model
+                                    | todoList = List.foldl upsertById model.todoList updatedProjectTodoList
+                                }
+                            )
+                        |> Maybe.withDefault model
+            in
+            ( newModel, Cmd.none )
+
+        MoveDown todoId ->
+            let
+                newModel =
+                    LX.find (idEq todoId) model.todoList
+                        |> Maybe.map
+                            (\todo ->
+                                let
+                                    projectTodoList =
+                                        sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
+
+                                    idx =
+                                        LX.findIndex (idEq todo.id) projectTodoList |> Maybe.withDefault -1
+
+                                    nextIdx =
+                                        idx + 1
+
+                                    updatedProjectTodoList =
+                                        LX.swapAt idx nextIdx projectTodoList
                                             |> List.indexedMap (\i t -> { t | projectSortIdx = i })
                                 in
                                 { model
