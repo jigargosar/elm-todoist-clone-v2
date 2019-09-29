@@ -103,7 +103,7 @@ type alias Flags =
 
 type TodoFormMeta
     = AddTodoWithDueDateMeta Date
-    | AddTodoInMaybeProjectIdMeta (Maybe ProjectId)
+    | AddTodoInMaybeProjectIdMeta Int (Maybe ProjectId)
     | EditTodoMeta Todo
 
 
@@ -282,7 +282,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( TodoForm.init "" maybeProjectId Nothing
-                    , AddTodoInMaybeProjectIdMeta maybeProjectId
+                    , AddTodoInMaybeProjectIdMeta 0 maybeProjectId
                     )
             , Cmd.none
             )
@@ -328,7 +328,7 @@ saveTodoForm ( form, meta ) model =
 
         ( todo, newModel ) =
             case meta of
-                AddTodoInMaybeProjectIdMeta _ ->
+                AddTodoInMaybeProjectIdMeta _ _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
                 AddTodoWithDueDateMeta _ ->
@@ -513,12 +513,12 @@ getEditTodoFormForTodoId todoId maybeForm =
             Nothing
 
 
-getAddTodoFormWithInitialProjectId : Maybe ProjectId -> Maybe ( a, TodoFormMeta ) -> Maybe a
+getAddTodoFormWithInitialProjectId : Maybe ProjectId -> Maybe ( a, TodoFormMeta ) -> Maybe ( Int, a )
 getAddTodoFormWithInitialProjectId maybeProjectId maybeForm =
     case maybeForm of
-        Just ( form, AddTodoInMaybeProjectIdMeta maybeProjectId_ ) ->
+        Just ( form, AddTodoInMaybeProjectIdMeta idx maybeProjectId_ ) ->
             if maybeProjectId == maybeProjectId_ then
-                Just form
+                Just ( idx, form )
 
             else
                 Nothing
@@ -631,13 +631,18 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
     let
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
+
+        maybeAddTodoFormWithIndex =
+            getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
     in
     viewEditableTodoList ProjectItemLayout model filteredTodoList
-        ++ [ getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
-                |> MX.unwrap
-                    (viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId))
-                    viewTodoForm
-           ]
+        ++ (case maybeAddTodoFormWithIndex of
+                Just _ ->
+                    []
+
+                Nothing ->
+                    [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId) ]
+           )
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
