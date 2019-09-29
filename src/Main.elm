@@ -12,6 +12,7 @@ import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
+import ProjectId exposing (ProjectId)
 import Random
 import Return
 import Task
@@ -33,26 +34,9 @@ type Route
 -- PROJECT
 
 
-type ProjectId
-    = ProjectId String
-
-
-projectIdFromString : String -> Maybe ProjectId
-projectIdFromString str =
-    if str |> String.trim |> String.isEmpty then
-        Nothing
-
-    else
-        Just <| ProjectId (String.trim str)
-
-
-projectIdEncoder (ProjectId str) =
-    JE.string str
-
-
 projectIdToValueAttr : ProjectId -> H.Attribute msg
-projectIdToValueAttr (ProjectId str) =
-    A.value str
+projectIdToValueAttr =
+    A.value << ProjectId.toString
 
 
 type alias Project =
@@ -62,17 +46,20 @@ type alias Project =
     }
 
 
-createMockProject : String -> String -> Project
+createMockProject : String -> String -> Maybe Project
 createMockProject id title =
-    Project (ProjectId id) title False
+    ProjectId.fromString id
+        |> Maybe.map (\projectId -> Project projectId title False)
 
 
+initialProjectList : List Project
 initialProjectList =
     [ createMockProject "1" "Build Utils"
     , createMockProject "2" "Publish Post"
     , createMockProject "3" "Complete Story"
     , createMockProject "4" "Exam Prep"
     ]
+        |> List.filterMap identity
 
 
 
@@ -139,7 +126,7 @@ cacheDecoder =
                 |> required "isDone" JD.bool
                 |> optional "isDeleted" JD.bool False
                 |> optional "maybeProjectId"
-                    (JD.string |> JD.map (ProjectId >> Just))
+                    (ProjectId.decoder |> JD.map Just)
                     Nothing
                 |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
     in
@@ -160,7 +147,7 @@ cacheModel_ model =
                 , ( "title", JE.string title )
                 , ( "isDone", JE.bool isDone )
                 , ( "isDeleted", JE.bool isDeleted )
-                , ( "maybeProjectId", maybeEncoder projectIdEncoder maybeProjectId )
+                , ( "maybeProjectId", maybeEncoder ProjectId.encoder maybeProjectId )
                 , ( "maybeDueDate", maybeEncoder (Date.toIsoString >> JE.string) maybeDueDate )
                 ]
 
@@ -736,7 +723,7 @@ viewProjectSelect maybeProjectId projectIdChanged =
                 ]
                 [ H.text title ]
     in
-    H.select [ E.onInput (projectIdFromString >> projectIdChanged) ]
+    H.select [ E.onInput (ProjectId.fromString >> projectIdChanged) ]
         (H.option [] [ H.text "Inbox" ]
             :: List.map viewOpt initialProjectList
         )
