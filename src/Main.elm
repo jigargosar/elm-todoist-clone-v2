@@ -103,7 +103,7 @@ type alias Flags =
 
 type TodoFormMeta
     = AddDueAtTodoMeta Date
-    | InsertProjectTodoMeta Int
+    | InsertTodoInProjectMeta Int
     | EditTodoMeta Todo
 
 
@@ -178,7 +178,7 @@ type Msg
     | MoveUp TodoId
     | MoveDown TodoId
     | AddTodoOnDueDateClicked Date
-    | InsertTodoInMaybeProjectIdClicked Int (Maybe ProjectId)
+    | InsertTodoInProjectClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | PatchTodoForm TodoForm
     | Save
@@ -278,12 +278,12 @@ update msg model =
             , Cmd.none
             )
 
-        InsertTodoInMaybeProjectIdClicked idx maybeProjectId ->
+        InsertTodoInProjectClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
                     ( getInsertTodoForm model.maybeTodoFormWithMeta
                         |> Maybe.withDefault (TodoForm.init "" maybeProjectId Nothing)
-                    , InsertProjectTodoMeta idx
+                    , InsertTodoInProjectMeta idx
                     )
             , Cmd.none
             )
@@ -329,7 +329,7 @@ saveTodoForm ( form, meta ) model =
 
         ( todo, newModel ) =
             case meta of
-                InsertProjectTodoMeta _ ->
+                InsertTodoInProjectMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
                 AddDueAtTodoMeta _ ->
@@ -517,7 +517,7 @@ getEditTodoFormForTodoId todoId maybeForm =
 getInsertTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getInsertTodoForm maybeForm =
     case maybeForm of
-        Just ( form, InsertProjectTodoMeta _ ) ->
+        Just ( form, InsertTodoInProjectMeta _ ) ->
             Just form
 
         _ ->
@@ -634,7 +634,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
             viewProjectTodoItem maybeProjectId model.today
     in
     case maybeTodoFormWithMeta of
-        Just ( form, InsertProjectTodoMeta formIdx ) ->
+        Just ( form, InsertTodoInProjectMeta formIdx ) ->
             let
                 formHtml =
                     viewTodoForm form
@@ -679,7 +679,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
 
         _ ->
             List.indexedMap viewTodoItem filteredTodoList
-                ++ [ viewAddTodoButton (InsertTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
+                ++ [ viewAddTodoButton (InsertTodoInProjectClicked -1 maybeProjectId) ]
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
@@ -729,8 +729,8 @@ viewProjectTodoItem maybeProject today idx todo =
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                 )
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "Insert Above" (InsertTodoInMaybeProjectIdClicked idx maybeProject)
-            , btn2 "Insert Below" (InsertTodoInMaybeProjectIdClicked (idx + 1) maybeProject)
+            [ btn2 "Insert Above" (InsertTodoInProjectClicked idx maybeProject)
+            , btn2 "Insert Below" (InsertTodoInProjectClicked (idx + 1) maybeProject)
             , btn2 "UP" (MoveUp todo.id)
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
