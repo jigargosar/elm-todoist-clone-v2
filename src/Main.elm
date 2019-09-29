@@ -189,6 +189,7 @@ mapTodoList func model =
     { model | todoList = func model.todoList }
 
 
+setTodoForm : a -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
 setTodoForm form model =
     { model | maybeTodoForm = Just form }
 
