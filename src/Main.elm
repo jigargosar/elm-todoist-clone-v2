@@ -9,7 +9,7 @@ import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Pipeline exposing (optional, required)
+import Json.Decode.Pipeline exposing (optional)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
@@ -55,21 +55,8 @@ defaultCacheValue =
 
 cacheDecoder : JD.Decoder Cache
 cacheDecoder =
-    let
-        todoDecoder : JD.Decoder Todo
-        todoDecoder =
-            JD.succeed Todo
-                |> required "id" TodoId.decoder
-                |> required "title" JD.string
-                |> required "isDone" JD.bool
-                |> optional "isDeleted" JD.bool False
-                |> optional "maybeProjectId"
-                    (ProjectId.decoder |> JD.map Just)
-                    Nothing
-                |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
-    in
     JD.succeed Cache
-        |> optional "todoList" (JD.list todoDecoder) Todo.mockList
+        |> optional "todoList" (JD.list Todo.decoder) Todo.mockList
 
 
 cacheModel_ : Model -> Cmd msg

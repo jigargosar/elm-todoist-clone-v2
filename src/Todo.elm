@@ -1,6 +1,8 @@
-module Todo exposing (Todo, generatorFromPartial, mockList, patchWithPartial)
+module Todo exposing (Todo, decoder, generatorFromPartial, mockList, patchWithPartial)
 
 import Date exposing (Date)
+import Json.Decode as JD
+import Json.Decode.Pipeline exposing (optional, required)
 import ProjectId exposing (ProjectId)
 import Random
 import TodoId exposing (TodoId)
@@ -13,7 +15,22 @@ type alias Todo =
     , isDeleted : Bool
     , maybeProjectId : Maybe ProjectId
     , maybeDueDate : Maybe Date
+    , projectSortIdx : Int
     }
+
+
+decoder : JD.Decoder Todo
+decoder =
+    JD.succeed Todo
+        |> required "id" TodoId.decoder
+        |> required "title" JD.string
+        |> required "isDone" JD.bool
+        |> optional "isDeleted" JD.bool False
+        |> optional "maybeProjectId"
+            (ProjectId.decoder |> JD.map Just)
+            Nothing
+        |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
+        |> optional "projectSortIdx" JD.int 0
 
 
 type alias Partial a =
@@ -26,7 +43,7 @@ type alias Partial a =
 
 fromPartial : TodoId -> Partial a -> Todo
 fromPartial id { title, maybeProjectId, maybeDueDate } =
-    Todo id title False False maybeProjectId maybeDueDate
+    Todo id title False False maybeProjectId maybeDueDate 0
 
 
 generatorFromPartial : Partial a -> Random.Generator Todo
@@ -43,7 +60,7 @@ patchWithPartial { title, maybeProjectId, maybeDueDate } todo =
 createMockTodo : String -> String -> Maybe Todo
 createMockTodo id title =
     TodoId.fromString id
-        |> Maybe.map (\todoId -> Todo todoId title False False Nothing Nothing)
+        |> Maybe.map (\todoId -> Todo todoId title False False Nothing Nothing 0)
 
 
 mockList : List Todo
