@@ -1,4 +1,4 @@
-module Todo exposing (Todo, generatorFromPartial, mockList)
+module Todo exposing (Todo, generatorFromPartial, mockList, patchWithPartial)
 
 import Date exposing (Date)
 import ProjectId exposing (ProjectId)
@@ -33,6 +33,11 @@ generatorFromPartial : Partial a -> Random.Generator Todo
 generatorFromPartial partial =
     TodoId.generator
         |> Random.map (\id -> fromPartial id partial)
+
+
+patchWithPartial : Partial a -> Todo -> Todo
+patchWithPartial { title, maybeProjectId, maybeDueDate } todo =
+    { todo | title = title, maybeProjectId = maybeProjectId, maybeDueDate = maybeDueDate }
 
 
 createMockTodo : String -> String -> Maybe Todo

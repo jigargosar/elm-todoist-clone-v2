@@ -146,7 +146,7 @@ type alias HasTodoFormFields a =
 
 type TodoFormMeta
     = AddTodoForm (Maybe Date)
-    | EditTodoForm TodoId
+    | EditTodoForm Todo
 
 
 type alias TodoForm_ =
@@ -267,11 +267,11 @@ update msg model =
             , Cmd.none
             )
 
-        EditTodoClicked { id, maybeProjectId, maybeDueDate } ->
+        EditTodoClicked ({ id, maybeProjectId, maybeDueDate } as todo) ->
             ( model
                 |> setTodoForm
                     { form = TodoForm.init "" maybeProjectId maybeDueDate
-                    , meta = EditTodoForm id
+                    , meta = EditTodoForm todo
                     }
             , Cmd.none
             )
@@ -318,23 +318,31 @@ mapTodoForm func model =
 
 
 saveTodoForm : TodoForm_ -> Model -> ( Model, Cmd Msg )
-saveTodoForm form model =
-    --    let
-    --        ( todo, newModel ) =
-    --            case form.meta of
-    --                AddTodoForm _ ->
-    --                    HasSeed.step (Todo.generatorFromPartial fields) model
-    --
-    --                EditTodoForm todoId ->
-    --                    ( editingTodo, model )
-    --    in
-    --    ( { newModel
-    --        | todoList = upsertById todo newModel.todoList
-    --        , maybeTodoForm = Nothing
-    --      }
-    --    , Cmd.none
-    --    )
-    ( model, Cmd.none )
+saveTodoForm form_ model =
+    let
+        partial =
+            TodoForm.toPartial form_.form
+
+        ( todo, newModel ) =
+            case form_.meta of
+                AddTodoForm _ ->
+                    HasSeed.step (Todo.generatorFromPartial partial) model
+
+                EditTodoForm editingTodo ->
+                    ( Todo.patchWithPartial (TodoForm.toPartial form_.form) editingTodo
+                    , model
+                    )
+    in
+    ( { newModel
+        | todoList = upsertById todo newModel.todoList
+        , maybeTodoForm = Nothing
+      }
+    , Cmd.none
+    )
+
+
+
+--    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub msg
@@ -440,8 +448,8 @@ getEditTodoFormForTodoId todoId maybeForm =
     case maybeForm of
         Just form_ ->
             case form_.meta of
-                EditTodoForm todoId_ ->
-                    if todoId_ == todoId then
+                EditTodoForm { id } ->
+                    if id == todoId then
                         Just form_.form
 
                     else

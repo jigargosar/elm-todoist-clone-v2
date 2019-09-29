@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, TodoForm, createConfig, init, viewTodoForm)
+module TodoForm exposing (Config, TodoForm, createConfig, init, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -7,11 +7,18 @@ import Html.Styled.Events as E
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
+import Random
+import Todo
 import UI exposing (btn2, col, ipt2, row)
 
 
 type TodoForm
     = TodoForm { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
+
+
+toPartial : TodoForm -> { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
+toPartial (TodoForm partial) =
+    partial
 
 
 init : String -> Maybe ProjectId -> Maybe Date -> TodoForm
