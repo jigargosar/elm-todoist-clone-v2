@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, colKeyed, ipt2, row)
+import UI exposing (btn2, checkbox3, col, colKeyed, row)
 
 
 type Route
@@ -128,22 +128,6 @@ type alias Flags =
     }
 
 
-type alias AddTodoFields =
-    { title : String
-    , maybeProjectId : Maybe ProjectId
-    , maybeDueDate : Maybe Date
-    , initialDueDate : Maybe Date
-    }
-
-
-type alias HasTodoFormFields a =
-    { a
-        | title : String
-        , maybeProjectId : Maybe ProjectId
-        , maybeDueDate : Maybe Date
-    }
-
-
 type TodoFormMeta
     = AddTodoForm (Maybe Date)
     | EditTodoForm Todo
@@ -211,12 +195,6 @@ setTodoForm form model =
 
 
 -- UPDATE
-
-
-type TodoFormFieldPatch
-    = TitleChanged String
-    | DueDateChanged (Maybe Date)
-    | ProjectIdChanged (Maybe ProjectId)
 
 
 type Msg
@@ -297,19 +275,6 @@ update msg model =
             ( { model | maybeTodoForm = Nothing }
             , Cmd.none
             )
-
-
-updateTodoFormFields : TodoFormFieldPatch -> HasTodoFormFields a -> HasTodoFormFields a
-updateTodoFormFields msg fields =
-    case msg of
-        TitleChanged title ->
-            { fields | title = title }
-
-        DueDateChanged maybeDueDate ->
-            { fields | maybeDueDate = maybeDueDate }
-
-        ProjectIdChanged maybeProjectId ->
-            { fields | maybeProjectId = maybeProjectId }
 
 
 mapTodoForm : (a -> a) -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
