@@ -592,6 +592,15 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
            ]
 
 
+viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
+viewEditableTodoList { maybeTodoFormWithMeta } =
+    List.map
+        (\todo ->
+            getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
+                |> MX.unpack (\_ -> viewDueDateTodoItem todo) viewTodoForm
+        )
+
+
 todoFormConfig : TodoForm.Config Msg
 todoFormConfig =
     TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
@@ -680,15 +689,6 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
         _ ->
             List.indexedMap viewTodoItem filteredTodoList
                 ++ [ viewAddTodoButton (InsertTodoInProjectClicked -1 maybeProjectId) ]
-
-
-viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
-viewEditableTodoList { maybeTodoFormWithMeta } =
-    List.map
-        (\todo ->
-            getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
-                |> MX.unpack (\_ -> viewDueDateTodoItem todo) viewTodoForm
-        )
 
 
 todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
