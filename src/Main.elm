@@ -434,11 +434,15 @@ getEditTodoFormForTodoId todoId maybeForm =
             Nothing
 
 
-getAddTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
-getAddTodoForm maybeForm =
+getAddTodoFormWithInitialProjectId : Maybe ProjectId -> Maybe ( a, TodoFormMeta ) -> Maybe a
+getAddTodoFormWithInitialProjectId maybeProjectId maybeForm =
     case maybeForm of
-        Just ( form, AddTodoInMaybeProjectIdMeta _ ) ->
-            Just form
+        Just ( form, AddTodoInMaybeProjectIdMeta maybeProjectId_ ) ->
+            if maybeProjectId == maybeProjectId_ then
+                Just form
+
+            else
+                Nothing
 
         _ ->
             Nothing
@@ -555,7 +559,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
 
 viewAddTodoItemForProject maybeProjectId maybeTodoForm =
-    getAddTodoForm maybeTodoForm
+    getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
         |> MX.unwrap (viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId)) viewTodoForm
 
 
