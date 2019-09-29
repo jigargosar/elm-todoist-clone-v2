@@ -662,17 +662,26 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                 formHtml =
                     ( "viewAddTodoForm", viewTodoForm form )
             in
-            viewKeyedEditableTodoItems ProjectItemLayout model filteredTodoList
+            filteredTodoList
                 |> List.indexedMap
-                    (\currentIdx html ->
+                    (\currentIdx todo ->
+                        let
+                            editableTodoHtml =
+                                ( TodoId.toString todo.id
+                                , getEditTodoFormForTodoId todo.id maybeTodoForm
+                                    |> MX.unpack
+                                        (\_ -> viewProjectTodoItem currentIdx model.today todo)
+                                        viewTodoForm
+                                )
+                        in
                         if currentIdx == formIdx then
-                            [ formHtml, html ]
+                            [ formHtml, editableTodoHtml ]
 
                         else if isLastIdx currentIdx && isIndexOutOfBounds formIdx then
-                            [ html, formHtml ]
+                            [ editableTodoHtml, formHtml ]
 
                         else
-                            [ html ]
+                            [ editableTodoHtml ]
                     )
                 |> List.concat
                 >> colKeyed []
@@ -716,6 +725,30 @@ todoProjectTitle { maybeProjectId } =
     Project.mockProjects
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
         |> MX.unwrap "Inbox" .title
+
+
+viewProjectTodoItem : Int -> Date -> Todo -> H.Html Msg
+viewProjectTodoItem idx today todo =
+    row [ A.class "hide-child relative" ]
+        [ row [ A.class "pa1" ]
+            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
+            ]
+        , row
+            [ A.class "pa1 flex-grow-1"
+            , E.onClick (EditTodoClicked todo)
+            ]
+            [ H.text todo.title ]
+        , todo.maybeDueDate
+            |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
+                (\dueDate ->
+                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
+                )
+        , row [ A.class "child absolute right-0 bg-white-90" ]
+            [ btn2 "UP" (MoveUp todo.id)
+            , btn2 "DN" (MoveDown todo.id)
+            , btn2 "X" (DeleteTodo todo.id)
+            ]
+        ]
 
 
 viewTodo : Int -> Date -> TodoItemLayout -> Todo -> H.Html Msg
