@@ -129,7 +129,8 @@ type alias Flags =
 
 
 type TodoFormMeta
-    = AddTodoMeta (Maybe Date)
+    = AddTodoWithDueDateMeta Date
+    | AddTodoInMaybeProjectIdMeta (Maybe ProjectId)
     | EditTodoMeta Todo
 
 
@@ -189,7 +190,6 @@ mapTodoList func model =
     { model | todoList = func model.todoList }
 
 
-setTodoForm : a -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
 setTodoForm form model =
     { model | maybeTodoForm = Just form }
 
@@ -202,7 +202,8 @@ type Msg
     = NoOp
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
-    | AddTodoClicked (Maybe ProjectId) (Maybe Date)
+    | AddTodoOnDueDateClicked Date
+    | AddTodoInMaybeProjectIdClicked (Maybe ProjectId)
     | EditTodoClicked Todo
     | PatchTodoForm TodoForm
     | Save
@@ -237,11 +238,20 @@ update msg model =
             , Cmd.none
             )
 
-        AddTodoClicked maybeProjectId maybeDueDate ->
+        AddTodoOnDueDateClicked dueDate ->
             ( model
                 |> setTodoForm
-                    ( TodoForm.init "" maybeProjectId maybeDueDate
-                    , AddTodoMeta maybeDueDate
+                    ( TodoForm.init "" Nothing (Just dueDate)
+                    , AddTodoWithDueDateMeta dueDate
+                    )
+            , Cmd.none
+            )
+
+        AddTodoInMaybeProjectIdClicked maybeProjectId ->
+            ( model
+                |> setTodoForm
+                    ( TodoForm.init "" maybeProjectId Nothing
+                    , AddTodoInMaybeProjectIdMeta maybeProjectId
                     )
             , Cmd.none
             )
@@ -289,7 +299,10 @@ saveTodoForm ( form, meta ) model =
 
         ( todo, newModel ) =
             case meta of
-                AddTodoMeta _ ->
+                AddTodoInMaybeProjectIdMeta _ ->
+                    HasSeed.step (Todo.generatorFromPartial partial) model
+
+                AddTodoWithDueDateMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
 
                 EditTodoMeta editingTodo ->
@@ -424,7 +437,7 @@ getEditTodoFormForTodoId todoId maybeForm =
 getAddTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoForm maybeForm =
     case maybeForm of
-        Just ( form, AddTodoMeta _ ) ->
+        Just ( form, AddTodoInMaybeProjectIdMeta _ ) ->
             Just form
 
         _ ->
@@ -434,7 +447,7 @@ getAddTodoForm maybeForm =
 getAddTodoFormWithInitialDueDateEq : Date -> Maybe ( a, TodoFormMeta ) -> Maybe a
 getAddTodoFormWithInitialDueDateEq date maybeForm =
     case maybeForm of
-        Just ( form, AddTodoMeta (Just date_) ) ->
+        Just ( form, AddTodoWithDueDateMeta date_ ) ->
             if date_ == date then
                 Just form
 
@@ -496,7 +509,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
 viewAddTodoItemForDueDate : Date -> Maybe TodoFormWithMeta -> H.Html Msg
 viewAddTodoItemForDueDate date maybeTodoForm =
     getAddTodoFormWithInitialDueDateEq date maybeTodoForm
-        |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewTodoForm
+        |> MX.unwrap (viewAddTodoButton (AddTodoOnDueDateClicked date)) viewTodoForm
 
 
 todoFormConfig : TodoForm.Config Msg
@@ -543,7 +556,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
 viewAddTodoItemForProject maybeProjectId maybeTodoForm =
     getAddTodoForm maybeTodoForm
-        |> MX.unwrap (viewAddTodoButton (AddTodoClicked maybeProjectId Nothing)) viewTodoForm
+        |> MX.unwrap (viewAddTodoButton (AddTodoInMaybeProjectIdClicked maybeProjectId)) viewTodoForm
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
