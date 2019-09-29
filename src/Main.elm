@@ -658,14 +658,18 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
     --           )
     case maybeAddTodoFormWithIndex of
         Just ( formIdx, form ) ->
+            let
+                formHtml =
+                    ( "viewAddTodoForm", viewTodoForm form )
+            in
             viewKeyedEditableTodoItems ProjectItemLayout model filteredTodoList
                 |> List.indexedMap
                     (\currentIdx html ->
                         if currentIdx == formIdx then
-                            [ ( "", viewTodoForm form ), html ]
+                            [ formHtml, html ]
 
                         else if isLastIdx currentIdx && isIndexOutOfBounds formIdx then
-                            [ html, ( "", viewTodoForm form ) ]
+                            [ html, formHtml ]
 
                         else
                             [ html ]
