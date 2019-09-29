@@ -133,13 +133,13 @@ type TodoFormMeta
     | EditTodoForm Todo
 
 
-type alias TodoForm_ =
+type alias TodoFormAndMeta =
     { form : TodoForm, meta : TodoFormMeta }
 
 
 type alias Model =
     { todoList : List Todo
-    , maybeTodoForm : Maybe TodoForm_
+    , maybeTodoForm : Maybe TodoFormAndMeta
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -283,7 +283,7 @@ mapTodoForm func model =
     { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
 
 
-saveTodoForm : TodoForm_ -> Model -> ( Model, Cmd Msg )
+saveTodoForm : TodoFormAndMeta -> Model -> ( Model, Cmd Msg )
 saveTodoForm form_ model =
     let
         partial =
