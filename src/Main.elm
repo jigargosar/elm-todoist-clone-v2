@@ -229,10 +229,10 @@ update msg model =
             , Cmd.none
             )
 
-        EditTodoClicked ({ id, maybeProjectId, maybeDueDate } as todo) ->
+        EditTodoClicked ({ id, title, maybeProjectId, maybeDueDate } as todo) ->
             ( model
                 |> setTodoForm
-                    ( TodoForm.init "" maybeProjectId maybeDueDate
+                    ( TodoForm.init title maybeProjectId maybeDueDate
                     , EditTodoMeta todo
                     )
             , Cmd.none
@@ -572,6 +572,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
     let
         filteredTodoList =
             List.filter (propEq .maybeProjectId maybeProjectId) todoList
+                |> List.sortBy .projectSortIdx
     in
     viewEditableTodoList ProjectItemLayout model filteredTodoList
         ++ [ getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
