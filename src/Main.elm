@@ -277,7 +277,7 @@ update msg model =
         InsertTodoInProjectClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    ( getInsertTodoForm model.maybeTodoFormWithMeta
+                    ( getInsertTodoInProjectForm model.maybeTodoFormWithMeta
                         |> Maybe.withDefault (TodoForm.init "" maybeProjectId Nothing)
                     , InsertTodoInProjectMeta idx
                     )
@@ -496,8 +496,8 @@ viewRoute model route =
             viewNext7DaysTodoList model
 
 
-getInsertTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
-getInsertTodoForm maybeForm =
+getInsertTodoInProjectForm : Maybe ( a, TodoFormMeta ) -> Maybe a
+getInsertTodoInProjectForm maybeForm =
     case maybeForm of
         Just ( form, InsertTodoInProjectMeta _ ) ->
             Just form
