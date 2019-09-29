@@ -7,6 +7,9 @@ const cli = meow(
   `
 	Usage
 	  $ genId <name>
+  
+  Options:
+    <name> - Name of the Id type, e.g. ProjectId
 
   Examples
 	  $ genId ProjectId
