@@ -113,7 +113,7 @@ type alias TodoFormWithMeta =
 
 type alias Model =
     { todoList : List Todo
-    , maybeTodoForm : Maybe TodoFormWithMeta
+    , maybeTodoFormWithMeta : Maybe TodoFormWithMeta
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -124,7 +124,7 @@ type alias Model =
 defaultModel : Model
 defaultModel =
     { todoList = Todo.mockList
-    , maybeTodoForm = Nothing
+    , maybeTodoFormWithMeta = Nothing
 
     --    , route = RouteProject (ProjectId "1")
     , route = RouteNext7Days
@@ -164,7 +164,7 @@ mapTodoList func model =
 
 
 setTodoForm form model =
-    { model | maybeTodoForm = Just form }
+    { model | maybeTodoFormWithMeta = Just form }
 
 
 
@@ -201,7 +201,7 @@ update msg model =
             ( { model | today = today }, Cmd.none )
 
         ChangeRouteTo route ->
-            refreshModel { model | route = route, maybeTodoForm = Nothing }
+            refreshModel { model | route = route, maybeTodoFormWithMeta = Nothing }
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
@@ -281,7 +281,7 @@ update msg model =
         InsertTodoInMaybeProjectIdClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    ( getInsertTodoForm model.maybeTodoForm
+                    ( getInsertTodoForm model.maybeTodoFormWithMeta
                         |> Maybe.withDefault (TodoForm.init "" maybeProjectId Nothing)
                     , InsertProjectTodoMeta idx
                     )
@@ -303,7 +303,7 @@ update msg model =
             )
 
         Save ->
-            case model.maybeTodoForm of
+            case model.maybeTodoFormWithMeta of
                 Just form ->
                     saveTodoForm form model
 
@@ -311,14 +311,14 @@ update msg model =
                     ( model, Cmd.none )
 
         Cancel ->
-            ( { model | maybeTodoForm = Nothing }
+            ( { model | maybeTodoFormWithMeta = Nothing }
             , Cmd.none
             )
 
 
-mapTodoForm : (a -> a) -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
+mapTodoForm : (a -> a) -> { b | maybeTodoFormWithMeta : Maybe a } -> { b | maybeTodoFormWithMeta : Maybe a }
 mapTodoForm func model =
-    { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
+    { model | maybeTodoFormWithMeta = model.maybeTodoFormWithMeta |> Maybe.map func }
 
 
 saveTodoForm : TodoFormWithMeta -> Model -> ( Model, Cmd Msg )
@@ -340,7 +340,7 @@ saveTodoForm ( form, meta ) model =
                     , model
                     )
     in
-    ( { newModel | maybeTodoForm = Nothing }
+    ( { newModel | maybeTodoFormWithMeta = Nothing }
         |> upsertTodoAndUpdateSortIndices todo
     , Cmd.none
     )
@@ -554,7 +554,7 @@ viewTodoListDueTodayWithOverDue model =
 
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
-viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
+viewOverDueTodoList ({ today, todoList, maybeTodoFormWithMeta } as model) =
     let
         filterPredicate =
             allPass
@@ -574,7 +574,7 @@ viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
-viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
+viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) =
     let
         filterPredicate =
             allPass
@@ -587,7 +587,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList DueDateItemLayout model filteredTodoList
-        ++ [ getAddTodoFormWithInitialDueDateEq dueDate maybeTodoForm
+        ++ [ getAddTodoFormWithInitialDueDateEq dueDate maybeTodoFormWithMeta
                 |> MX.unwrap (viewAddTodoButton (AddTodoOnDueDateClicked dueDate)) viewTodoForm
            ]
 
@@ -624,7 +624,7 @@ humanDate date today =
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
-viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as model) =
+viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList } as model) =
     let
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
@@ -642,7 +642,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
         viewTodoItem =
             viewProjectTodoItem maybeProjectId model.today
     in
-    case maybeTodoForm of
+    case maybeTodoFormWithMeta of
         Just ( form, InsertProjectTodoMeta formIdx ) ->
             let
                 formHtml =
@@ -695,8 +695,8 @@ keyed keyF renderF =
 
 
 viewEditableTodoItem : TodoItemLayout -> Model -> Todo -> H.Html Msg
-viewEditableTodoItem layout { today, maybeTodoForm } todo =
-    getEditTodoFormForTodoId todo.id maybeTodoForm
+viewEditableTodoItem layout { today, maybeTodoFormWithMeta } todo =
+    getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
         |> MX.unpack (\_ -> viewTodo today layout todo) viewTodoForm
 
 
