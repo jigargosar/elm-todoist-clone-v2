@@ -281,7 +281,9 @@ update msg model =
         InsertTodoInMaybeProjectIdClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    ( TodoForm.init "" maybeProjectId Nothing
+                    ( getAddTodoFormWithInitialProjectId maybeProjectId model.maybeTodoForm
+                        |> Maybe.map Tuple.second
+                        |> Maybe.withDefault (TodoForm.init "" maybeProjectId Nothing)
                     , AddTodoInMaybeProjectIdMeta idx maybeProjectId
                     )
             , Cmd.none
