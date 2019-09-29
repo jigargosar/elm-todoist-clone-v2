@@ -634,19 +634,49 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
         maybeAddTodoFormWithIndex =
             getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
+
+        lastIndex =
+            List.length filteredTodoList
+                - 1
+                |> Debug.log "last idx"
     in
-    viewEditableTodoList ProjectItemLayout model filteredTodoList
-        ++ (case maybeAddTodoFormWithIndex of
-                Just ( i, form ) ->
-                    if i == -1 then
-                        [ viewTodoForm form ]
+    --    viewEditableTodoList ProjectItemLayout model filteredTodoList
+    --        ++ (case maybeAddTodoFormWithIndex of
+    --                Just ( i, form ) ->
+    --                    if i == -1 || i >= List.length filteredTodoList then
+    --                        [ viewTodoForm form ]
+    --
+    --                    else
+    --                        []
+    --
+    --                Nothing ->
+    --                    [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
+    --           )
+    case maybeAddTodoFormWithIndex of
+        Just ( formIdx, form ) ->
+            viewKeyedEditableTodoItems ProjectItemLayout model filteredTodoList
+                |> List.indexedMap
+                    (\currentIdx html ->
+                        let
+                            _ =
+                                Debug.log "currentIdx" currentIdx
+                        in
+                        if
+                            (formIdx < 0 || formIdx > lastIndex)
+                                && (currentIdx == lastIndex)
+                        then
+                            [ html, ( "", viewTodoForm form ) ]
 
-                    else
-                        []
+                        else
+                            [ html ]
+                    )
+                |> List.concat
+                >> colKeyed []
+                >> List.singleton
 
-                Nothing ->
-                    [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
-           )
+        Nothing ->
+            viewEditableTodoList ProjectItemLayout model filteredTodoList
+                ++ [ viewAddTodoButton (AddTodoInMaybeProjectIdClicked -1 maybeProjectId) ]
 
 
 viewEditableTodoList : TodoItemLayout -> Model -> List Todo -> List (H.Html Msg)
@@ -661,6 +691,12 @@ keyed keyF renderF =
     List.map (\item -> ( keyF item, renderF item ))
 
 
+viewKeyedEditableTodoItems : TodoItemLayout -> Model -> List Todo -> List ( String, H.Html Msg )
+viewKeyedEditableTodoItems layout model =
+    keyed (.id >> TodoId.toString) (viewEditableTodoItem layout model)
+
+
+viewEditableTodoItem : TodoItemLayout -> Model -> Todo -> H.Html Msg
 viewEditableTodoItem layout { today, maybeTodoForm } todo =
     getEditTodoFormForTodoId todo.id maybeTodoForm
         |> MX.unpack (\_ -> viewTodo today layout todo) viewTodoForm
