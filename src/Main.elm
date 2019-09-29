@@ -241,7 +241,7 @@ update msg model =
         PatchTodoForm todoForm ->
             ( model
                 |> mapTodoForm
-                    (Tuple.mapFirst (always todoForm))
+                    (Tuple.mapFirst (always (todoForm |> Debug.log "toDF")))
             , Cmd.none
             )
 
