@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Basics.More exposing (HasId, allPass, idEq, propEq, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
+import HasSeed
 import Html
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -356,10 +357,9 @@ saveTodoForm form model =
         ( todo, newModel ) =
             case form of
                 AddTodoForm fields ->
-                    Random.step TodoId.generator model.seed
-                        |> Tuple.mapBoth
+                    HasSeed.step TodoId.generator model
+                        |> Tuple.mapFirst
                             (\todoId -> Todo.fromPartial todoId fields)
-                            (\seed -> { model | seed = seed })
 
                 EditTodoForm editingTodo ->
                     ( editingTodo, model )
