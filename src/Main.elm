@@ -636,9 +636,13 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             getAddTodoFormWithInitialProjectId maybeProjectId maybeTodoForm
 
         lastIndex =
-            List.length filteredTodoList
-                - 1
-                |> Debug.log "last idx"
+            List.length filteredTodoList - 1
+
+        isIndexOutOfBounds idx =
+            idx < 0 || idx > lastIndex
+
+        isLastIdx idx =
+            idx == lastIndex
     in
     --    viewEditableTodoList ProjectItemLayout model filteredTodoList
     --        ++ (case maybeAddTodoFormWithIndex of
@@ -657,10 +661,10 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
             viewKeyedEditableTodoItems ProjectItemLayout model filteredTodoList
                 |> List.indexedMap
                     (\currentIdx html ->
-                        if
-                            (formIdx < 0 || formIdx > lastIndex)
-                                && (currentIdx == lastIndex)
-                        then
+                        if currentIdx == formIdx then
+                            [ ( "", viewTodoForm form ), html ]
+
+                        else if isLastIdx currentIdx && isIndexOutOfBounds formIdx then
                             [ html, ( "", viewTodoForm form ) ]
 
                         else
