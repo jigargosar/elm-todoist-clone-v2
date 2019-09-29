@@ -506,20 +506,6 @@ getInsertTodoForm maybeForm =
             Nothing
 
 
-getAddTodoFormWithInitialDueDateEq : Date -> Maybe ( a, TodoFormMeta ) -> Maybe a
-getAddTodoFormWithInitialDueDateEq date maybeForm =
-    case maybeForm of
-        Just ( form, AddDueAtTodoMeta date_ ) ->
-            if date_ == date then
-                Just form
-
-            else
-                Nothing
-
-        _ ->
-            Nothing
-
-
 
 -- DUE DATE TODO_LIST VIEWS
 
@@ -570,11 +556,22 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
 
         filteredTodoList =
             todoList |> List.filter filterPredicate
+
+        addButtonHtml =
+            viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList model filteredTodoList
-        ++ [ getAddTodoFormWithInitialDueDateEq dueDate maybeTodoFormWithMeta
-                |> MX.unwrap (viewAddTodoButton (AddTodoOnDueDateClicked dueDate)) viewTodoForm
+        ++ [ case maybeTodoFormWithMeta of
+                Just ( form, AddDueAtTodoMeta date_ ) ->
+                    if date_ == dueDate then
+                        viewTodoForm form
+
+                    else
+                        addButtonHtml
+
+                _ ->
+                    addButtonHtml
            ]
 
 
