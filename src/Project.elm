@@ -46,22 +46,17 @@ mockProjects =
         |> List.filterMap identity
 
 
-projectIdToValueAttr : ProjectId -> H.Attribute msg
-projectIdToValueAttr =
-    A.value << ProjectId.toString
-
-
 viewSelectOne : Maybe ProjectId -> (Maybe ProjectId -> msg) -> H.Html msg
-viewSelectOne maybeProjectId projectIdChanged =
+viewSelectOne maybeProjectId onChange =
     let
         viewOpt { id, title } =
             H.option
                 [ A.selected (maybeProjectId == Just id)
-                , projectIdToValueAttr id
+                , A.value <| ProjectId.toString id
                 ]
                 [ H.text title ]
     in
-    H.select [ E.onInput (ProjectId.fromString >> projectIdChanged) ]
+    H.select [ E.onInput (ProjectId.fromString >> onChange) ]
         (H.option [] [ H.text "Inbox" ]
             :: List.map viewOpt mockProjects
         )
