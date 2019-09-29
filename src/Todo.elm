@@ -35,6 +35,7 @@ decoder =
         |> optional "projectSortIdx" JD.int 0
 
 
+maybeEncoder : (a -> Value) -> Maybe a -> Value
 maybeEncoder =
     MX.unwrap JE.null
 
