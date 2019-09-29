@@ -97,7 +97,7 @@ cacheDecoder =
                 |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
     in
     JD.succeed Cache
-        |> optional "todoList" (JD.list todoDecoder) initialTodoList
+        |> optional "todoList" (JD.list todoDecoder) Todo.mockList
 
 
 cacheModel_ : Model -> Cmd msg
@@ -189,7 +189,7 @@ type alias Model =
 
 defaultModel : Model
 defaultModel =
-    { todoList = initialTodoList
+    { todoList = Todo.mockList
     , maybeTodoForm = Nothing
 
     --    , route = RouteProject (ProjectId "1")
@@ -358,7 +358,7 @@ saveTodoForm form model =
                 AddTodoForm fields ->
                     Random.step TodoId.generator model.seed
                         |> Tuple.mapBoth
-                            (\todoId -> todoFromFields todoId fields)
+                            (\todoId -> Todo.fromPartial todoId fields)
                             (\seed -> { model | seed = seed })
 
                 EditTodoForm editingTodo ->

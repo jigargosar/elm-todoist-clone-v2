@@ -1,4 +1,4 @@
-module Todo exposing (Todo, mockList, todoFromFields)
+module Todo exposing (Todo, fromPartial, mockList)
 
 import Date exposing (Date)
 import ProjectId exposing (ProjectId)
@@ -23,8 +23,8 @@ type alias Partial a =
     }
 
 
-todoFromFields : TodoId -> Partial a -> Todo
-todoFromFields id { title, maybeProjectId, maybeDueDate } =
+fromPartial : TodoId -> Partial a -> Todo
+fromPartial id { title, maybeProjectId, maybeDueDate } =
     Todo id title False False maybeProjectId maybeDueDate
 
 
