@@ -16,6 +16,7 @@ import Random
 import Return
 import Task
 import Time
+import TodoId exposing (TodoId)
 import UI exposing (btn2, checkbox3, col, colKeyed, ipt2, row)
 
 
@@ -78,24 +79,6 @@ initialProjectList =
 -- TODO_
 
 
-type TodoId
-    = TodoId String
-
-
-todoIdGen : Random.Generator TodoId
-todoIdGen =
-    Random.int (10 ^ 3) (10 ^ 5)
-        |> Random.map (String.fromInt >> (++) "TodoId-" >> TodoId)
-
-
-todoIdEncoder (TodoId v) =
-    JE.string v
-
-
-todoIdToString (TodoId id) =
-    id
-
-
 type alias Todo =
     { id : TodoId
     , title : String
@@ -108,7 +91,8 @@ type alias Todo =
 
 createMockTodo : String -> String -> Maybe Todo
 createMockTodo id title =
-    Just <| Todo (TodoId id) title False False Nothing Nothing
+    TodoId.fromString id
+        |> Maybe.map (\todoId -> Todo todoId title False False Nothing Nothing)
 
 
 todoFromFields : TodoId -> AddTodoFields -> Todo
@@ -150,7 +134,7 @@ cacheDecoder =
         todoDecoder : JD.Decoder Todo
         todoDecoder =
             JD.succeed Todo
-                |> required "id" (JD.string |> JD.map TodoId)
+                |> required "id" TodoId.decoder
                 |> required "title" JD.string
                 |> required "isDone" JD.bool
                 |> optional "isDeleted" JD.bool False
@@ -172,7 +156,7 @@ cacheModel_ model =
         todoEncoder : Todo -> Value
         todoEncoder { id, title, isDone, isDeleted, maybeProjectId, maybeDueDate } =
             object
-                [ ( "id", todoIdEncoder id )
+                [ ( "id", TodoId.encoder id )
                 , ( "title", JE.string title )
                 , ( "isDone", JE.bool isDone )
                 , ( "isDeleted", JE.bool isDeleted )
@@ -419,7 +403,7 @@ saveTodoForm form model =
         ( todo, newModel ) =
             case form of
                 AddTodoForm fields ->
-                    Random.step todoIdGen model.seed
+                    Random.step TodoId.generator model.seed
                         |> Tuple.mapBoth
                             (\todoId -> todoFromFields todoId fields)
                             (\seed -> { model | seed = seed })
@@ -662,7 +646,7 @@ viewEditableTodoList layout model =
 
 todoToIdString : Todo -> String
 todoToIdString { id } =
-    todoIdToString id
+    TodoId.toString id
 
 
 keyed : (item -> String) -> (item -> html) -> List item -> List ( String, html )
