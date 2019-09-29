@@ -315,7 +315,8 @@ updateTodo oldTodo newTodo model =
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
             else
-                todoListForMaybeProjectId newTodo.maybeProjectId model.todoList
+                model.todoList
+                    |> todoListForMaybeProjectId newTodo.maybeProjectId
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
     { model
