@@ -27,11 +27,11 @@ cli.input.forEach(genId)
 
 function genId(name) {
   const filePath = `./src/${name}.elm`
-  fs.writeFileSync(
-    filePath,
-    idFileCode(name),
-    { encoding: 'UTF-8', flag: 'w' },
-  )
+  fs.writeFileSync(filePath, idFileCode(name), {
+    encoding: 'UTF-8',
+    flag: 'w',
+  })
+  console.log('Generated: ', filePath)
 }
 
 function idFileCode(name) {
