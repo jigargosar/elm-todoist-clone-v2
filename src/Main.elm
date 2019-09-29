@@ -289,7 +289,25 @@ saveTodoForm ( form, meta ) model =
     )
 
 
+updateSortIndices : List Todo -> List Todo
+updateSortIndices =
+    LX.gatherEqualsBy .maybeProjectId
+        >> List.map
+            ((\( fst, rest ) -> fst :: rest)
+                >> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+            )
+        >> List.concat
+
+
 upsertTodoAndUpdateSortIndices todo model =
+    let
+        _ =
+            LX.gatherEqualsBy .maybeProjectId model.todoList
+                |> List.map
+                    ((\( fst, rest ) -> fst :: rest)
+                        >> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+                    )
+    in
     { model
         | todoList = upsertById todo model.todoList
     }
