@@ -312,7 +312,18 @@ upsertTodoAndUpdateSortIndices todo model =
 
 
 updateTodo todo model =
-    { model | todoList = updateWhenIdEq todo.id (always todo) model.todoList }
+    let
+        projectTodoList =
+            todoListForMaybeProjectId todo.maybeProjectId model.todoList
+                |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+    in
+    { model
+        | todoList =
+            List.foldl
+                (\t -> updateWhenIdEq t.id (always t))
+                model.todoList
+                projectTodoList
+    }
 
 
 insertTodo todo model =
