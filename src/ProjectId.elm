@@ -1,8 +1,4 @@
-const fs = require('fs')
 
-fs.writeFileSync(
-  './src/ProjectId.elm',
-  `
 module ProjectId exposing (ProjectId, encoder, decoder, toString ,fromString)
 
 import Json.Encode as JE exposing(Value)
@@ -27,7 +23,4 @@ toString (ProjectId s) =
 fromString: String -> Maybe ProjectId
 fromString =
   String.trim
-  >> \\s -> if String.isEmpty s then Nothing else Just (ProjectId s)  
-`,
-  { encoding: 'UTF-8', flag:'w' },
-)
+  >> \s -> if String.isEmpty s then Nothing else Just (ProjectId s)  
