@@ -487,27 +487,13 @@ viewRoute model route =
             viewTodoListForMaybeProjectId Nothing model
 
         RouteToday ->
-            viewTodoListDueTodayWithOverDue model
+            viewDueTodayAndOverdueTodoList model
 
         RouteProject projectId ->
             viewTodoListForMaybeProjectId (Just projectId) model
 
         RouteNext7Days ->
             viewNext7DaysTodoList model
-
-
-getEditTodoFormForTodoId : TodoId -> Maybe ( a, TodoFormMeta ) -> Maybe a
-getEditTodoFormForTodoId todoId maybeForm =
-    case maybeForm of
-        Just ( form, EditTodoMeta { id } ) ->
-            if id == todoId then
-                Just form
-
-            else
-                Nothing
-
-        _ ->
-            Nothing
 
 
 getInsertTodoForm : Maybe ( a, TodoFormMeta ) -> Maybe a
@@ -534,6 +520,10 @@ getAddTodoFormWithInitialDueDateEq date maybeForm =
             Nothing
 
 
+
+-- DUE DATE TODO_LIST VIEWS
+
+
 viewNext7DaysTodoList : Model -> List (H.Html Msg)
 viewNext7DaysTodoList model =
     let
@@ -545,7 +535,7 @@ viewNext7DaysTodoList model =
     dateRange 0 6 |> List.concatMap (\date -> viewTodoListDueOn date model)
 
 
-viewTodoListDueTodayWithOverDue model =
+viewDueTodayAndOverdueTodoList model =
     viewOverDueTodoList model ++ viewTodoListDueOn model.today model
 
 
@@ -592,9 +582,39 @@ viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
 viewEditableTodoList { maybeTodoFormWithMeta } =
     List.map
         (\todo ->
-            getEditTodoFormForTodoId todo.id maybeTodoFormWithMeta
-                |> MX.unpack (\_ -> viewDueDateTodoItem todo) viewTodoForm
+            case maybeTodoFormWithMeta of
+                Just ( form, EditTodoMeta { id } ) ->
+                    if id == todo.id then
+                        viewTodoForm form
+
+                    else
+                        viewDueDateTodoItem todo
+
+                _ ->
+                    viewDueDateTodoItem todo
         )
+
+
+viewDueDateTodoItem : Todo -> H.Html Msg
+viewDueDateTodoItem todo =
+    row [ A.class "hide-child relative" ]
+        [ row [ A.class "pa1" ]
+            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
+            ]
+        , row
+            [ A.class "pa1 flex-grow-1"
+            , E.onClick (EditTodoClicked todo)
+            ]
+            [ H.text todo.title ]
+        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
+            [ H.text <| todoProjectTitle todo ]
+        , row [ A.class "child absolute right-0 bg-white-90" ]
+            [ btn2 "X" (DeleteTodo todo.id) ]
+        ]
+
+
+
+-- PROJECT TODO_LIST VIEWS
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
@@ -679,24 +699,6 @@ viewProjectTodoItem maybeProject today idx todo =
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
             ]
-        ]
-
-
-viewDueDateTodoItem : Todo -> H.Html Msg
-viewDueDateTodoItem todo =
-    row [ A.class "hide-child relative" ]
-        [ row [ A.class "pa1" ]
-            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
-            ]
-        , row
-            [ A.class "pa1 flex-grow-1"
-            , E.onClick (EditTodoClicked todo)
-            ]
-            [ H.text todo.title ]
-        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-            [ H.text <| todoProjectTitle todo ]
-        , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "X" (DeleteTodo todo.id) ]
         ]
 
 
