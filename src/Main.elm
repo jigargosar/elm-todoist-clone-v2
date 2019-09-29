@@ -283,12 +283,16 @@ saveTodoForm ( form, meta ) model =
                     , model
                     )
     in
-    ( { newModel
-        | todoList = upsertById todo newModel.todoList
-        , maybeTodoForm = Nothing
-      }
+    ( { newModel | maybeTodoForm = Nothing }
+        |> upsertTodoAndUpdateSortIndices todo
     , Cmd.none
     )
+
+
+upsertTodoAndUpdateSortIndices todo model =
+    { model
+        | todoList = upsertById todo model.todoList
+    }
 
 
 
