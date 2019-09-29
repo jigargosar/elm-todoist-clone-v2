@@ -536,20 +536,19 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
         ++ [ viewAddTodoItemForDueDate dueDate maybeTodoForm ]
 
 
-viewAddTodoItemForDueDate : Date -> Maybe { a | meta : TodoFormMeta, form : b } -> H.Html Msg
+viewAddTodoItemForDueDate : Date -> Maybe { a | meta : TodoFormMeta, form : TodoForm } -> H.Html Msg
 viewAddTodoItemForDueDate date maybeTodoForm =
     getAddTodoFormWithInitialDueDateEq date maybeTodoForm
         |> MX.unwrap (viewAddTodoButton (AddTodoClicked Nothing (Just date))) viewTodoForm
 
 
-todoFormConfig : TodoForm.Config Msg
 todoFormConfig =
     TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
 
 
 viewTodoForm : TodoForm -> H.Html Msg
-viewTodoForm =
-    TodoForm.viewTodoForm todoFormConfig
+viewTodoForm todoForm =
+    TodoForm.viewTodoForm todoFormConfig todoForm
 
 
 humanDate date today =
