@@ -289,16 +289,6 @@ saveTodoForm ( form, meta ) model =
     )
 
 
-updateSortIndices : List Todo -> List Todo
-updateSortIndices =
-    LX.gatherEqualsBy .maybeProjectId
-        >> List.map
-            ((\( fst, rest ) -> fst :: rest)
-                >> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
-            )
-        >> List.concat
-
-
 todoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
 todoListForMaybeProjectId maybeProjectId =
     List.filter (propEq .maybeProjectId maybeProjectId)
@@ -348,7 +338,7 @@ insertTodo todo model =
         | todoList =
             List.foldl
                 (\t -> updateWhenIdEq t.id (always t))
-                model.todoList
+                (todo :: model.todoList)
                 projectTodoList
     }
 
