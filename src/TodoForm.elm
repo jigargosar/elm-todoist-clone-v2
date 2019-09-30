@@ -1,14 +1,17 @@
 module TodoForm exposing
     ( Config
+    , Meta(..)
     , Partial
     , TodoForm
     , createConfig
+    , getMeta
     , getProjectSortIdx
     , initAdd
     , initEdit
     , initialDueDateEq
+    , isEditingTodoId
     , setProjectSortIdx
-    , toPartial
+    , toPartialWithMeta
     , viewTodoForm
     )
 
@@ -56,9 +59,24 @@ type alias Partial a =
     }
 
 
-toPartial : TodoForm -> Partial {}
-toPartial (TodoForm _ _ internal) =
-    internal
+toPartialWithMeta : TodoForm -> ( Meta, Partial {} )
+toPartialWithMeta (TodoForm meta _ internal) =
+    ( meta, internal )
+
+
+unwrapMeta : TodoForm -> Meta
+unwrapMeta (TodoForm meta _ _) =
+    meta
+
+
+isEditingTodoId : TodoId -> TodoForm -> Bool
+isEditingTodoId todoId =
+    unwrapMeta >> (==) (Edit todoId)
+
+
+getMeta : TodoForm -> Meta
+getMeta =
+    unwrapMeta
 
 
 getProjectSortIdx : TodoForm -> Int

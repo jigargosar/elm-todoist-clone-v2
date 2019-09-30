@@ -97,13 +97,8 @@ type alias Flags =
     }
 
 
-type TodoFormMeta
-    = AddTodoMeta
-    | EditTodoMeta TodoId
-
-
 type alias TodoFormWithMeta =
-    ( TodoForm, TodoFormMeta )
+    TodoForm
 
 
 type alias Model =
@@ -221,16 +216,14 @@ update msg model =
         AddTodoOnDueDateClicked dueDate ->
             ( model
                 |> setTodoForm
-                    ( TodoForm.initAdd (\d -> { d | maybeDueDate = Just dueDate })
-                    , AddTodoMeta
-                    )
+                    (TodoForm.initAdd (\d -> { d | maybeDueDate = Just dueDate }))
             , Cmd.none
             )
 
         InsertTodoInProjectClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    ( getInsertTodoInProjectForm model.maybeTodoFormWithMeta
+                    (model.maybeTodoFormWithMeta
                         |> Maybe.map (TodoForm.setProjectSortIdx idx)
                         |> Maybe.withDefault
                             (TodoForm.initAdd
@@ -241,19 +234,18 @@ update msg model =
                                     }
                                 )
                             )
-                    , AddTodoMeta
                     )
             , Cmd.none
             )
 
         EditTodoClicked todo ->
             ( model
-                |> setTodoForm ( TodoForm.initEdit todo, EditTodoMeta todo.id )
+                |> setTodoForm (TodoForm.initEdit todo)
             , Cmd.none
             )
 
         PatchTodoForm todoForm ->
-            ( model |> mapTodoForm (Tuple.mapFirst (always todoForm))
+            ( model |> mapTodoForm (always todoForm)
             , Cmd.none
             )
 
@@ -277,19 +269,19 @@ mapTodoForm func model =
 
 
 saveTodoForm : TodoFormWithMeta -> Model -> ( Model, Cmd Msg )
-saveTodoForm ( form, meta ) model =
+saveTodoForm form model =
     let
-        partial =
-            TodoForm.toPartial form
+        ( meta, partial ) =
+            TodoForm.toPartialWithMeta form
 
         newModel =
             case meta of
-                AddTodoMeta ->
+                TodoForm.Add ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
                         |> uncurry insertTodo
 
-                EditTodoMeta todoId ->
-                    updateTodoWithIdBy todoId (Todo.patchWithPartial (TodoForm.toPartial form)) model
+                TodoForm.Edit todoId ->
+                    updateTodoWithIdBy todoId (Todo.patchWithPartial partial) model
     in
     ( { newModel | maybeTodoFormWithMeta = Nothing }
     , Cmd.none
@@ -452,16 +444,6 @@ viewRoute model route =
             viewNext7DaysTodoList model
 
 
-getInsertTodoInProjectForm : Maybe ( a, TodoFormMeta ) -> Maybe a
-getInsertTodoInProjectForm maybeForm =
-    case maybeForm of
-        Just ( form, AddTodoMeta ) ->
-            Just form
-
-        _ ->
-            Nothing
-
-
 
 -- DUE DATE TODO_LIST VIEWS
 
@@ -519,7 +501,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList model filteredTodoList
         ++ [ case maybeTodoFormWithMeta of
-                Just ( form, AddTodoMeta ) ->
+                Just form ->
                     if TodoForm.initialDueDateEq (Just dueDate) form then
                         viewTodoForm form
 
@@ -536,8 +518,8 @@ viewEditableTodoList { maybeTodoFormWithMeta } =
     List.map
         (\todo ->
             case maybeTodoFormWithMeta of
-                Just ( form, EditTodoMeta todoId ) ->
-                    if todoId == todo.id then
+                Just form ->
+                    if TodoForm.isEditingTodoId todo.id form then
                         viewTodoForm form
 
                     else
@@ -581,31 +563,33 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
             viewProjectTodoItem model.today
     in
     case maybeTodoFormWithMeta of
-        Just ( form, AddTodoMeta ) ->
-            let
-                formHtml =
-                    viewTodoForm form
-
-                formIdx =
-                    clampListIndex filteredTodoList (TodoForm.getProjectSortIdx form)
-            in
-            LX.splitAt formIdx filteredTodoList
-                |> (\( l, r ) ->
-                        List.map viewTodoItem l
-                            ++ [ formHtml ]
-                            ++ List.map viewTodoItem r
-                   )
-
-        Just ( form, EditTodoMeta todoId ) ->
-            filteredTodoList
-                |> List.map
-                    (\todo ->
-                        if todoId == todo.id then
+        Just form ->
+            case TodoForm.getMeta form of
+                TodoForm.Add ->
+                    let
+                        formHtml =
                             viewTodoForm form
 
-                        else
-                            viewTodoItem todo
-                    )
+                        formIdx =
+                            clampListIndex filteredTodoList (TodoForm.getProjectSortIdx form)
+                    in
+                    LX.splitAt formIdx filteredTodoList
+                        |> (\( l, r ) ->
+                                List.map viewTodoItem l
+                                    ++ [ formHtml ]
+                                    ++ List.map viewTodoItem r
+                           )
+
+                TodoForm.Edit todoId ->
+                    filteredTodoList
+                        |> List.map
+                            (\todo ->
+                                if idEq todoId todo then
+                                    viewTodoForm form
+
+                                else
+                                    viewTodoItem todo
+                            )
 
         Nothing ->
             List.map viewTodoItem filteredTodoList
