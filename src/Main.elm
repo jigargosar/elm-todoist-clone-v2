@@ -293,9 +293,7 @@ update msg model =
             )
 
         EditTodoClicked todo ->
-            ( model |> setTodoForm (TodoForm.initEdit todo)
-            , Cmd.none
-            )
+            ( model |> setTodoForm (TodoForm.initEdit todo), Cmd.none )
 
         PatchTodoForm todoForm ->
             ( model |> setTodoForm todoForm, Cmd.none )
@@ -309,9 +307,7 @@ update msg model =
                     ( model, Cmd.none )
 
         Cancel ->
-            ( { model | maybeTodoForm = Nothing }
-            , Cmd.none
-            )
+            ( { model | maybeTodoForm = Nothing }, Cmd.none )
 
 
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
