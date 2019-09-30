@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, idEq, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, idEq, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -58,3 +58,8 @@ allPass predFunctions val =
 uncurry : (a -> b -> c) -> ( a, b ) -> c
 uncurry fn ( a, b ) =
     fn a b
+
+
+clampListIndex : List a -> Int -> Int
+clampListIndex list =
+    clamp 0 (List.length list - 1)

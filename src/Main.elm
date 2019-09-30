@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, clampListIndex, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -578,19 +578,13 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
             viewProjectTodoItem model.today
     in
     case maybeTodoFormWithMeta of
-        Just ( form, InsertTodoInProjectMeta formIdx ) ->
+        Just ( form, InsertTodoInProjectMeta formIdx_ ) ->
             let
                 formHtml =
                     viewTodoForm form
 
-                lastIndex =
-                    List.length filteredTodoList - 1
-
-                isFormIndexOutOfBounds =
-                    formIdx < 0 || formIdx > lastIndex
-
-                isLastIdx idx =
-                    idx == lastIndex
+                formIdx =
+                    clampListIndex filteredTodoList formIdx_
             in
             filteredTodoList
                 |> List.indexedMap
@@ -601,9 +595,6 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                         in
                         if currentIdx == formIdx then
                             [ formHtml, todoItemHtml ]
-
-                        else if isLastIdx currentIdx && isFormIndexOutOfBounds then
-                            [ todoItemHtml, formHtml ]
 
                         else
                             [ todoItemHtml ]
