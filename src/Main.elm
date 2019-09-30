@@ -701,16 +701,6 @@ viewProjectTodoItem today todo =
 viewSearchResults : String -> Model -> List (H.Html Msg)
 viewSearchResults query model =
     let
-        todoList =
-            model.todoList |> List.filter pred
-
-        filteredProjects =
-            model.projectList
-                |> List.filter pred
-
-        viewProject { title } =
-            col [ A.class "pv1 ph2" ] [ H.text title ]
-
         pred : { a | title : String } -> Bool
         pred =
             if query |> String.isEmpty then
@@ -718,6 +708,9 @@ viewSearchResults query model =
 
             else
                 .title >> String.contains query
+
+        viewProject { title } =
+            col [ A.class "pv1 ph2" ] [ H.text title ]
 
         viewTodoItem =
             viewSearchTodoItem model.today model.projectList
@@ -731,10 +724,10 @@ viewSearchResults query model =
                     editFormForTodoId todo.id model.maybeTodoForm
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
-                todoList
+                (List.filter pred model.todoList)
 
         projectListHtml =
-            List.map viewProject filteredProjects
+            model.projectList |> List.filter pred |> List.map viewProject
     in
     (col [] [ H.text "Tasks" ] :: todoListHtml)
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: projectListHtml)
