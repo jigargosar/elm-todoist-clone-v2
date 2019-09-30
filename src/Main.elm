@@ -677,7 +677,6 @@ viewProjectTodoItem today todo =
 -- VIEW SEARCH ROUTE
 
 
-viewSearchResults : String -> Model -> List (H.Html Msg)
 viewSearchResults query model =
     let
         pred : { a | title : String } -> Bool
@@ -744,7 +743,11 @@ viewAddTodoFormForInitialDueDate dueDate { projectList, maybeTodoForm } =
         >> Maybe.map (viewTodoForm projectList)
 
 
-viewEditTodoFormOr : ({ a | id : TodoId } -> H.Html Msg) -> { b | projectList : List Project, maybeTodoForm : Maybe TodoForm } -> { a | id : TodoId } -> H.Html Msg
+viewEditTodoFormOr :
+    (Todo -> H.Html Msg)
+    -> { b | projectList : List Project, maybeTodoForm : Maybe TodoForm }
+    -> Todo
+    -> H.Html Msg
 viewEditTodoFormOr viewFunc { projectList, maybeTodoForm } todo =
     maybeTodoForm
         |> MX.filter (TodoForm.isEditingFor todo.id)
