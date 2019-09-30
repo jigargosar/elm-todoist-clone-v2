@@ -670,12 +670,8 @@ viewProjectTodoList maybeProjectId model =
                             LX.splitAt i
                                 >> (\( l, r ) -> l ++ [ c ] ++ r)
                     in
-                    LX.splitAt formIdx filteredTodoList
-                        |> (\( l, r ) ->
-                                List.map viewTodoItem l
-                                    ++ [ viewTodoForm model.projectList form ]
-                                    ++ List.map viewTodoItem r
-                           )
+                    List.map viewTodoItem filteredTodoList
+                        |> insertAt formIdx (viewTodoForm model.projectList form)
 
                 TodoForm.Edit _ ->
                     viewEditableTodoList viewProjectTodoItem model filteredTodoList
