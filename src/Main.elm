@@ -678,7 +678,7 @@ viewSearchResults query model =
             else
                 .title >> String.contains query
 
-        filtered =
+        filteredTodoList =
             model.todoList |> List.filter pred
 
         viewItem =
@@ -698,7 +698,7 @@ viewSearchResults query model =
                     _ ->
                         viewItem todo
             )
-            filtered
+            filteredTodoList
         )
     ]
 
