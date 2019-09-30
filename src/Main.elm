@@ -753,7 +753,7 @@ todoFormConfig =
 
 
 viewTodoForm : List Project -> TodoForm -> H.Html Msg
-viewTodoForm _ =
+viewTodoForm =
     TodoForm.viewTodoForm todoFormConfig
 
 

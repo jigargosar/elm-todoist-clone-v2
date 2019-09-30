@@ -85,8 +85,8 @@ map =
     identity
 
 
-viewSelectOne : Maybe ProjectId -> (Maybe ProjectId -> msg) -> H.Html msg
-viewSelectOne maybeProjectId onChange =
+viewSelectOne : Maybe ProjectId -> (Maybe ProjectId -> msg) -> List Project -> H.Html msg
+viewSelectOne maybeProjectId onChange projectList =
     let
         viewOpt { id, title } =
             H.option
@@ -97,5 +97,5 @@ viewSelectOne maybeProjectId onChange =
     in
     H.select [ E.onInput (ProjectId.fromString >> onChange) ]
         (H.option [ A.value " " ] [ H.text "Inbox" ]
-            :: List.map viewOpt mockProjects
+            :: List.map viewOpt projectList
         )

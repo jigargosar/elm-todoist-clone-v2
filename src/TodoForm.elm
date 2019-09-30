@@ -146,8 +146,8 @@ createConfig =
     Config
 
 
-viewTodoForm : Config msg -> TodoForm -> H.Html msg
-viewTodoForm (Config { onSave, onCancel, toMsg }) (TodoForm meta initial model) =
+viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
+viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta initial model) =
     let
         onChange =
             toMsg << TodoForm meta initial
@@ -165,7 +165,7 @@ viewTodoForm (Config { onSave, onCancel, toMsg }) (TodoForm meta initial model) 
         [ col [ A.class "pv1" ]
             [ ipt2 model.title titleChanged
             ]
-        , Project.viewSelectOne model.maybeProjectId projectChanged
+        , Project.viewSelectOne model.maybeProjectId projectChanged projectList
         , viewDueDateInput model.maybeDueDate dueDateChanged
         , row [ A.class "pv1" ] [ btn2 "Save" onSave, btn2 "Cancel" onCancel ]
         ]
