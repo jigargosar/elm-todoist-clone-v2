@@ -585,7 +585,7 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
 
     else
         col [] [ H.text "OverDue" ]
-            :: List.map (viewEditingFormForTodoOr viewDueDateTodoItem maybeTodoForm) filteredTodoList
+            :: List.map (viewEditTodoFormOr viewDueDateTodoItem maybeTodoForm) filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -604,28 +604,10 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
-        :: List.map (viewEditingFormForTodoOr viewDueDateTodoItem maybeTodoForm) filteredTodoList
+        :: List.map (viewEditTodoFormOr viewDueDateTodoItem maybeTodoForm) filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate maybeTodoForm
                 |> Maybe.withDefault addButtonHtml
            ]
-
-
-viewAddTodoFormForInitialDueDate : Date -> Maybe TodoForm -> Maybe (H.Html Msg)
-viewAddTodoFormForInitialDueDate dueDate =
-    MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
-        >> Maybe.map viewTodoForm
-
-
-viewEditFormForTodoId : TodoId -> Maybe TodoForm -> Maybe (H.Html Msg)
-viewEditFormForTodoId todoId =
-    MX.filter (TodoForm.isEditingFor todoId)
-        >> Maybe.map viewTodoForm
-
-
-viewEditingFormForTodoOr viewFunc maybeTodoForm todo =
-    maybeTodoForm
-        |> viewEditFormForTodoId todo.id
-        |> Maybe.withDefault (viewFunc todo)
 
 
 viewDueDateTodoItem : Todo -> H.Html Msg
@@ -679,7 +661,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                            )
 
                 TodoForm.Edit _ ->
-                    List.map (viewEditingFormForTodoOr viewTodoItem maybeTodoForm)
+                    List.map (viewEditTodoFormOr viewTodoItem maybeTodoForm)
                         filteredTodoList
 
         Nothing ->
@@ -737,6 +719,33 @@ viewSearchTodoItem today todo =
 
 
 
+-- VIEW TODO_FORM HELPERS
+
+
+viewAddTodoFormForInitialDueDate : Date -> Maybe TodoForm -> Maybe (H.Html Msg)
+viewAddTodoFormForInitialDueDate dueDate =
+    MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
+        >> Maybe.map viewTodoForm
+
+
+viewEditTodoFormOr : (Todo -> H.Html Msg) -> Maybe TodoForm -> Todo -> H.Html Msg
+viewEditTodoFormOr viewFunc maybeTodoForm todo =
+    maybeTodoForm
+        |> MX.filter (TodoForm.isEditingFor todo.id)
+        |> MX.unpack (\_ -> viewFunc todo) viewTodoForm
+
+
+todoFormConfig : TodoForm.Config Msg
+todoFormConfig =
+    TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
+
+
+viewTodoForm : TodoForm -> H.Html Msg
+viewTodoForm =
+    TodoForm.viewTodoForm todoFormConfig
+
+
+
 -- VIEW HELPERS
 
 
@@ -750,16 +759,6 @@ todoProjectTitle { maybeProjectId } =
 viewAddTodoButton : Msg -> H.Html Msg
 viewAddTodoButton onClick =
     row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
-
-
-todoFormConfig : TodoForm.Config Msg
-todoFormConfig =
-    TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
-
-
-viewTodoForm : TodoForm -> H.Html Msg
-viewTodoForm =
-    TodoForm.viewTodoForm todoFormConfig
 
 
 humanDate date today =
