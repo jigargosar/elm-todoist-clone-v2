@@ -1,4 +1,16 @@
-module TodoForm exposing (Config, Partial, TodoForm, createConfig, fromPartial, getProjectSortIdx, initBy, initialDueDateEq, setProjectSortIdx, toPartial, viewTodoForm)
+module TodoForm exposing
+    ( Config
+    , Partial
+    , TodoForm
+    , createConfig
+    , fromPartial
+    , getProjectSortIdx
+    , initBy
+    , initialDueDateEq
+    , setProjectSortIdx
+    , toPartial
+    , viewTodoForm
+    )
 
 import Basics.More exposing (propEq)
 import Date exposing (Date)
