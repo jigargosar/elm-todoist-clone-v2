@@ -605,13 +605,13 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList model filteredTodoList
-        ++ [ viewAddTodoFormIfInitialDueDateEq dueDate maybeTodoForm
+        ++ [ viewAddTodoFormForInitialDueDate dueDate maybeTodoForm
                 |> Maybe.withDefault addButtonHtml
            ]
 
 
-viewAddTodoFormIfInitialDueDateEq : Date -> Maybe TodoForm -> Maybe (H.Html Msg)
-viewAddTodoFormIfInitialDueDateEq dueDate =
+viewAddTodoFormForInitialDueDate : Date -> Maybe TodoForm -> Maybe (H.Html Msg)
+viewAddTodoFormForInitialDueDate dueDate =
     MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
         >> Maybe.map viewTodoForm
 
