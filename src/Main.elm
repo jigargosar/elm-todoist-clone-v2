@@ -563,7 +563,7 @@ viewOverDueTodoList model =
 
     else
         col [] [ H.text "OverDue" ]
-            :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model.projectList) model) filteredTodoList
+            :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model) model) filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -582,14 +582,14 @@ viewTodoListDueOn dueDate model =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate model.today ]
-        :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model.projectList) model) filteredTodoList
+        :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model) model) filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate model
                 |> Maybe.withDefault addButtonHtml
            ]
 
 
-viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
-viewDueDateTodoItem projectList todo =
+viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
+viewDueDateTodoItem { projectList } todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
