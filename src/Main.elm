@@ -232,7 +232,15 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( getInsertTodoInProjectForm model.maybeTodoFormWithMeta
-                        |> Maybe.withDefault (TodoForm.initBy (\d -> { d | maybeProjectId = maybeProjectId }))
+                        |> Maybe.withDefault
+                            (TodoForm.initBy
+                                (\d ->
+                                    { d
+                                        | maybeProjectId = maybeProjectId
+                                        , projectSortIdx = idx
+                                    }
+                                )
+                            )
                     , InsertTodoInProjectMeta idx
                     )
             , Cmd.none
