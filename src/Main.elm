@@ -1,4 +1,4 @@
-port module Main exposing (main)
+port module Main exposing (main, viewSearchResults)
 
 import Basics.More exposing (HasId, allPass, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
@@ -677,6 +677,7 @@ viewProjectTodoItem today todo =
 -- VIEW SEARCH ROUTE
 
 
+viewSearchResults : String -> Model -> List (H.Html Msg)
 viewSearchResults query model =
     let
         filteredTodoList =
