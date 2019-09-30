@@ -721,11 +721,25 @@ viewSearchResults query model =
 
         viewTodoItem =
             viewSearchTodoItem model.today model.projectList
+
+        contentHtml =
+            List.map
+                (\todo ->
+                    case editFormForTodoId todo.id model.maybeTodoForm of
+                        Just form ->
+                            viewTodoForm model.projectList form
+
+                        Nothing ->
+                            viewTodoItem todo
+                )
+                todoList
     in
     (col [] [ H.text "Tasks" ]
-        :: viewEditableTodoList viewTodoItem model todoList
+        :: contentHtml
     )
-        ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
+        ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ]
+                :: List.map viewProject filteredProjects
+           )
 
 
 viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
