@@ -9,11 +9,17 @@ import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
+import TodoId exposing (TodoId)
 import UI exposing (btn2, col, ipt2, row)
 
 
+type Meta
+    = Add
+    | Edit TodoId
+
+
 type TodoForm
-    = TodoForm Internal Internal
+    = TodoForm Meta Internal Internal
 
 
 type alias Internal =
@@ -38,7 +44,7 @@ type alias Partial a =
 
 
 toPartial : TodoForm -> Partial {}
-toPartial (TodoForm _ internal) =
+toPartial (TodoForm _ _ internal) =
     internal
 
 
@@ -53,12 +59,12 @@ initialDueDateEq maybeDueDate =
 
 
 unwrap : TodoForm -> Internal
-unwrap (TodoForm _ internal) =
+unwrap (TodoForm _ _ internal) =
     internal
 
 
 unwrapInitial : TodoForm -> Internal
-unwrapInitial (TodoForm initial _) =
+unwrapInitial (TodoForm _ initial _) =
     initial
 
 
@@ -68,8 +74,8 @@ setProjectSortIdx projectSortIdx =
 
 
 map : (Internal -> Internal) -> TodoForm -> TodoForm
-map func (TodoForm initial internal) =
-    TodoForm initial <| func internal
+map func (TodoForm meta initial internal) =
+    TodoForm meta initial <| func internal
 
 
 empty : Internal
@@ -79,17 +85,17 @@ empty =
 
 initBy : (Internal -> Internal) -> TodoForm
 initBy func =
-    init <| func empty
+    init Add <| func empty
 
 
-init : Internal -> TodoForm
-init internal =
-    TodoForm internal internal
+init : Meta -> Internal -> TodoForm
+init meta internal =
+    TodoForm meta internal internal
 
 
 fromPartial : Partial a -> TodoForm
 fromPartial { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    init <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
+    init Add <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg
@@ -102,10 +108,10 @@ createConfig =
 
 
 viewTodoForm : Config msg -> TodoForm -> H.Html msg
-viewTodoForm (Config { onSave, onCancel, toMsg }) (TodoForm initial model) =
+viewTodoForm (Config { onSave, onCancel, toMsg }) (TodoForm meta initial model) =
     let
         onChange =
-            toMsg << TodoForm initial
+            toMsg << TodoForm meta initial
 
         titleChanged title =
             onChange { model | title = title }
