@@ -592,7 +592,7 @@ viewTodoListDueOn dueDate model =
 
 
 viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
-viewDueDateTodoItem { projectList } todo =
+viewDueDateTodoItem model todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -602,8 +602,7 @@ viewDueDateTodoItem { projectList } todo =
             , E.onClick (EditTodoClicked todo)
             ]
             [ H.text todo.title ]
-        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-            [ H.text <| todoProjectTitle projectList todo ]
+        , viewTodoProjectPill model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -726,8 +725,7 @@ viewSearchTodoItem model todo =
                 (\dueDate ->
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
                 )
-        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-            [ H.text <| todoProjectTitle model.projectList todo ]
+        , viewTodoProjectPill model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -772,11 +770,15 @@ viewTodoForm =
 -- VIEW TODO_ITEM HELPERS
 
 
-todoProjectTitle : List Project -> Todo -> String
-todoProjectTitle projectList { maybeProjectId } =
-    projectList
-        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
-        |> MX.unwrap "Inbox" .title
+viewTodoProjectPill { projectList } todo =
+    let
+        todoProjectTitle { maybeProjectId } =
+            projectList
+                |> LX.find (.id >> (\id -> Just id == maybeProjectId))
+                |> MX.unwrap "Inbox" .title
+    in
+    row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
+        [ H.text <| todoProjectTitle todo ]
 
 
 humanDate : { a | today : Date } -> Date -> String
