@@ -32,6 +32,22 @@ type Route
     | RouteNext7Days
 
 
+routeEncoder : Route -> Value
+routeEncoder route =
+    case route of
+        RouteInbox ->
+            JE.string "RouteInbox"
+
+        RouteToday ->
+            JE.string "RouteToday"
+
+        RouteProject projectId ->
+            ProjectId.encoder projectId
+
+        RouteNext7Days ->
+            JE.string "RouteNext7Days"
+
+
 
 -- CACHE
 
