@@ -217,16 +217,9 @@ update msg model =
             ( newModel, Cmd.none )
 
         MoveDown todoId ->
-            let
-                newModel =
-                    LX.find (idEq todoId) model.todoList
-                        |> Maybe.map
-                            (\todo ->
-                                updateTodo todo { todo | projectSortIdx = todo.projectSortIdx + 1 } model
-                            )
-                        |> Maybe.withDefault model
-            in
-            ( newModel, Cmd.none )
+            ( updateTodoWithIdBy todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx + 1 }) model
+            , Cmd.none
+            )
 
         SetTodoIsDone todoId isDone ->
             ( model |> mapTodoList (updateWhenIdEq todoId (\todo -> { todo | isDone = isDone }))
@@ -302,16 +295,7 @@ saveTodoForm ( form, meta ) model =
                         |> uncurry insertTodo
 
                 EditTodoMeta { id } ->
-                    LX.find (idEq id) model.todoList
-                        |> Maybe.map
-                            (\existingTodo ->
-                                let
-                                    newTodo =
-                                        Todo.patchWithPartial (TodoForm.toPartial form) existingTodo
-                                in
-                                updateTodo existingTodo newTodo model
-                            )
-                        |> Maybe.withDefault model
+                    updateTodoWithIdBy id (Todo.patchWithPartial (TodoForm.toPartial form)) model
     in
     ( { newModel | maybeTodoFormWithMeta = Nothing }
     , Cmd.none
@@ -322,6 +306,16 @@ sortedTodoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
 sortedTodoListForMaybeProjectId maybeProjectId =
     List.filter (propEq .maybeProjectId maybeProjectId)
         >> List.sortBy .projectSortIdx
+
+
+updateTodoWithIdBy : TodoId -> (Todo -> Todo) -> Model -> Model
+updateTodoWithIdBy id func model =
+    LX.find (idEq id) model.todoList
+        |> Maybe.map
+            (\todo ->
+                updateTodo todo (func todo) model
+            )
+        |> Maybe.withDefault model
 
 
 updateTodo : Todo -> Todo -> Model -> Model
