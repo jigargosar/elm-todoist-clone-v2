@@ -278,7 +278,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     (model.maybeTodoForm
-                        |> Maybe.map (TodoForm.setProjectSortIdx idx)
+                        |> Maybe.andThen (TodoForm.setProjectSortIdxIfAdding idx)
                         |> Maybe.withDefault
                             (TodoForm.initAdd
                                 (\d ->

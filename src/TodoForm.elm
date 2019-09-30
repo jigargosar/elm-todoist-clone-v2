@@ -10,12 +10,12 @@ module TodoForm exposing
     , initEdit
     , isAddingForInitialDueDate
     , isEditingFor
-    , setProjectSortIdx
+    , setProjectSortIdxIfAdding
     , toPartialWithMeta
     , viewTodoForm
     )
 
-import Basics.More exposing (propEq)
+import Basics.More exposing (allPass, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -86,7 +86,10 @@ getProjectSortIdx =
 
 isAddingForInitialDueDate : Date -> TodoForm -> Bool
 isAddingForInitialDueDate dueDate =
-    unwrapInitial >> propEq .maybeDueDate (Just dueDate)
+    allPass
+        [ unwrapMeta >> (==) Add
+        , unwrapInitial >> propEq .maybeDueDate (Just dueDate)
+        ]
 
 
 unwrap : TodoForm -> Internal
@@ -99,14 +102,19 @@ unwrapInitial (TodoForm _ initial _) =
     initial
 
 
-setProjectSortIdx : Int -> TodoForm -> TodoForm
-setProjectSortIdx projectSortIdx =
-    map (\f -> { f | projectSortIdx = projectSortIdx })
+setProjectSortIdxIfAdding : Int -> TodoForm -> Maybe TodoForm
+setProjectSortIdxIfAdding projectSortIdx =
+    mapCurrentIfAdding (\f -> { f | projectSortIdx = projectSortIdx })
 
 
-map : (Internal -> Internal) -> TodoForm -> TodoForm
-map func (TodoForm meta initial internal) =
-    TodoForm meta initial <| func internal
+mapCurrentIfAdding : (Internal -> Internal) -> TodoForm -> Maybe TodoForm
+mapCurrentIfAdding func (TodoForm meta initial current) =
+    case meta of
+        Add ->
+            Just <| TodoForm meta initial <| func current
+
+        _ ->
+            Nothing
 
 
 empty : Internal
