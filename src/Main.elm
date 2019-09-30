@@ -684,7 +684,7 @@ viewSearchResults query model =
                 .title >> String.contains query
     in
     (col [] [ H.text "Tasks" ]
-        :: List.map (viewEditTodoFormOr viewSearchTodoItem model) filteredTodoList
+        :: viewEditableTodoList viewSearchTodoItem model filteredTodoList
     )
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
