@@ -566,7 +566,7 @@ viewOverDueTodoList model =
 
     else
         col [] [ H.text "OverDue" ]
-            :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model) model) filteredTodoList
+            :: List.map (viewEditTodoFormOr viewDueDateTodoItem model) filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -585,7 +585,7 @@ viewTodoListDueOn dueDate model =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
-        :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model) model) filteredTodoList
+        :: List.map (viewEditTodoFormOr viewDueDateTodoItem model) filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate model
                 |> Maybe.withDefault addButtonHtml
            ]
@@ -635,7 +635,7 @@ viewTodoListForMaybeProjectId maybeProjectId model =
                            )
 
                 TodoForm.Edit _ ->
-                    List.map (viewEditTodoFormOr viewTodoItem model) filteredTodoList
+                    List.map (viewEditTodoFormOr viewProjectTodoItem model) filteredTodoList
 
         Nothing ->
             List.map viewTodoItem filteredTodoList
@@ -684,7 +684,7 @@ viewSearchResults query model =
                 .title >> String.contains query
     in
     (col [] [ H.text "Tasks" ]
-        :: List.map (viewEditTodoFormOr (viewSearchTodoItem model) model) filteredTodoList
+        :: List.map (viewEditTodoFormOr viewSearchTodoItem model) filteredTodoList
     )
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
@@ -716,14 +716,14 @@ viewAddTodoFormForInitialDueDate dueDate { projectList, maybeTodoForm } =
 
 
 viewEditTodoFormOr :
-    (Todo -> H.Html Msg)
-    -> { b | projectList : List Project, maybeTodoForm : Maybe TodoForm }
+    ({ a | today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm } -> Todo -> H.Html Msg)
+    -> { a | today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm }
     -> Todo
     -> H.Html Msg
-viewEditTodoFormOr viewFunc { projectList, maybeTodoForm } todo =
-    maybeTodoForm
+viewEditTodoFormOr viewFunc model todo =
+    model.maybeTodoForm
         |> MX.filter (TodoForm.isEditingFor todo.id)
-        |> MX.unpack (\_ -> viewFunc todo) (viewTodoForm projectList)
+        |> MX.unpack (\_ -> viewFunc model todo) (viewTodoForm model.projectList)
 
 
 todoFormConfig : TodoForm.Config Msg
