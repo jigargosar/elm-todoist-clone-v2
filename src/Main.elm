@@ -153,13 +153,9 @@ type alias Flags =
     }
 
 
-type alias TodoFormWithMeta =
-    TodoForm
-
-
 type alias Model =
     { todoList : List Todo
-    , maybeTodoFormWithMeta : Maybe TodoFormWithMeta
+    , maybeTodoForm : Maybe TodoForm
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -170,7 +166,7 @@ type alias Model =
 defaultModel : Model
 defaultModel =
     { todoList = defaultCacheValue.todoList
-    , maybeTodoFormWithMeta = Nothing
+    , maybeTodoForm = Nothing
 
     --    , route = RouteProject (ProjectId "1")
     , route = defaultCacheValue.route
@@ -214,7 +210,7 @@ mapTodoList func model =
 
 
 setTodoForm form model =
-    { model | maybeTodoFormWithMeta = Just form }
+    { model | maybeTodoForm = Just form }
 
 
 
@@ -251,7 +247,7 @@ update msg model =
             ( { model | today = today }, Cmd.none )
 
         ChangeRouteTo route ->
-            refreshModel { model | route = route, maybeTodoFormWithMeta = Nothing }
+            refreshModel { model | route = route, maybeTodoForm = Nothing }
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
@@ -283,7 +279,7 @@ update msg model =
         InsertTodoInProjectClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    (model.maybeTodoFormWithMeta
+                    (model.maybeTodoForm
                         |> Maybe.map (TodoForm.setProjectSortIdx idx)
                         |> Maybe.withDefault
                             (TodoForm.initAdd
@@ -310,7 +306,7 @@ update msg model =
             )
 
         Save ->
-            case model.maybeTodoFormWithMeta of
+            case model.maybeTodoForm of
                 Just form ->
                     saveTodoForm form model
 
@@ -318,17 +314,17 @@ update msg model =
                     ( model, Cmd.none )
 
         Cancel ->
-            ( { model | maybeTodoFormWithMeta = Nothing }
+            ( { model | maybeTodoForm = Nothing }
             , Cmd.none
             )
 
 
-mapTodoForm : (a -> a) -> { b | maybeTodoFormWithMeta : Maybe a } -> { b | maybeTodoFormWithMeta : Maybe a }
+mapTodoForm : (a -> a) -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
 mapTodoForm func model =
-    { model | maybeTodoFormWithMeta = model.maybeTodoFormWithMeta |> Maybe.map func }
+    { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
 
 
-saveTodoForm : TodoFormWithMeta -> Model -> ( Model, Cmd Msg )
+saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
 saveTodoForm form model =
     let
         ( meta, partial ) =
@@ -343,7 +339,7 @@ saveTodoForm form model =
                 TodoForm.Edit todoId ->
                     updateTodoWithIdBy todoId (Todo.patchWithPartial partial) model
     in
-    ( { newModel | maybeTodoFormWithMeta = Nothing }
+    ( { newModel | maybeTodoForm = Nothing }
     , Cmd.none
     )
 
@@ -539,7 +535,7 @@ viewRoute model route =
             [ col []
                 (List.map
                     (\todo ->
-                        case model.maybeTodoFormWithMeta of
+                        case model.maybeTodoForm of
                             Just form ->
                                 if TodoForm.isEditingTodoId todo.id form then
                                     viewTodoForm form
@@ -575,7 +571,7 @@ viewDueTodayAndOverdueTodoList model =
 
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
-viewOverDueTodoList ({ today, todoList, maybeTodoFormWithMeta } as model) =
+viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
     let
         filterPredicate =
             allPass
@@ -595,7 +591,7 @@ viewOverDueTodoList ({ today, todoList, maybeTodoFormWithMeta } as model) =
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
-viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) =
+viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
     let
         filterPredicate =
             allPass
@@ -611,7 +607,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList model filteredTodoList
-        ++ [ case maybeTodoFormWithMeta of
+        ++ [ case maybeTodoForm of
                 Just form ->
                     if TodoForm.initialDueDateEq (Just dueDate) form then
                         viewTodoForm form
@@ -625,10 +621,10 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
 
 
 viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
-viewEditableTodoList { maybeTodoFormWithMeta } =
+viewEditableTodoList { maybeTodoForm } =
     List.map
         (\todo ->
-            case maybeTodoFormWithMeta of
+            case maybeTodoForm of
                 Just form ->
                     if TodoForm.isEditingTodoId todo.id form then
                         viewTodoForm form
@@ -664,7 +660,7 @@ viewDueDateTodoItem todo =
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
-viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList } as model) =
+viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as model) =
     let
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
@@ -673,7 +669,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
         viewTodoItem =
             viewProjectTodoItem model.today
     in
-    case maybeTodoFormWithMeta of
+    case maybeTodoForm of
         Just form ->
             case TodoForm.getMeta form of
                 TodoForm.Add ->
