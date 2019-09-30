@@ -664,6 +664,11 @@ viewProjectTodoList maybeProjectId model =
                     let
                         formIdx =
                             clamp 0 (List.length filteredTodoList) (TodoForm.getProjectSortIdx form)
+
+                        insertAt : Int -> a -> List a -> List a
+                        insertAt i c =
+                            LX.splitAt i
+                                >> (\( l, r ) -> l ++ [ c ] ++ r)
                     in
                     LX.splitAt formIdx filteredTodoList
                         |> (\( l, r ) ->
