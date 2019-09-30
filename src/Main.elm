@@ -728,12 +728,8 @@ viewSearchResults query model =
         contentHtml =
             List.map
                 (\todo ->
-                    case editFormForTodoId todo.id model.maybeTodoForm of
-                        Just form ->
-                            viewForm form
-
-                        Nothing ->
-                            viewTodoItem todo
+                    editFormForTodoId todo.id model.maybeTodoForm
+                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 todoList
     in
