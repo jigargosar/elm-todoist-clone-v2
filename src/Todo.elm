@@ -21,6 +21,10 @@ type alias Todo =
     }
 
 
+type alias Internal =
+    Todo
+
+
 mockTitles =
     [ "Get Milk!!"
     , "Submit assignment"
@@ -42,6 +46,7 @@ mockListGenerator =
         |> Random.map (List.map2 setTitle mockTitles >> setSortIndices)
 
 
+map : (Internal -> Internal) -> Todo -> Todo
 map =
     identity
 
