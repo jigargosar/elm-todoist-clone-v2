@@ -1,4 +1,4 @@
-module Todo exposing (Todo, decoder, encoder, generatorFromPartial, mockList, mockListGenerator, patchWithPartial)
+module Todo exposing (Todo, decoder, encoder, generatorFromPartial, mockListGenerator, patchWithPartial)
 
 import Date exposing (Date)
 import Json.Decode as JD
@@ -126,20 +126,3 @@ patchWithPartial p todo =
         , maybeDueDate = p.maybeDueDate
         , projectSortIdx = p.projectSortIdx
     }
-
-
-createMockTodo : String -> String -> Maybe Todo
-createMockTodo id title =
-    TodoId.fromString id
-        |> Maybe.map (\todoId -> Todo todoId title False False Nothing Nothing 0)
-
-
-mockList : List Todo
-mockList =
-    [ createMockTodo "1" "Get Milk!!"
-    , createMockTodo "2" "Submit assignment"
-    , createMockTodo "3" "Check Facebook"
-    , createMockTodo "4" "Go to movies"
-    , createMockTodo "5" "Get Coffee"
-    ]
-        |> List.filterMap identity
