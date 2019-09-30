@@ -360,16 +360,6 @@ sortedTodoListForMaybeProjectId maybeProjectId =
         >> List.sortBy .projectSortIdx
 
 
-upsertTodoAndUpdateSortIndices : Todo -> Model -> Model
-upsertTodoAndUpdateSortIndices todo model =
-    case LX.find (idEq todo.id) model.todoList of
-        Just existingTodo ->
-            updateTodo existingTodo todo model
-
-        Nothing ->
-            insertTodo todo model
-
-
 updateTodo : Todo -> Todo -> Model -> Model
 updateTodo oldTodo newTodo model =
     let
