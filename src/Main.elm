@@ -550,17 +550,18 @@ viewDueTodayAndOverdueTodoList model =
     viewOverDueTodoList model ++ viewTodoListDueOn model.today model
 
 
+overDuePred today =
+    allPass
+        [ propEq .isDone False
+        , .maybeDueDate >> MX.unwrap False (\dueDate -> Date.compare dueDate today == LT)
+        ]
+
+
 viewOverDueTodoList : Model -> List (H.Html Msg)
 viewOverDueTodoList model =
     let
-        filterPredicate =
-            allPass
-                [ .maybeDueDate >> MX.unwrap False (\dueDate -> Date.compare dueDate model.today == LT)
-                , propEq .isDone False
-                ]
-
         filteredTodoList =
-            model.todoList |> List.filter filterPredicate
+            model.todoList |> List.filter (overDuePred model.today)
     in
     if filteredTodoList |> List.isEmpty then
         []
