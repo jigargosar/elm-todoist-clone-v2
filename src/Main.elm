@@ -684,7 +684,7 @@ viewSearchResults query model =
             model.todoList |> List.filter pred
 
         viewTodoItem =
-            viewSearchTodoItem model.projectList model.today
+            viewSearchTodoItem model
 
         filteredProjects =
             model.projectList
@@ -707,8 +707,8 @@ viewSearchResults query model =
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
 
-viewSearchTodoItem : List Project -> Date -> Todo -> H.Html Msg
-viewSearchTodoItem projectList today todo =
+viewSearchTodoItem : { a | today : Date, projectList : List Project } -> Todo -> H.Html Msg
+viewSearchTodoItem { today, projectList } todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
