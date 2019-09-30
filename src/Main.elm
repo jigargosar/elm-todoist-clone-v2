@@ -279,8 +279,9 @@ saveTodoForm ( form, meta ) model =
 
         newModel =
             case meta of
-                InsertTodoInProjectMeta _ ->
+                InsertTodoInProjectMeta idx ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
+                        |> Tuple.mapFirst (\t -> { t | projectSortIdx = idx })
                         |> uncurry insertTodo
 
                 AddDueAtTodoMeta _ ->
