@@ -532,8 +532,27 @@ viewRoute model route =
 
                 filtered =
                     model.todoList |> List.filter pred
+
+                viewItem =
+                    viewSearchTodoItem model.today
             in
-            [ col [] (filtered |> List.map (viewSearchTodoItem model.today)) ]
+            [ col []
+                (List.map
+                    (\todo ->
+                        case model.maybeTodoFormWithMeta of
+                            Just form ->
+                                if TodoForm.isEditingTodoId todo.id form then
+                                    viewTodoForm form
+
+                                else
+                                    viewItem todo
+
+                            _ ->
+                                viewItem todo
+                    )
+                    filtered
+                )
+            ]
 
 
 
