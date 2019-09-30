@@ -685,21 +685,7 @@ viewSearchResults query model =
             viewSearchTodoItem model.today
     in
     [ col []
-        (List.map
-            (\todo ->
-                case model.maybeTodoForm of
-                    Just form ->
-                        if TodoForm.isEditingFor todo.id form then
-                            viewTodoForm form
-
-                        else
-                            viewItem todo
-
-                    _ ->
-                        viewItem todo
-            )
-            filteredTodoList
-        )
+        (List.map (viewEditTodoFormOr viewItem model.maybeTodoForm) filteredTodoList)
     ]
 
 
