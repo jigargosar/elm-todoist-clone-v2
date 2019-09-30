@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, TodoForm, createConfig, fromTodo, init, toPartial, viewTodoForm)
+module TodoForm exposing (Config, TodoForm, createConfig, empty, fromTodo, init, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -27,6 +27,11 @@ toPartial (TodoForm internal) =
 init : String -> Maybe ProjectId -> Maybe Date -> TodoForm
 init title maybeProjectId maybeDueDate =
     TodoForm <| Internal title maybeProjectId maybeDueDate
+
+
+empty : Internal
+empty =
+    Internal "" Nothing Nothing
 
 
 fromTodo : Todo -> TodoForm
