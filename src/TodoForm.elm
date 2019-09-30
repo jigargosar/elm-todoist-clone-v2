@@ -26,12 +26,12 @@ toPartial (TodoForm internal) =
 
 init : String -> Maybe ProjectId -> Maybe Date -> TodoForm
 init title maybeProjectId maybeDueDate =
-    TodoForm { title = title, maybeProjectId = maybeProjectId, maybeDueDate = maybeDueDate }
+    TodoForm <| Internal title maybeProjectId maybeDueDate
 
 
 fromTodo : Todo -> TodoForm
 fromTodo { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    TodoForm { title = title, maybeProjectId = maybeProjectId, maybeDueDate = maybeDueDate }
+    TodoForm <| Internal title maybeProjectId maybeDueDate
 
 
 type Config msg
