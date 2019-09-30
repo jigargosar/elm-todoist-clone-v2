@@ -205,16 +205,9 @@ update msg model =
             )
 
         MoveUp todoId ->
-            let
-                newModel =
-                    LX.find (idEq todoId) model.todoList
-                        |> Maybe.map
-                            (\todo ->
-                                updateTodo todo { todo | projectSortIdx = todo.projectSortIdx - 1 } model
-                            )
-                        |> Maybe.withDefault model
-            in
-            ( newModel, Cmd.none )
+            ( updateTodoWithIdBy todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx - 1 }) model
+            , Cmd.none
+            )
 
         MoveDown todoId ->
             ( updateTodoWithIdBy todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx + 1 }) model
