@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, idEq, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -63,3 +63,8 @@ uncurry fn ( a, b ) =
 clampListIndex : List a -> Int -> Int
 clampListIndex list =
     clamp 0 (List.length list - 1)
+
+
+clampListLength : List a -> Int -> Int
+clampListLength list =
+    clamp 0 (List.length list)

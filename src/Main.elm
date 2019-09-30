@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, clampListIndex, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, clampListIndex, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -624,7 +624,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                             viewTodoForm form
 
                         formIdx =
-                            clampListIndex filteredTodoList (TodoForm.getProjectSortIdx form)
+                            clampListLength filteredTodoList (TodoForm.getProjectSortIdx form)
                     in
                     LX.splitAt formIdx filteredTodoList
                         |> (\( l, r ) ->
