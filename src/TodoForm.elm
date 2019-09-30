@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, TodoForm, createConfig, empty, fromPartial, init, toPartial, viewTodoForm)
+module TodoForm exposing (Config, TodoForm, createConfig, fromPartial, init, initBy, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -31,6 +31,11 @@ init title maybeProjectId maybeDueDate =
 empty : Internal
 empty =
     Internal "" Nothing Nothing
+
+
+initBy : (Internal -> Internal) -> TodoForm
+initBy func =
+    TodoForm <| func empty
 
 
 fromPartial : { a | title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date } -> TodoForm
