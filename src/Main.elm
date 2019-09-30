@@ -370,6 +370,7 @@ updateTodo oldTodo newTodo model =
                 model.todoList
                     |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
                     |> updateWhenIdEq newTodo.id (always newTodo)
+                    |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
         todoListWithoutOldTodo =
