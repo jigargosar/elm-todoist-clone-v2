@@ -679,14 +679,6 @@ viewProjectTodoItem today todo =
 
 viewSearchResults query model =
     let
-        pred : { a | title : String } -> Bool
-        pred =
-            if query |> String.isEmpty then
-                always True
-
-            else
-                .title >> String.contains query
-
         filteredTodoList =
             model.todoList |> List.filter pred
 
@@ -699,6 +691,14 @@ viewSearchResults query model =
 
         viewProject { title } =
             col [ A.class "pv1 ph2" ] [ H.text title ]
+
+        pred : { a | title : String } -> Bool
+        pred =
+            if query |> String.isEmpty then
+                always True
+
+            else
+                .title >> String.contains query
     in
     (col [] [ H.text "Tasks" ]
         :: List.map (viewEditTodoFormOr viewTodoItem model) filteredTodoList
@@ -768,7 +768,7 @@ viewTodoForm =
 -- VIEW HELPERS
 
 
-todoProjectTitle : List Project -> { a | maybeProjectId : Maybe ProjectId } -> String
+todoProjectTitle : List Project -> Todo -> String
 todoProjectTitle projectList { maybeProjectId } =
     projectList
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
