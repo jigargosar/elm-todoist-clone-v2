@@ -100,7 +100,7 @@ type alias Cache =
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = Todo.mockList, route = RouteInbox }
+    { todoList = [], route = RouteInbox }
 
 
 cacheDecoder : JD.Decoder Cache
