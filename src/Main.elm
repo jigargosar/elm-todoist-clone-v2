@@ -99,7 +99,7 @@ type alias Flags =
 
 type TodoFormMeta
     = AddDueAtTodoMeta Date
-    | InsertTodoInProjectMeta Int
+    | InsertTodoInProjectMeta
     | EditTodoMeta Todo
 
 
@@ -232,6 +232,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( getInsertTodoInProjectForm model.maybeTodoFormWithMeta
+                        |> Maybe.map (TodoForm.setProjectSortIdx idx)
                         |> Maybe.withDefault
                             (TodoForm.initBy
                                 (\d ->
@@ -241,7 +242,7 @@ update msg model =
                                     }
                                 )
                             )
-                    , InsertTodoInProjectMeta idx
+                    , InsertTodoInProjectMeta
                     )
             , Cmd.none
             )
@@ -284,9 +285,8 @@ saveTodoForm ( form, meta ) model =
 
         newModel =
             case meta of
-                InsertTodoInProjectMeta idx ->
+                InsertTodoInProjectMeta ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
-                        |> Tuple.mapFirst (\t -> { t | projectSortIdx = idx })
                         |> uncurry insertTodo
 
                 AddDueAtTodoMeta _ ->
@@ -346,7 +346,7 @@ insertTodo todo model =
     let
         projectTodoList =
             sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
-                |> LX.splitAt todo.projectSortIdx
+                |> LX.splitAt (todo.projectSortIdx |> Debug.log "projectSortIdx")
                 |> (\( l, r ) -> l ++ [ todo ] ++ r)
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
@@ -460,7 +460,7 @@ viewRoute model route =
 getInsertTodoInProjectForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getInsertTodoInProjectForm maybeForm =
     case maybeForm of
-        Just ( form, InsertTodoInProjectMeta _ ) ->
+        Just ( form, InsertTodoInProjectMeta ) ->
             Just form
 
         _ ->
@@ -586,13 +586,13 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
             viewProjectTodoItem model.today
     in
     case maybeTodoFormWithMeta of
-        Just ( form, InsertTodoInProjectMeta formIdx_ ) ->
+        Just ( form, InsertTodoInProjectMeta ) ->
             let
                 formHtml =
                     viewTodoForm form
 
                 formIdx =
-                    clampListIndex filteredTodoList formIdx_
+                    clampListIndex filteredTodoList (TodoForm.getProjectSortIdx form)
             in
             LX.splitAt formIdx filteredTodoList
                 |> (\( l, r ) ->

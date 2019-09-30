@@ -63,8 +63,8 @@ type alias Partial a =
 
 
 fromPartial : TodoId -> Partial a -> Todo
-fromPartial id { title, maybeProjectId, maybeDueDate } =
-    Todo id title False False maybeProjectId maybeDueDate 0
+fromPartial id { title, maybeProjectId, maybeDueDate, projectSortIdx } =
+    Todo id title False False maybeProjectId maybeDueDate projectSortIdx
 
 
 generatorFromPartial : Partial a -> Random.Generator Todo

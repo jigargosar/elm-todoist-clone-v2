@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, Partial, TodoForm, createConfig, fromPartial, initBy, toPartial, viewTodoForm)
+module TodoForm exposing (Config, Partial, TodoForm, createConfig, fromPartial, getProjectSortIdx, initBy, setProjectSortIdx, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -39,6 +39,25 @@ type alias Partial a =
 toPartial : TodoForm -> Partial {}
 toPartial (TodoForm internal) =
     internal
+
+
+getProjectSortIdx : TodoForm -> Int
+getProjectSortIdx =
+    unwrap >> .projectSortIdx
+
+
+unwrap (TodoForm internal) =
+    internal
+
+
+setProjectSortIdx : Int -> TodoForm -> TodoForm
+setProjectSortIdx projectSortIdx =
+    map (\f -> { f | projectSortIdx = projectSortIdx })
+
+
+map : (Internal -> Internal) -> TodoForm -> TodoForm
+map func (TodoForm internal) =
+    TodoForm <| func internal
 
 
 empty : Internal
