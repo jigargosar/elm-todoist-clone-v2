@@ -668,6 +668,7 @@ viewProjectTodoItem today todo =
 -- VIEW SEARCH ROUTE
 
 
+viewSearchResults : String -> Model -> List (H.Html Msg)
 viewSearchResults query model =
     let
         pred : { a | title : String } -> Bool
@@ -683,10 +684,18 @@ viewSearchResults query model =
 
         viewItem =
             viewSearchTodoItem model.today
+
+        filteredProjects =
+            Project.mockProjects
+                |> List.filter pred
+
+        viewProject { title } =
+            col [ A.class "pv1 ph2" ] [ H.text title ]
     in
-    [ col []
-        (List.map (viewEditTodoFormOr viewItem model.maybeTodoForm) filteredTodoList)
-    ]
+    (col [] [ H.text "Tasks" ]
+        :: List.map (viewEditTodoFormOr viewItem model.maybeTodoForm) filteredTodoList
+    )
+        ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
 
 viewSearchTodoItem : Date -> Todo -> H.Html Msg
