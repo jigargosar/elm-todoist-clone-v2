@@ -557,18 +557,21 @@ overDuePred today =
         ]
 
 
-viewOverDueTodoList : Model -> List (H.Html Msg)
-viewOverDueTodoList model =
-    let
-        filteredTodoList =
-            model.todoList |> List.filter (overDuePred model.today)
-    in
-    if filteredTodoList |> List.isEmpty then
+unlessEmpty func list =
+    if List.isEmpty list then
         []
 
     else
-        col [] [ H.text "OverDue" ]
-            :: viewEditableTodoList viewDueDateTodoItem model filteredTodoList
+        func list
+
+
+viewOverDueTodoList : Model -> List (H.Html Msg)
+viewOverDueTodoList model =
+    unlessEmpty
+        (\todoList ->
+            col [] [ H.text "OverDue" ] :: viewEditableTodoList viewDueDateTodoItem model todoList
+        )
+        (List.filter (overDuePred model.today) model.todoList)
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
