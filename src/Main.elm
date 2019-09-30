@@ -733,9 +733,7 @@ viewSearchResults query model =
                 )
                 todoList
     in
-    (col [] [ H.text "Tasks" ]
-        :: contentHtml
-    )
+    (col [] [ H.text "Tasks" ] :: contentHtml)
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ]
                 :: List.map viewProject filteredProjects
            )
@@ -755,18 +753,6 @@ viewSearchTodoItem today projectList todo =
 
 
 -- VIEW TODO_FORM HELPERS
-
-
-viewEditTodoFormOr : (Todo -> H.Html Msg) -> Model -> Todo -> H.Html Msg
-viewEditTodoFormOr viewFunc model todo =
-    model.maybeTodoForm
-        |> MX.filter (TodoForm.isEditingFor todo.id)
-        |> MX.unpack (\_ -> viewFunc todo) (viewTodoForm model.projectList)
-
-
-viewEditableTodoList : (Todo -> H.Html Msg) -> Model -> List Todo -> List (H.Html Msg)
-viewEditableTodoList viewFunc model todoList =
-    List.map (viewEditTodoFormOr viewFunc model) todoList
 
 
 todoFormConfig : TodoForm.Config Msg
