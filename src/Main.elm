@@ -557,6 +557,13 @@ overDuePred today =
         ]
 
 
+dueOnPred dueDate =
+    allPass
+        [ propEq .maybeDueDate (Just dueDate)
+        , propEq .isDone False
+        ]
+
+
 unlessEmpty func list =
     if List.isEmpty list then
         []
@@ -574,26 +581,27 @@ viewOverDueTodoList model =
         (List.filter (overDuePred model.today) model.todoList)
 
 
+filterTodoList : (Todo -> Bool) -> { b | todoList : List Todo } -> List Todo
+filterTodoList pred =
+    .todoList >> List.filter pred
+
+
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
 viewTodoListDueOn dueDate model =
     let
-        filterPredicate =
-            allPass
-                [ propEq .maybeDueDate (Just dueDate)
-                , propEq .isDone False
-                ]
+        titleHtml =
+            col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
 
-        filteredTodoList =
-            model.todoList |> List.filter filterPredicate
+        contentHtml =
+            viewEditableTodoList viewDueDateTodoItem
+                model
+                (filterTodoList (dueOnPred dueDate) model)
 
-        addButtonHtml =
-            viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
+        footerHtml =
+            viewAddTodoFormForInitialDueDate dueDate model
+                |> Maybe.withDefault (viewAddTodoButton (AddTodoOnDueDateClicked dueDate))
     in
-    col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
-        :: viewEditableTodoList viewDueDateTodoItem model filteredTodoList
-        ++ [ viewAddTodoFormForInitialDueDate dueDate model
-                |> Maybe.withDefault addButtonHtml
-           ]
+    [ titleHtml ] ++ contentHtml ++ [ footerHtml ]
 
 
 viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
