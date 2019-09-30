@@ -573,7 +573,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
 
-        viewTodoItem : Int -> Todo -> H.Html Msg
+        viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
             viewProjectTodoItem model.today
     in
@@ -597,7 +597,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                     (\currentIdx todo ->
                         let
                             todoItemHtml =
-                                viewTodoItem currentIdx todo
+                                viewTodoItem todo
                         in
                         if currentIdx == formIdx then
                             [ formHtml, todoItemHtml ]
@@ -612,22 +612,22 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
 
         Just ( form, EditTodoMeta editTodo ) ->
             filteredTodoList
-                |> List.indexedMap
-                    (\currentIdx todo ->
+                |> List.map
+                    (\todo ->
                         if editTodo.id == todo.id then
                             viewTodoForm form
 
                         else
-                            viewTodoItem currentIdx todo
+                            viewTodoItem todo
                     )
 
         _ ->
-            List.indexedMap viewTodoItem filteredTodoList
+            List.map viewTodoItem filteredTodoList
                 ++ [ viewAddTodoButton (InsertTodoInProjectClicked Random.maxInt maybeProjectId) ]
 
 
-viewProjectTodoItem : Date -> Int -> Todo -> H.Html Msg
-viewProjectTodoItem today idx todo =
+viewProjectTodoItem : Date -> Todo -> H.Html Msg
+viewProjectTodoItem today todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -643,8 +643,8 @@ viewProjectTodoItem today idx todo =
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                 )
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "Insert Above" (InsertTodoInProjectClicked idx todo.maybeProjectId)
-            , btn2 "Insert Below" (InsertTodoInProjectClicked (idx + 1) todo.maybeProjectId)
+            [ btn2 "Insert Above" (InsertTodoInProjectClicked todo.projectSortIdx todo.maybeProjectId)
+            , btn2 "Insert Below" (InsertTodoInProjectClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
             , btn2 "UP" (MoveUp todo.id)
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
