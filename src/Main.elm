@@ -550,7 +550,7 @@ viewRoute model route =
 
 
 
--- DUE DATE TODO_LIST VIEWS
+-- VIEW DUE_DATE TODO_LIST
 
 
 viewNext7DaysTodoList : Model -> List (H.Html Msg)
@@ -647,7 +647,7 @@ viewDueDateTodoItem todo =
 
 
 
--- PROJECT TODO_LIST VIEWS
+-- VIEW PROJECT TODO_LIST
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
@@ -734,6 +734,10 @@ viewSearchTodoItem today todo =
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
+
+
+
+-- VIEW HELPERS
 
 
 todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
