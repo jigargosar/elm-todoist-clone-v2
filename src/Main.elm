@@ -701,7 +701,7 @@ viewProjectTodoItem today todo =
 viewSearchResults : String -> Model -> List (H.Html Msg)
 viewSearchResults query model =
     let
-        filteredTodoList =
+        todoList =
             model.todoList |> List.filter pred
 
         filteredProjects =
@@ -718,20 +718,23 @@ viewSearchResults query model =
 
             else
                 .title >> String.contains query
+
+        viewTodoItem =
+            viewSearchTodoItem model.today model.projectList
     in
     (col [] [ H.text "Tasks" ]
-        :: viewEditableTodoList viewSearchTodoItem model filteredTodoList
+        :: viewEditableTodoList (\_ -> viewTodoItem) model todoList
     )
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
 
-viewSearchTodoItem : { a | today : Date, projectList : List Project } -> Todo -> H.Html Msg
-viewSearchTodoItem model todo =
+viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
+viewSearchTodoItem today projectList todo =
     row [ A.class "hide-child relative" ]
         [ viewTodoCheckbox todo
         , viewTodoTitle todo
-        , viewTodoDueDate model.today todo
-        , viewTodoProjectPill model.projectList todo
+        , viewTodoDueDate today todo
+        , viewTodoProjectPill projectList todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
