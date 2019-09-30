@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, ipt1, row)
+import UI exposing (btn2, checkbox3, col, ipt2, row)
 
 
 type Route
@@ -417,7 +417,7 @@ view model =
         col [ A.class "sans-serif ph4" ]
             [ row [ A.class "bg-black-10 pa1" ]
                 [ btn2 "Reset" ResetModel
-                , row [] [ ipt1 "Search" ]
+                , row [] [ ipt2 "Search" (ChangeRouteTo << RouteSearch) ]
                 ]
             , row []
                 [ col [ A.class "pa2" ] (viewNav model)
