@@ -25,6 +25,7 @@ type alias Internal =
     Todo
 
 
+mockTitles : List String
 mockTitles =
     [ "Get Milk!!"
     , "Submit assignment"

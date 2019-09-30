@@ -1,9 +1,10 @@
-module Project exposing (Project, mockProjects, viewSelectOne)
+module Project exposing (Project, mockListGenerator, mockProjects, viewSelectOne)
 
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
 import ProjectId exposing (ProjectId)
+import Random
 
 
 type alias Project =
@@ -11,6 +12,10 @@ type alias Project =
     , title : String
     , isDeleted : Bool
     }
+
+
+type alias Internal =
+    Project
 
 
 createMockProject : String -> String -> Maybe Project
@@ -27,6 +32,37 @@ mockProjects =
     , createMockProject "4" "Exam Prep"
     ]
         |> List.filterMap identity
+
+
+mockTitles : List String
+mockTitles =
+    [ "Build Utils"
+    , "Publish Post"
+    , "Complete Story"
+    , "Exam Prep"
+    ]
+
+
+mockListGenerator : Random.Generator (List Project)
+mockListGenerator =
+    let
+        gen : Random.Generator Project
+        gen =
+            ProjectId.generator
+                |> Random.map (\id -> Project id "" False)
+    in
+    Random.list (List.length mockTitles) gen
+        |> Random.map (List.map2 setTitle mockTitles)
+
+
+setTitle : String -> Project -> Project
+setTitle title =
+    map (\m -> { m | title = title })
+
+
+map : (Internal -> Internal) -> Project -> Project
+map =
+    identity
 
 
 viewSelectOne : Maybe ProjectId -> (Maybe ProjectId -> msg) -> H.Html msg
