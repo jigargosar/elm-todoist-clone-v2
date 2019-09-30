@@ -222,7 +222,7 @@ update msg model =
         AddTodoOnDueDateClicked dueDate ->
             ( model
                 |> setTodoForm
-                    ( TodoForm.init "" Nothing (Just dueDate)
+                    ( TodoForm.initBy (\d -> { d | maybeDueDate = Just dueDate })
                     , AddDueAtTodoMeta dueDate
                     )
             , Cmd.none

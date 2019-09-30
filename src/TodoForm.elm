@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, TodoForm, createConfig, fromPartial, init, initBy, toPartial, viewTodoForm)
+module TodoForm exposing (Config, TodoForm, createConfig, fromPartial, initBy, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -21,11 +21,6 @@ type alias Internal =
 toPartial : TodoForm -> { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
 toPartial (TodoForm internal) =
     internal
-
-
-init : String -> Maybe ProjectId -> Maybe Date -> TodoForm
-init title maybeProjectId maybeDueDate =
-    TodoForm <| Internal title maybeProjectId maybeDueDate
 
 
 empty : Internal
