@@ -210,6 +210,7 @@ init flags =
         model =
             { defaultModel
                 | todoList = cache.todoList
+                , projectList = cache.projectList
                 , route = cache.route
                 , seed = Random.initialSeed flags.now
             }
