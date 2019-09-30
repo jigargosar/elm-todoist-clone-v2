@@ -574,10 +574,24 @@ unlessEmpty func list =
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
 viewOverDueTodoList model =
+    let
+        isEditingFor todoId =
+            model.maybeTodoForm
+                |> MX.filter (TodoForm.isEditingFor todoId)
+    in
     unlessEmpty
         (\todoList ->
             col [] [ H.text "OverDue" ]
-                :: viewEditableTodoList (\_ -> viewDueDateTodoItem model.projectList) model todoList
+                :: List.map
+                    (\todo ->
+                        case isEditingFor todo.id of
+                            Just form ->
+                                viewTodoForm model.projectList form
+
+                            Nothing ->
+                                viewDueDateTodoItem model.projectList todo
+                    )
+                    todoList
         )
         (List.filter (overDuePred model.today) model.todoList)
 
