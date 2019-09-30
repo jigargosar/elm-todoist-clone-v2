@@ -8,7 +8,7 @@ module TodoForm exposing
     , getProjectSortIdx
     , initAdd
     , initEdit
-    , initialDueDateEq
+    , isAddingForInitialDueDate
     , isEditingTodoId
     , setProjectSortIdx
     , toPartialWithMeta
@@ -84,9 +84,9 @@ getProjectSortIdx =
     unwrap >> .projectSortIdx
 
 
-initialDueDateEq : Maybe Date -> TodoForm -> Bool
-initialDueDateEq maybeDueDate =
-    unwrapInitial >> propEq .maybeDueDate maybeDueDate
+isAddingForInitialDueDate : Date -> TodoForm -> Bool
+isAddingForInitialDueDate dueDate =
+    unwrapInitial >> propEq .maybeDueDate (Just dueDate)
 
 
 unwrap : TodoForm -> Internal

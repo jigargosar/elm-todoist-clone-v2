@@ -612,7 +612,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
 
 viewAddTodoFormIfInitialDueDateEq : Date -> Maybe TodoForm -> Maybe (H.Html Msg)
 viewAddTodoFormIfInitialDueDateEq dueDate =
-    MX.filter (TodoForm.initialDueDateEq (Just dueDate))
+    MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
         >> Maybe.map viewTodoForm
 
 
