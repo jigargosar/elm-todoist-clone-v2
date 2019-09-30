@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, idEq, propEq, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -348,11 +348,6 @@ saveTodoForm ( form, meta ) model =
     ( { newModel | maybeTodoFormWithMeta = Nothing }
     , Cmd.none
     )
-
-
-uncurry : (a -> b -> c) -> ( a, b ) -> c
-uncurry fn ( a, b ) =
-    fn a b
 
 
 sortedTodoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo

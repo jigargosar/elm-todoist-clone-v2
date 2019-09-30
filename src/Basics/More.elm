@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, idEq, propEq, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, idEq, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -53,3 +53,8 @@ anyPass predFunctions val =
 allPass : List (b -> Bool) -> b -> Bool
 allPass predFunctions val =
     List.all (\fn -> fn val) predFunctions
+
+
+uncurry : (a -> b -> c) -> ( a, b ) -> c
+uncurry fn ( a, b ) =
+    fn a b
