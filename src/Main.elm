@@ -535,7 +535,7 @@ viewRoute model route =
                     (\todo ->
                         case model.maybeTodoForm of
                             Just form ->
-                                if TodoForm.isEditingTodoId todo.id form then
+                                if TodoForm.isEditingFor todo.id form then
                                     viewTodoForm form
 
                                 else
@@ -616,21 +616,21 @@ viewAddTodoFormForInitialDueDate dueDate =
         >> Maybe.map viewTodoForm
 
 
+viewEditFormForTodoId : TodoId -> Maybe TodoForm -> Maybe (H.Html Msg)
+viewEditFormForTodoId todoId =
+    MX.filter (TodoForm.isEditingFor todoId)
+        >> Maybe.map viewTodoForm
+
+
+viewEditingFormForTodoOr viewFunc maybeTodoForm todo =
+    maybeTodoForm
+        |> viewEditFormForTodoId todo.id
+        |> Maybe.withDefault (viewFunc todo)
+
+
 viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
 viewEditableTodoList { maybeTodoForm } =
-    List.map
-        (\todo ->
-            case maybeTodoForm of
-                Just form ->
-                    if TodoForm.isEditingTodoId todo.id form then
-                        viewTodoForm form
-
-                    else
-                        viewDueDateTodoItem todo
-
-                _ ->
-                    viewDueDateTodoItem todo
-        )
+    List.map (viewEditingFormForTodoOr viewDueDateTodoItem maybeTodoForm)
 
 
 viewDueDateTodoItem : Todo -> H.Html Msg

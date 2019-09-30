@@ -9,7 +9,7 @@ module TodoForm exposing
     , initAdd
     , initEdit
     , isAddingForInitialDueDate
-    , isEditingTodoId
+    , isEditingFor
     , setProjectSortIdx
     , toPartialWithMeta
     , viewTodoForm
@@ -69,8 +69,8 @@ unwrapMeta (TodoForm meta _ _) =
     meta
 
 
-isEditingTodoId : TodoId -> TodoForm -> Bool
-isEditingTodoId todoId =
+isEditingFor : TodoId -> TodoForm -> Bool
+isEditingFor todoId =
     unwrapMeta >> (==) (Edit todoId)
 
 
