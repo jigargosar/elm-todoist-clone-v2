@@ -3,9 +3,9 @@ module TodoForm exposing
     , Partial
     , TodoForm
     , createConfig
-    , fromPartial
     , getProjectSortIdx
-    , initBy
+    , initAdd
+    , initEdit
     , initialDueDateEq
     , setProjectSortIdx
     , toPartial
@@ -21,6 +21,7 @@ import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
+import Todo exposing (Todo)
 import TodoId exposing (TodoId)
 import UI exposing (btn2, col, ipt2, row)
 
@@ -95,8 +96,8 @@ empty =
     InternalConstructor "" Nothing Nothing Random.maxInt
 
 
-initBy : (Internal -> Internal) -> TodoForm
-initBy func =
+initAdd : (Internal -> Internal) -> TodoForm
+initAdd func =
     init Add <| func empty
 
 
@@ -105,9 +106,9 @@ init meta internal =
     TodoForm meta internal internal
 
 
-fromPartial : Partial a -> TodoForm
-fromPartial { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    init Add <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
+initEdit : Todo -> TodoForm
+initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
+    init (Edit id) <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg

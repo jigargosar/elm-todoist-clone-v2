@@ -221,7 +221,7 @@ update msg model =
         AddTodoOnDueDateClicked dueDate ->
             ( model
                 |> setTodoForm
-                    ( TodoForm.initBy (\d -> { d | maybeDueDate = Just dueDate })
+                    ( TodoForm.initAdd (\d -> { d | maybeDueDate = Just dueDate })
                     , AddTodoMeta
                     )
             , Cmd.none
@@ -233,7 +233,7 @@ update msg model =
                     ( getInsertTodoInProjectForm model.maybeTodoFormWithMeta
                         |> Maybe.map (TodoForm.setProjectSortIdx idx)
                         |> Maybe.withDefault
-                            (TodoForm.initBy
+                            (TodoForm.initAdd
                                 (\d ->
                                     { d
                                         | maybeProjectId = maybeProjectId
@@ -248,7 +248,7 @@ update msg model =
 
         EditTodoClicked todo ->
             ( model
-                |> setTodoForm ( TodoForm.fromPartial todo, EditTodoMeta todo.id )
+                |> setTodoForm ( TodoForm.initEdit todo, EditTodoMeta todo.id )
             , Cmd.none
             )
 
