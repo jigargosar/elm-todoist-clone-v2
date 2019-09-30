@@ -575,7 +575,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
 
         viewTodoItem : Int -> Todo -> H.Html Msg
         viewTodoItem =
-            viewProjectTodoItem maybeProjectId model.today
+            viewProjectTodoItem model.today
     in
     case maybeTodoFormWithMeta of
         Just ( form, InsertTodoInProjectMeta formIdx ) ->
@@ -626,8 +626,8 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                 ++ [ viewAddTodoButton (InsertTodoInProjectClicked Random.maxInt maybeProjectId) ]
 
 
-viewProjectTodoItem : Maybe ProjectId -> Date -> Int -> Todo -> H.Html Msg
-viewProjectTodoItem maybeProject today idx todo =
+viewProjectTodoItem : Date -> Int -> Todo -> H.Html Msg
+viewProjectTodoItem today idx todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -643,8 +643,8 @@ viewProjectTodoItem maybeProject today idx todo =
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                 )
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "Insert Above" (InsertTodoInProjectClicked idx maybeProject)
-            , btn2 "Insert Below" (InsertTodoInProjectClicked (idx + 1) maybeProject)
+            [ btn2 "Insert Above" (InsertTodoInProjectClicked idx todo.maybeProjectId)
+            , btn2 "Insert Below" (InsertTodoInProjectClicked (idx + 1) todo.maybeProjectId)
             , btn2 "UP" (MoveUp todo.id)
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
