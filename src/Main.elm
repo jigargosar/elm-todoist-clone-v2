@@ -586,20 +586,12 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                 formIdx =
                     clampListIndex filteredTodoList formIdx_
             in
-            filteredTodoList
-                |> List.indexedMap
-                    (\currentIdx todo ->
-                        let
-                            todoItemHtml =
-                                viewTodoItem todo
-                        in
-                        if currentIdx == formIdx then
-                            [ formHtml, todoItemHtml ]
-
-                        else
-                            [ todoItemHtml ]
-                    )
-                |> List.concat
+            LX.splitAt formIdx filteredTodoList
+                |> (\( l, r ) ->
+                        List.map viewTodoItem l
+                            ++ [ formHtml ]
+                            ++ List.map viewTodoItem r
+                   )
 
         Just ( form, EditTodoMeta editTodo ) ->
             filteredTodoList
