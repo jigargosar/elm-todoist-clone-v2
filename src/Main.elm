@@ -722,6 +722,7 @@ viewEditTodoFormOr viewFunc model todo =
         |> MX.unpack (\_ -> viewFunc model todo) (viewTodoForm model.projectList)
 
 
+viewEditableTodoList : (Model -> Todo -> H.Html Msg) -> Model -> List Todo -> List (H.Html Msg)
 viewEditableTodoList viewFunc model todoList =
     List.map (viewEditTodoFormOr viewFunc model) todoList
 
