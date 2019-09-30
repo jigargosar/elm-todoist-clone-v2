@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, row)
+import UI exposing (btn2, checkbox3, col, ipt1, ipt2, row)
 
 
 type Route
@@ -408,7 +408,10 @@ view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
         col [ A.class "sans-serif ph4" ]
-            [ row [ A.class "bg-black-10 pa1" ] [ btn2 "Reset" ResetModel ]
+            [ row [ A.class "bg-black-10 pa1" ]
+                [ btn2 "Reset" ResetModel
+                , row [] [ ipt1 "Search" ]
+                ]
             , row []
                 [ col [ A.class "pa2" ] (viewNav model)
                 , col [ A.class "pa2 flex-grow-1 bl b--black-10 measure-wide" ] (viewRoute model model.route)

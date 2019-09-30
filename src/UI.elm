@@ -57,3 +57,8 @@ btn1 title =
 ipt2 : String -> (String -> msg) -> H.Html msg
 ipt2 val msg =
     H.input [ A.value val, E.onInput msg ] []
+
+
+ipt1 : String -> H.Html msg
+ipt1 val =
+    H.input [ A.value val ] []
