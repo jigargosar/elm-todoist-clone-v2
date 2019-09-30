@@ -299,9 +299,7 @@ update msg model =
             )
 
         PatchTodoForm todoForm ->
-            ( model |> mapTodoForm (always todoForm)
-            , Cmd.none
-            )
+            ( { model | maybeTodoForm = Just todoForm }, Cmd.none )
 
         Save ->
             case model.maybeTodoForm of
@@ -315,11 +313,6 @@ update msg model =
             ( { model | maybeTodoForm = Nothing }
             , Cmd.none
             )
-
-
-mapTodoForm : (a -> a) -> { b | maybeTodoForm : Maybe a } -> { b | maybeTodoForm : Maybe a }
-mapTodoForm func model =
-    { model | maybeTodoForm = model.maybeTodoForm |> Maybe.map func }
 
 
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
