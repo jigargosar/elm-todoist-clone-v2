@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, idEq, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -74,3 +74,12 @@ insertAt : Int -> a -> List a -> List a
 insertAt i c =
     List.Extra.splitAt i
         >> (\( l, r ) -> l ++ [ c ] ++ r)
+
+
+ifElse : (a -> Bool) -> (a -> b) -> (a -> b) -> a -> b
+ifElse bool true false val =
+    if bool val then
+        true val
+
+    else
+        false val
