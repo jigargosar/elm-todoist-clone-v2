@@ -323,23 +323,35 @@ saveTodoForm ( form, meta ) model =
         partial =
             TodoForm.toPartial form
 
-        ( todo, newModel ) =
+        newModel =
             case meta of
                 InsertTodoInProjectMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
+                        |> uncurry insertTodo
 
                 AddDueAtTodoMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
+                        |> uncurry insertTodo
 
-                EditTodoMeta editingTodo ->
-                    ( Todo.patchWithPartial (TodoForm.toPartial form) editingTodo
-                    , model
-                    )
+                EditTodoMeta { id } ->
+                    LX.find (idEq id) model.todoList
+                        |> Maybe.map
+                            (\existingTodo ->
+                                let
+                                    newTodo =
+                                        Todo.patchWithPartial (TodoForm.toPartial form) existingTodo
+                                in
+                                updateTodo existingTodo newTodo model
+                            )
+                        |> Maybe.withDefault model
     in
     ( { newModel | maybeTodoFormWithMeta = Nothing }
-        |> upsertTodoAndUpdateSortIndices todo
     , Cmd.none
     )
+
+
+uncurry fn ( a, b ) =
+    fn a b
 
 
 sortedTodoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
