@@ -1,26 +1,9 @@
 module Project exposing (Project, mockProjects, viewSelectOne)
 
-import Basics.More exposing (HasId, allPass, idEq, propEq, updateWhenIdEq, upsertById)
-import Browser
-import Date exposing (Date)
-import HasSeed
-import Html
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
-import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Pipeline exposing (optional, required)
-import Json.Encode as JE exposing (Value, encode, object)
-import List.Extra as LX
-import Maybe.Extra as MX
 import ProjectId exposing (ProjectId)
-import Random
-import Return
-import Task
-import Time
-import Todo exposing (Todo)
-import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, colKeyed, ipt2, row)
 
 
 type alias Project =
