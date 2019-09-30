@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, ipt2, row)
+import UI exposing (btn2, checkbox3, col, ipt2, ipt3, row)
 
 
 type Route
@@ -411,13 +411,27 @@ subscriptions _ =
     Sub.none
 
 
+getSearchQuery : Route -> String
+getSearchQuery route =
+    case route of
+        RouteSearch qs ->
+            qs
+
+        _ ->
+            ""
+
+
 view : Model -> Html.Html Msg
 view model =
     H.toUnstyled <|
         col [ A.class "sans-serif ph4" ]
             [ row [ A.class "bg-black-10 pa1" ]
                 [ btn2 "Reset" ResetModel
-                , row [] [ ipt2 "Search" (ChangeRouteTo << RouteSearch) ]
+                , row []
+                    [ ipt3 (getSearchQuery model.route)
+                        (ChangeRouteTo << RouteSearch)
+                        [ A.placeholder "Search" ]
+                    ]
                 ]
             , row []
                 [ col [ A.class "pa2" ] (viewNav model)

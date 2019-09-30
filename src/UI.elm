@@ -54,6 +54,11 @@ btn1 title =
     H.button [ A.class "ph2 pv1 color-primary" ] [ H.text title ]
 
 
+ipt3 : String -> (String -> msg) -> List (H.Attribute msg) -> H.Html msg
+ipt3 val msg attrs =
+    H.input ([ A.value val, E.onInput msg ] ++ attrs) []
+
+
 ipt2 : String -> (String -> msg) -> H.Html msg
 ipt2 val msg =
     H.input [ A.value val, E.onInput msg ] []
