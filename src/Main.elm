@@ -75,7 +75,7 @@ routeDecoder =
                 _ ->
                     JD.fail <| "Invalid route tag: " ++ tag
     in
-    JD.string |> JD.andThen decoderFromTag
+    JD.field "tag" JD.string |> JD.andThen (JD.field "val" << decoderFromTag)
 
 
 
@@ -99,27 +99,30 @@ port setCache : String -> Cmd msg
 
 type alias Cache =
     { todoList : List Todo
+    , route : Route
     }
 
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = Todo.mockList }
+    { todoList = Todo.mockList, route = RouteInbox }
 
 
 cacheDecoder : JD.Decoder Cache
 cacheDecoder =
     JD.succeed Cache
-        |> optional "todoList" (JD.list Todo.decoder) Todo.mockList
+        |> optional "todoList" (JD.list Todo.decoder) defaultCacheValue.todoList
+        |> optional "route" routeDecoder defaultCacheValue.route
 
 
 cacheModel_ : Model -> Cmd msg
 cacheModel_ model =
     let
         modelEncoder : Model -> Value
-        modelEncoder { todoList } =
+        modelEncoder { todoList, route } =
             object
                 [ ( "todoList", JE.list Todo.encoder todoList )
+                , ( "route", routeEncoder route )
                 ]
 
         modelValue =
@@ -171,11 +174,11 @@ type alias Model =
 
 defaultModel : Model
 defaultModel =
-    { todoList = Todo.mockList
+    { todoList = defaultCacheValue.todoList
     , maybeTodoFormWithMeta = Nothing
 
     --    , route = RouteProject (ProjectId "1")
-    , route = RouteNext7Days
+    , route = defaultCacheValue.route
     , zone = Time.utc
     , today = Date.fromRataDie 0
     , seed = Random.initialSeed 0
@@ -192,7 +195,11 @@ init flags =
 
         model : Model
         model =
-            { defaultModel | todoList = cache.todoList, seed = Random.initialSeed flags.now }
+            { defaultModel
+                | todoList = cache.todoList
+                , route = cache.route
+                , seed = Random.initialSeed flags.now
+            }
     in
     refreshModel model
 
