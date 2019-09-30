@@ -715,11 +715,7 @@ viewAddTodoFormForInitialDueDate dueDate { projectList, maybeTodoForm } =
         >> Maybe.map (viewTodoForm projectList)
 
 
-viewEditTodoFormOr :
-    ({ a | today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm } -> Todo -> H.Html Msg)
-    -> { a | today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm }
-    -> Todo
-    -> H.Html Msg
+viewEditTodoFormOr : (Model -> Todo -> H.Html Msg) -> Model -> Todo -> H.Html Msg
 viewEditTodoFormOr viewFunc model todo =
     model.maybeTodoForm
         |> MX.filter (TodoForm.isEditingFor todo.id)
