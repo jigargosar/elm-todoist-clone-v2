@@ -550,7 +550,7 @@ viewRoute model route =
 
 
 
--- VIEW DUE_DATE TODO_LIST
+-- VIEW DUE_DATE TODO_ROUTES
 
 
 viewNext7DaysTodoList : Model -> List (H.Html Msg)
@@ -629,7 +629,7 @@ viewDueDateTodoItem todo =
 
 
 
--- VIEW PROJECT TODO_LIST
+-- VIEW PROJECT_TODO_LIST ROUTE
 
 
 viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
@@ -693,6 +693,10 @@ viewProjectTodoItem today todo =
             , btn2 "X" (DeleteTodo todo.id)
             ]
         ]
+
+
+
+-- VIEW SEARCH ROUTE
 
 
 viewSearchTodoItem : Date -> Todo -> H.Html Msg
