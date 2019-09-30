@@ -722,12 +722,15 @@ viewSearchResults query model =
         viewTodoItem =
             viewSearchTodoItem model.today model.projectList
 
+        viewForm =
+            viewTodoForm model.projectList
+
         contentHtml =
             List.map
                 (\todo ->
                     case editFormForTodoId todo.id model.maybeTodoForm of
                         Just form ->
-                            viewTodoForm model.projectList form
+                            viewForm form
 
                         Nothing ->
                             viewTodoItem todo
