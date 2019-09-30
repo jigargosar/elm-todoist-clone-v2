@@ -36,7 +36,7 @@ type alias Partial a =
     }
 
 
-toPartial : TodoForm -> Internal
+toPartial : TodoForm -> Partial {}
 toPartial (TodoForm internal) =
     internal
 
