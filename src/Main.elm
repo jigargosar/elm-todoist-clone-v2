@@ -584,7 +584,7 @@ viewTodoListDueOn dueDate model =
         addButtonHtml =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
-    col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate model.today ]
+    col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
         :: List.map (viewEditTodoFormOr (viewDueDateTodoItem model) model) filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate model
                 |> Maybe.withDefault addButtonHtml
@@ -621,7 +621,7 @@ viewTodoListForMaybeProjectId maybeProjectId model =
 
         viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
-            viewProjectTodoItem model.today
+            viewProjectTodoItem model
     in
     case model.maybeTodoForm of
         Just form ->
@@ -650,8 +650,8 @@ viewTodoListForMaybeProjectId maybeProjectId model =
                 ++ [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
 
 
-viewProjectTodoItem : Date -> Todo -> H.Html Msg
-viewProjectTodoItem today todo =
+viewProjectTodoItem : { a | today : Date } -> Todo -> H.Html Msg
+viewProjectTodoItem model todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -664,7 +664,7 @@ viewProjectTodoItem today todo =
         , todo.maybeDueDate
             |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
                 (\dueDate ->
-                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
+                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
                 )
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
@@ -711,7 +711,7 @@ viewSearchResults query model =
 
 
 viewSearchTodoItem : { a | today : Date, projectList : List Project } -> Todo -> H.Html Msg
-viewSearchTodoItem { today, projectList } todo =
+viewSearchTodoItem model todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -724,10 +724,10 @@ viewSearchTodoItem { today, projectList } todo =
         , todo.maybeDueDate
             |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
                 (\dueDate ->
-                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
+                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
                 )
         , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-            [ H.text <| todoProjectTitle projectList todo ]
+            [ H.text <| todoProjectTitle model.projectList todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -784,7 +784,8 @@ viewAddTodoButton onClick =
     row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
 
 
-humanDate date today =
+humanDate : { a | today : Date } -> Date -> String
+humanDate { today } date =
     let
         addDays ct =
             Date.add Date.Days ct today
