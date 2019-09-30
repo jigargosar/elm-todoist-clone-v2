@@ -650,7 +650,7 @@ viewDueDateTodoItem projectList todo =
 viewProjectTodoList : Maybe ProjectId -> Model -> List (H.Html Msg)
 viewProjectTodoList maybeProjectId model =
     let
-        filteredTodoList =
+        todoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
 
         viewTodoItem : Todo -> H.Html Msg
@@ -665,16 +665,16 @@ viewProjectTodoList maybeProjectId model =
             in
             case TodoForm.getMeta form of
                 TodoForm.Add ->
-                    List.map viewTodoItem filteredTodoList
+                    List.map viewTodoItem todoList
                         |> insertAt (TodoForm.getProjectSortIdx form) formHtml
 
                 TodoForm.Edit todoId ->
                     List.map
                         (ifElse (idEq todoId) (\_ -> formHtml) viewTodoItem)
-                        filteredTodoList
+                        todoList
 
         Nothing ->
-            List.map viewTodoItem filteredTodoList
+            List.map viewTodoItem todoList
                 ++ [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
 
 
