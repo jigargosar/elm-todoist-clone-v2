@@ -1,4 +1,4 @@
-module Todo exposing (Todo, decoder, encoder, generatorFromPartial, mockList, patchWithPartial)
+module Todo exposing (Todo, decoder, encoder, generatorFromPartial, mockList, mockListGenerator, patchWithPartial)
 
 import Date exposing (Date)
 import Json.Decode as JD
@@ -19,6 +19,45 @@ type alias Todo =
     , maybeDueDate : Maybe Date
     , projectSortIdx : Int
     }
+
+
+emptyGenerator : Random.Generator Todo
+emptyGenerator =
+    TodoId.generator
+        |> Random.map (\id -> Todo id "" False False Nothing Nothing 0)
+
+
+mockTitles =
+    [ "Get Milk!!"
+    , "Submit assignment"
+    , "Check Facebook"
+    , "Go to movies"
+    , "Get Coffee"
+    ]
+
+
+mockListGenerator : Random.Generator (List Todo)
+mockListGenerator =
+    Random.list (List.length mockTitles) emptyGenerator
+        |> Random.map (List.map2 setTitle mockTitles >> setSortIndices)
+
+
+map =
+    identity
+
+
+setTitle : String -> Todo -> Todo
+setTitle title =
+    map (\m -> { m | title = title })
+
+
+setProjectSortIdx : Int -> Todo -> Todo
+setProjectSortIdx projectSortIdx =
+    map (\m -> { m | projectSortIdx = projectSortIdx })
+
+
+setSortIndices =
+    List.indexedMap setProjectSortIdx
 
 
 decoder : JD.Decoder Todo
