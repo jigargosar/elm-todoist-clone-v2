@@ -34,21 +34,63 @@ type Route
 
 routeEncoder : Route -> Value
 routeEncoder route =
+    let
+        enc1 name =
+            enc2 name JE.null
+
+        enc2 name val =
+            JE.object [ ( "tag", JE.string name ), ( "val", val ) ]
+    in
     case route of
         RouteInbox ->
-            JE.string "RouteInbox"
+            enc1 "RouteInbox"
 
         RouteToday ->
-            JE.string "RouteToday"
+            enc1 "RouteInbox"
 
         RouteProject projectId ->
-            ProjectId.encoder projectId
+            enc2 "RouteProject" (ProjectId.encoder projectId)
 
         RouteNext7Days ->
-            JE.string "RouteNext7Days"
+            enc1 "RouteNext7Days"
+
+
+routeDecoder : Decoder Route
+routeDecoder =
+    let
+        decoderFromTag tag =
+            case tag of
+                "RouteInbox" ->
+                    JD.succeed RouteInbox
+
+                "RouteToday" ->
+                    JD.succeed RouteToday
+
+                "RouteProject" ->
+                    ProjectId.decoder |> JD.map RouteProject
+
+                "RouteNext7Days" ->
+                    JD.succeed RouteNext7Days
+
+                _ ->
+                    JD.fail <| "Invalid route tag: " ++ tag
+    in
+    JD.string |> JD.andThen decoderFromTag
 
 
 
+--    case route of
+--        RouteInbox ->
+--            enc1 "RouteInbox"
+--
+--        RouteToday ->
+--            enc1 "RouteInbox"
+--
+--        RouteProject projectId ->
+--            enc2 "RouteProject" (ProjectId.encoder projectId)
+--
+--        RouteNext7Days ->
+--            enc1 "RouteNext7Days"
 -- CACHE
 
 
