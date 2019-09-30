@@ -98,8 +98,7 @@ type alias Flags =
 
 
 type TodoFormMeta
-    = AddDueAtTodoMeta Date
-    | InsertTodoInProjectMeta
+    = AddTodoMeta (Maybe Date)
     | EditTodoMeta Todo
 
 
@@ -223,7 +222,7 @@ update msg model =
             ( model
                 |> setTodoForm
                     ( TodoForm.initBy (\d -> { d | maybeDueDate = Just dueDate })
-                    , AddDueAtTodoMeta dueDate
+                    , AddTodoMeta (Just dueDate)
                     )
             , Cmd.none
             )
@@ -242,7 +241,7 @@ update msg model =
                                     }
                                 )
                             )
-                    , InsertTodoInProjectMeta
+                    , AddTodoMeta Nothing
                     )
             , Cmd.none
             )
@@ -285,11 +284,7 @@ saveTodoForm ( form, meta ) model =
 
         newModel =
             case meta of
-                InsertTodoInProjectMeta ->
-                    HasSeed.step (Todo.generatorFromPartial partial) model
-                        |> uncurry insertTodo
-
-                AddDueAtTodoMeta _ ->
+                AddTodoMeta _ ->
                     HasSeed.step (Todo.generatorFromPartial partial) model
                         |> uncurry insertTodo
 
@@ -460,7 +455,7 @@ viewRoute model route =
 getInsertTodoInProjectForm : Maybe ( a, TodoFormMeta ) -> Maybe a
 getInsertTodoInProjectForm maybeForm =
     case maybeForm of
-        Just ( form, InsertTodoInProjectMeta ) ->
+        Just ( form, AddTodoMeta _ ) ->
             Just form
 
         _ ->
@@ -524,8 +519,8 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoFormWithMeta } as model) 
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
         :: viewEditableTodoList model filteredTodoList
         ++ [ case maybeTodoFormWithMeta of
-                Just ( form, AddDueAtTodoMeta date_ ) ->
-                    if date_ == dueDate then
+                Just ( form, AddTodoMeta date_ ) ->
+                    if date_ == Just dueDate then
                         viewTodoForm form
 
                     else
@@ -586,7 +581,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
             viewProjectTodoItem model.today
     in
     case maybeTodoFormWithMeta of
-        Just ( form, InsertTodoInProjectMeta ) ->
+        Just ( form, AddTodoMeta _ ) ->
             let
                 formHtml =
                     viewTodoForm form
@@ -612,7 +607,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                             viewTodoItem todo
                     )
 
-        _ ->
+        Nothing ->
             List.map viewTodoItem filteredTodoList
                 ++ [ viewAddTodoButton (InsertTodoInProjectClicked Random.maxInt maybeProjectId) ]
 
