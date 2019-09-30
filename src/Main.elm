@@ -577,6 +577,11 @@ editFormForTodoId todoId maybeTodoForm =
         |> MX.filter (TodoForm.isEditingFor todoId)
 
 
+addFormWithInitialDueDate dueDate maybeTodoForm =
+    maybeTodoForm
+        |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
+
+
 viewOverDueTodoList : Model -> List (H.Html Msg)
 viewOverDueTodoList model =
     unlessEmpty
@@ -602,14 +607,10 @@ viewTodoListDueOn dueDate model =
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
 
-        isEditingFor todoId =
-            model.maybeTodoForm
-                |> MX.filter (TodoForm.isEditingFor todoId)
-
         contentHtml =
             List.map
                 (\todo ->
-                    case isEditingFor todo.id of
+                    case editFormForTodoId todo.id model.maybeTodoForm of
                         Just form ->
                             viewTodoForm model.projectList form
 
@@ -620,8 +621,7 @@ viewTodoListDueOn dueDate model =
 
         footerHtml =
             case
-                model.maybeTodoForm
-                    |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
+                addFormWithInitialDueDate dueDate model.maybeTodoForm
             of
                 Just form ->
                     viewTodoForm model.projectList form
