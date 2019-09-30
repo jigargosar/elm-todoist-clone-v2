@@ -1,6 +1,6 @@
 port module Main exposing (main, viewSearchResults)
 
-import Basics.More exposing (HasId, allPass, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, clampListLength, idEq, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -661,17 +661,8 @@ viewProjectTodoList maybeProjectId model =
         Just form ->
             case TodoForm.getMeta form of
                 TodoForm.Add ->
-                    let
-                        formIdx =
-                            clamp 0 (List.length filteredTodoList) (TodoForm.getProjectSortIdx form)
-
-                        insertAt : Int -> a -> List a -> List a
-                        insertAt i c =
-                            LX.splitAt i
-                                >> (\( l, r ) -> l ++ [ c ] ++ r)
-                    in
                     List.map viewTodoItem filteredTodoList
-                        |> insertAt formIdx (viewTodoForm model.projectList form)
+                        |> insertAt (TodoForm.getProjectSortIdx form) (viewTodoForm model.projectList form)
 
                 TodoForm.Edit _ ->
                     viewEditableTodoList viewProjectTodoItem model filteredTodoList

@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, idEq, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -68,3 +68,9 @@ clampListIndex list =
 clampListLength : List a -> Int -> Int
 clampListLength list =
     clamp 0 (List.length list)
+
+
+insertAt : Int -> a -> List a -> List a
+insertAt i c =
+    List.Extra.splitAt i
+        >> (\( l, r ) -> l ++ [ c ] ++ r)
