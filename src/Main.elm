@@ -578,7 +578,7 @@ viewOverDueTodoList model =
         (\todoList ->
             col [] [ H.text "OverDue" ] :: viewEditableTodoList viewDueDateTodoItem model todoList
         )
-        (List.filter (overDuePred model.today) model.todoList)
+        (filterTodoList (overDuePred model.today) model)
 
 
 filterTodoList : (Todo -> Bool) -> { b | todoList : List Todo } -> List Todo
