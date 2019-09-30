@@ -222,7 +222,7 @@ type Msg
     | MoveUp TodoId
     | MoveDown TodoId
     | AddTodoOnDueDateClicked Date
-    | InsertTodoInProjectClicked Int (Maybe ProjectId)
+    | AddTodoInProjectAtClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | PatchTodoForm TodoForm
     | Save
@@ -274,7 +274,7 @@ update msg model =
             , Cmd.none
             )
 
-        InsertTodoInProjectClicked idx maybeProjectId ->
+        AddTodoInProjectAtClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
                     (model.maybeTodoForm
@@ -698,7 +698,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
 
         Nothing ->
             List.map viewTodoItem filteredTodoList
-                ++ [ viewAddTodoButton (InsertTodoInProjectClicked Random.maxInt maybeProjectId) ]
+                ++ [ viewAddTodoButton (AddTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
 
 
 viewProjectTodoItem : Date -> Todo -> H.Html Msg
@@ -718,8 +718,8 @@ viewProjectTodoItem today todo =
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                 )
         , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "Insert Above" (InsertTodoInProjectClicked todo.projectSortIdx todo.maybeProjectId)
-            , btn2 "Insert Below" (InsertTodoInProjectClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+            [ btn2 "Insert Above" (AddTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+            , btn2 "Insert Below" (AddTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
             , btn2 "UP" (MoveUp todo.id)
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
