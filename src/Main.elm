@@ -598,22 +598,25 @@ viewTodoListDueOn dueDate model =
                 (filterTodoList (dueOnPred dueDate) model)
 
         footerHtml =
-            viewAddTodoFormForInitialDueDate dueDate model
-                |> Maybe.withDefault (viewAddTodoButton (AddTodoOnDueDateClicked dueDate))
-
-        footerHtml2 =
-            viewATF
+            viewAddTodoFormForInitialDueDate
                 { viewForm = viewTodoForm model.projectList
                 , viewOtherwise = \_ -> viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
                 }
+                dueDate
                 model.maybeTodoForm
-
-        viewATF { viewOtherwise, viewForm } maybeTodoForm =
-            maybeTodoForm
-                |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
-                >> MX.unpack viewOtherwise viewForm
     in
-    [ titleHtml ] ++ contentHtml ++ [ footerHtml2 ]
+    [ titleHtml ] ++ contentHtml ++ [ footerHtml ]
+
+
+viewAddTodoFormForInitialDueDate :
+    { viewOtherwise : () -> b, viewForm : TodoForm -> b }
+    -> Date
+    -> Maybe TodoForm
+    -> b
+viewAddTodoFormForInitialDueDate { viewOtherwise, viewForm } dueDate maybeTodoForm =
+    maybeTodoForm
+        |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
+        >> MX.unpack viewOtherwise viewForm
 
 
 viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
@@ -728,16 +731,6 @@ viewSearchTodoItem model todo =
 
 
 -- VIEW TODO_FORM HELPERS
-
-
-viewAddTodoFormForInitialDueDate :
-    Date
-    -> { a | projectList : List Project, maybeTodoForm : Maybe TodoForm }
-    -> Maybe (H.Html Msg)
-viewAddTodoFormForInitialDueDate dueDate { projectList, maybeTodoForm } =
-    maybeTodoForm
-        |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
-        >> Maybe.map (viewTodoForm projectList)
 
 
 viewEditTodoFormOr : (Model -> Todo -> H.Html Msg) -> Model -> Todo -> H.Html Msg
