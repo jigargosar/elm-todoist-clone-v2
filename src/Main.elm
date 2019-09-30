@@ -769,7 +769,7 @@ viewTodoForm =
 
 
 
--- VIEW HELPERS
+-- VIEW TODO_ITEM HELPERS
 
 
 todoProjectTitle : List Project -> Todo -> String
@@ -777,11 +777,6 @@ todoProjectTitle projectList { maybeProjectId } =
     projectList
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
         |> MX.unwrap "Inbox" .title
-
-
-viewAddTodoButton : Msg -> H.Html Msg
-viewAddTodoButton onClick =
-    row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
 
 
 humanDate : { a | today : Date } -> Date -> String
@@ -804,6 +799,15 @@ humanDate { today } date =
 
     else
         Date.format "ddd MMM YYYY" date
+
+
+
+-- VIEW HELPERS
+
+
+viewAddTodoButton : Msg -> H.Html Msg
+viewAddTodoButton onClick =
+    row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
 
 
 main : Program Flags Model Msg
