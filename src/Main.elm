@@ -635,8 +635,7 @@ viewTodoListForMaybeProjectId maybeProjectId model =
                            )
 
                 TodoForm.Edit _ ->
-                    List.map (viewEditTodoFormOr viewTodoItem model)
-                        filteredTodoList
+                    List.map (viewEditTodoFormOr viewTodoItem model) filteredTodoList
 
         Nothing ->
             List.map viewTodoItem filteredTodoList
