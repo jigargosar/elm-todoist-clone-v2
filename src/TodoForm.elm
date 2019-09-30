@@ -12,7 +12,7 @@ import UI exposing (btn2, col, ipt2, row)
 
 
 type TodoForm
-    = TodoForm Internal
+    = TodoForm Internal Internal
 
 
 type alias Internal =
@@ -37,7 +37,7 @@ type alias Partial a =
 
 
 toPartial : TodoForm -> Partial {}
-toPartial (TodoForm internal) =
+toPartial (TodoForm _ internal) =
     internal
 
 
@@ -46,7 +46,8 @@ getProjectSortIdx =
     unwrap >> .projectSortIdx
 
 
-unwrap (TodoForm internal) =
+unwrap : TodoForm -> Internal
+unwrap (TodoForm _ internal) =
     internal
 
 
@@ -56,8 +57,8 @@ setProjectSortIdx projectSortIdx =
 
 
 map : (Internal -> Internal) -> TodoForm -> TodoForm
-map func (TodoForm internal) =
-    TodoForm <| func internal
+map func (TodoForm initial internal) =
+    TodoForm initial <| func internal
 
 
 empty : Internal
@@ -67,12 +68,17 @@ empty =
 
 initBy : (Internal -> Internal) -> TodoForm
 initBy func =
-    TodoForm <| func empty
+    init <| func empty
+
+
+init : Internal -> TodoForm
+init internal =
+    TodoForm internal internal
 
 
 fromPartial : Partial a -> TodoForm
 fromPartial { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    TodoForm <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
+    init <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg
@@ -85,10 +91,10 @@ createConfig =
 
 
 viewTodoForm : Config msg -> TodoForm -> H.Html msg
-viewTodoForm (Config { onSave, onCancel, toMsg }) (TodoForm model) =
+viewTodoForm (Config { onSave, onCancel, toMsg }) (TodoForm initial model) =
     let
         onChange =
-            toMsg << TodoForm
+            toMsg << TodoForm initial
 
         titleChanged title =
             onChange { model | title = title }
