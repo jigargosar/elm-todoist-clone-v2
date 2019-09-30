@@ -210,23 +210,7 @@ update msg model =
                     LX.find (idEq todoId) model.todoList
                         |> Maybe.map
                             (\todo ->
-                                let
-                                    projectTodoList =
-                                        sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
-
-                                    idx =
-                                        LX.findIndex (idEq todo.id) projectTodoList |> Maybe.withDefault -1
-
-                                    prevIdx =
-                                        idx - 1
-
-                                    updatedProjectTodoList =
-                                        LX.swapAt idx prevIdx projectTodoList
-                                            |> List.indexedMap (\i t -> { t | projectSortIdx = i })
-                                in
-                                { model
-                                    | todoList = List.foldl upsertById model.todoList updatedProjectTodoList
-                                }
+                                updateTodo todo { todo | projectSortIdx = todo.projectSortIdx - 1 } model
                             )
                         |> Maybe.withDefault model
             in
@@ -238,23 +222,7 @@ update msg model =
                     LX.find (idEq todoId) model.todoList
                         |> Maybe.map
                             (\todo ->
-                                let
-                                    projectTodoList =
-                                        sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
-
-                                    idx =
-                                        LX.findIndex (idEq todo.id) projectTodoList |> Maybe.withDefault -1
-
-                                    nextIdx =
-                                        idx + 1
-
-                                    updatedProjectTodoList =
-                                        LX.swapAt idx nextIdx projectTodoList
-                                            |> List.indexedMap (\i t -> { t | projectSortIdx = i })
-                                in
-                                { model
-                                    | todoList = List.foldl upsertById model.todoList updatedProjectTodoList
-                                }
+                                updateTodo todo { todo | projectSortIdx = todo.projectSortIdx + 1 } model
                             )
                         |> Maybe.withDefault model
             in
