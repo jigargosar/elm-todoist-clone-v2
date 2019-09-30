@@ -58,6 +58,7 @@ type alias Partial a =
         | title : String
         , maybeProjectId : Maybe ProjectId
         , maybeDueDate : Maybe Date
+        , projectSortIdx : Int
     }
 
 
@@ -73,8 +74,13 @@ generatorFromPartial partial =
 
 
 patchWithPartial : Partial a -> Todo -> Todo
-patchWithPartial { title, maybeProjectId, maybeDueDate } todo =
-    { todo | title = title, maybeProjectId = maybeProjectId, maybeDueDate = maybeDueDate }
+patchWithPartial p todo =
+    { todo
+        | title = p.title
+        , maybeProjectId = p.maybeProjectId
+        , maybeDueDate = p.maybeDueDate
+        , projectSortIdx = p.projectSortIdx
+    }
 
 
 createMockTodo : String -> String -> Maybe Todo
