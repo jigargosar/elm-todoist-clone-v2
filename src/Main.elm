@@ -167,8 +167,6 @@ defaultModel : Model
 defaultModel =
     { todoList = defaultCacheValue.todoList
     , maybeTodoForm = Nothing
-
-    --    , route = RouteProject (ProjectId "1")
     , route = defaultCacheValue.route
     , zone = Time.utc
     , today = Date.fromRataDie 0
