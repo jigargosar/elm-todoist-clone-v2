@@ -606,12 +606,6 @@ viewTodoListDueOn dueDate model =
     [ titleHtml ] ++ contentHtml ++ [ footerHtml ]
 
 
-unpackAddTodoFormForDueDate dueDate viewOtherwise viewForm maybeTodoForm =
-    maybeTodoForm
-        |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
-        >> MX.unpack viewOtherwise viewForm
-
-
 viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
 viewDueDateTodoItem model todo =
     row [ A.class "hide-child relative" ]
