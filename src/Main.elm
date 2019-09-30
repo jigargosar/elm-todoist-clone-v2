@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, clampListIndex, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, clampListLength, idEq, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, ipt1, ipt2, row)
+import UI exposing (btn2, checkbox3, col, ipt1, row)
 
 
 type Route
@@ -30,6 +30,7 @@ type Route
     | RouteToday
     | RouteProject ProjectId
     | RouteNext7Days
+    | RouteSearch String
 
 
 routeEncoder : Route -> Value
@@ -54,6 +55,9 @@ routeEncoder route =
         RouteNext7Days ->
             enc1 "RouteNext7Days"
 
+        RouteSearch query ->
+            enc2 "RouteSearch" (JE.string query)
+
 
 routeDecoder : Decoder Route
 routeDecoder =
@@ -71,6 +75,9 @@ routeDecoder =
 
                 "RouteNext7Days" ->
                     JD.succeed RouteNext7Days
+
+                "RouteSearch" ->
+                    JD.string |> JD.map RouteSearch
 
                 _ ->
                     JD.fail <| "Invalid route tag: " ++ tag
@@ -498,6 +505,9 @@ viewRoute model route =
 
         RouteNext7Days ->
             viewNext7DaysTodoList model
+
+        RouteSearch query ->
+            []
 
 
 
