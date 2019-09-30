@@ -594,9 +594,7 @@ viewTodoListDueOn dueDate model =
 viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
 viewDueDateTodoItem model todo =
     row [ A.class "hide-child relative" ]
-        [ row [ A.class "pa1" ]
-            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
-            ]
+        [ viewTodoCheckbox todo
         , viewTodoTitle todo
         , viewTodoProjectPill model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
@@ -648,9 +646,7 @@ viewTodoListForMaybeProjectId maybeProjectId model =
 viewProjectTodoItem : { a | today : Date } -> Todo -> H.Html Msg
 viewProjectTodoItem model todo =
     row [ A.class "hide-child relative" ]
-        [ row [ A.class "pa1" ]
-            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
-            ]
+        [ viewTodoCheckbox todo
         , viewTodoTitle todo
         , viewTodoDueDate model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
@@ -700,15 +696,9 @@ viewSearchResults query model =
 viewSearchTodoItem : { a | today : Date, projectList : List Project } -> Todo -> H.Html Msg
 viewSearchTodoItem model todo =
     row [ A.class "hide-child relative" ]
-        [ row [ A.class "pa1" ]
-            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
-            ]
+        [ viewTodoCheckbox todo
         , viewTodoTitle todo
-        , todo.maybeDueDate
-            |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
-                (\dueDate ->
-                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
-                )
+        , viewTodoDueDate model todo
         , viewTodoProjectPill model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
@@ -752,6 +742,13 @@ viewTodoForm =
 
 
 -- VIEW TODO_ITEM HELPERS
+
+
+viewTodoCheckbox : Todo -> H.Html Msg
+viewTodoCheckbox todo =
+    row [ A.class "pa1" ]
+        [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
+        ]
 
 
 viewTodoTitle : Todo -> H.Html Msg
