@@ -7,7 +7,6 @@ import Html.Styled.Events as E
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
-import Random
 import Todo exposing (Todo)
 import UI exposing (btn2, col, ipt2, row)
 
