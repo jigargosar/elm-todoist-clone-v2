@@ -533,7 +533,7 @@ viewRoute model route =
                 filtered =
                     model.todoList |> List.filter pred
             in
-            [ col [] (filtered |> List.map viewDueDateTodoItem) ]
+            [ col [] (filtered |> List.map (viewSearchTodoItem model.today)) ]
 
 
 
@@ -711,6 +711,29 @@ viewProjectTodoItem today todo =
             , btn2 "DN" (MoveDown todo.id)
             , btn2 "X" (DeleteTodo todo.id)
             ]
+        ]
+
+
+viewSearchTodoItem : Date -> Todo -> H.Html Msg
+viewSearchTodoItem today todo =
+    row [ A.class "hide-child relative" ]
+        [ row [ A.class "pa1" ]
+            [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
+            ]
+        , row
+            [ A.class "pa1 flex-grow-1"
+            , E.onClick (EditTodoClicked todo)
+            ]
+            [ H.text todo.title ]
+        , todo.maybeDueDate
+            |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
+                (\dueDate ->
+                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
+                )
+        , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
+            [ H.text <| todoProjectTitle todo ]
+        , row [ A.class "child absolute right-0 bg-white-90" ]
+            [ btn2 "X" (DeleteTodo todo.id) ]
         ]
 
 
