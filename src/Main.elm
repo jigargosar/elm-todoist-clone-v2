@@ -566,7 +566,7 @@ viewOverDueTodoList model =
 
     else
         col [] [ H.text "OverDue" ]
-            :: List.map (viewEditTodoFormOr viewDueDateTodoItem model) filteredTodoList
+            :: viewEditableTodoList viewDueDateTodoItem model filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -585,7 +585,7 @@ viewTodoListDueOn dueDate model =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
-        :: List.map (viewEditTodoFormOr viewDueDateTodoItem model) filteredTodoList
+        :: viewEditableTodoList viewDueDateTodoItem model filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate model
                 |> Maybe.withDefault addButtonHtml
            ]
@@ -635,7 +635,7 @@ viewTodoListForMaybeProjectId maybeProjectId model =
                            )
 
                 TodoForm.Edit _ ->
-                    List.map (viewEditTodoFormOr viewProjectTodoItem model) filteredTodoList
+                    viewEditableTodoList viewProjectTodoItem model filteredTodoList
 
         Nothing ->
             List.map viewTodoItem filteredTodoList
