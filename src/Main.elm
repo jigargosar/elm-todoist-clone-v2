@@ -725,18 +725,19 @@ viewSearchResults query model =
         viewForm =
             viewTodoForm model.projectList
 
-        contentHtml =
+        todoListHtml =
             List.map
                 (\todo ->
                     editFormForTodoId todo.id model.maybeTodoForm
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 todoList
+
+        projectListHtml =
+            List.map viewProject filteredProjects
     in
-    (col [] [ H.text "Tasks" ] :: contentHtml)
-        ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ]
-                :: List.map viewProject filteredProjects
-           )
+    (col [] [ H.text "Tasks" ] :: todoListHtml)
+        ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: projectListHtml)
 
 
 viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
