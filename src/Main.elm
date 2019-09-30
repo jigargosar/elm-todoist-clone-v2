@@ -444,14 +444,14 @@ view model =
 
 
 viewNav : Model -> List (H.Html Msg)
-viewNav { route } =
+viewNav { route, projectList } =
     let
         navItems =
             [ NavInbox
             , NavToday
             , NavNext7Days
             , NavProjects
-                (Project.mockProjects |> List.map NavProject)
+                (projectList |> List.map NavProject)
             ]
     in
     navItems |> List.map (viewNavItem route)
@@ -695,7 +695,7 @@ viewSearchResults query model =
             viewSearchTodoItem model.today
 
         filteredProjects =
-            Project.mockProjects
+            model.projectList
                 |> List.filter pred
 
         viewProject { title } =
