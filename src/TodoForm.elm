@@ -12,12 +12,16 @@ import UI exposing (btn2, col, ipt2, row)
 
 
 type TodoForm
-    = TodoForm { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
+    = TodoForm Internal
+
+
+type alias Internal =
+    { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
 
 
 toPartial : TodoForm -> { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
-toPartial (TodoForm partial) =
-    partial
+toPartial (TodoForm internal) =
+    internal
 
 
 init : String -> Maybe ProjectId -> Maybe Date -> TodoForm
