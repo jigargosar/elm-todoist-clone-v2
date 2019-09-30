@@ -805,7 +805,7 @@ humanDate { today } date =
 
 viewAddTodoButton : Msg -> H.Html Msg
 viewAddTodoButton onClick =
-    row [ A.class "pa1" ] [ btn2 "add todo" onClick ]
+    row [ A.class "pa1" ] [ btn2 "add task" onClick ]
 
 
 main : Program Flags Model Msg
