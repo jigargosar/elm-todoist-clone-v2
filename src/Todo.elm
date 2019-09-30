@@ -61,6 +61,7 @@ setProjectSortIdx projectSortIdx =
     map (\m -> { m | projectSortIdx = projectSortIdx })
 
 
+setSortIndices : List Todo -> List Todo
 setSortIndices =
     List.indexedMap setProjectSortIdx
 
