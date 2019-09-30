@@ -563,7 +563,7 @@ viewOverDueTodoList { today, todoList, projectList, maybeTodoForm } =
 
     else
         col [] [ H.text "OverDue" ]
-            :: List.map (viewEditTodoFormOr viewDueDateTodoItem projectList maybeTodoForm) filteredTodoList
+            :: List.map (viewEditTodoFormOr (viewDueDateTodoItem projectList) projectList maybeTodoForm) filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -582,14 +582,14 @@ viewTodoListDueOn dueDate { today, todoList, projectList, maybeTodoForm } =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
-        :: List.map (viewEditTodoFormOr viewDueDateTodoItem projectList maybeTodoForm) filteredTodoList
+        :: List.map (viewEditTodoFormOr (viewDueDateTodoItem projectList) projectList maybeTodoForm) filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate projectList maybeTodoForm
                 |> Maybe.withDefault addButtonHtml
            ]
 
 
-viewDueDateTodoItem : Todo -> H.Html Msg
-viewDueDateTodoItem todo =
+viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
+viewDueDateTodoItem projectList todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -600,7 +600,7 @@ viewDueDateTodoItem todo =
             ]
             [ H.text todo.title ]
         , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-            [ H.text <| todoProjectTitle todo ]
+            [ H.text <| todoProjectTitle projectList todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -692,7 +692,7 @@ viewSearchResults query model =
             model.todoList |> List.filter pred
 
         viewTodoItem =
-            viewSearchTodoItem model.today
+            viewSearchTodoItem model.projectList model.today
 
         filteredProjects =
             model.projectList
@@ -707,8 +707,8 @@ viewSearchResults query model =
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
 
-viewSearchTodoItem : Date -> Todo -> H.Html Msg
-viewSearchTodoItem today todo =
+viewSearchTodoItem : List Project -> Date -> Todo -> H.Html Msg
+viewSearchTodoItem projectList today todo =
     row [ A.class "hide-child relative" ]
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
@@ -724,7 +724,7 @@ viewSearchTodoItem today todo =
                     row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate dueDate today) ]
                 )
         , row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
-            [ H.text <| todoProjectTitle todo ]
+            [ H.text <| todoProjectTitle projectList todo ]
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -761,9 +761,9 @@ viewTodoForm =
 -- VIEW HELPERS
 
 
-todoProjectTitle : { a | maybeProjectId : Maybe ProjectId } -> String
-todoProjectTitle { maybeProjectId } =
-    Project.mockProjects
+todoProjectTitle : List Project -> { a | maybeProjectId : Maybe ProjectId } -> String
+todoProjectTitle projectList { maybeProjectId } =
+    projectList
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
         |> MX.unwrap "Inbox" .title
 

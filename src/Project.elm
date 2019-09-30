@@ -1,4 +1,4 @@
-module Project exposing (Project, decoder, encoder, mockListGenerator, mockProjects, viewSelectOne)
+module Project exposing (Project, decoder, encoder, mockListGenerator, viewSelectOne)
 
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -36,22 +36,6 @@ decoder =
 
 type alias Internal =
     Project
-
-
-createMockProject : String -> String -> Maybe Project
-createMockProject id title =
-    ProjectId.fromString id
-        |> Maybe.map (\projectId -> Project projectId title False)
-
-
-mockProjects : List Project
-mockProjects =
-    [ createMockProject "1" "Build Utils"
-    , createMockProject "2" "Publish Post"
-    , createMockProject "3" "Complete Story"
-    , createMockProject "4" "Exam Prep"
-    ]
-        |> List.filterMap identity
 
 
 mockTitles : List String
