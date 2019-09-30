@@ -623,7 +623,7 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
 
         _ ->
             List.indexedMap viewTodoItem filteredTodoList
-                ++ [ viewAddTodoButton (InsertTodoInProjectClicked -1 maybeProjectId) ]
+                ++ [ viewAddTodoButton (InsertTodoInProjectClicked Random.maxInt maybeProjectId) ]
 
 
 viewProjectTodoItem : Maybe ProjectId -> Date -> Int -> Todo -> H.Html Msg
