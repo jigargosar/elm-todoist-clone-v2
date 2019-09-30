@@ -670,7 +670,7 @@ viewSearchResults query model =
         filteredTodoList =
             model.todoList |> List.filter pred
 
-        viewItem =
+        viewTodoItem =
             viewSearchTodoItem model.today
 
         filteredProjects =
@@ -681,7 +681,7 @@ viewSearchResults query model =
             col [ A.class "pv1 ph2" ] [ H.text title ]
     in
     (col [] [ H.text "Tasks" ]
-        :: List.map (viewEditTodoFormOr viewItem model.maybeTodoForm) filteredTodoList
+        :: List.map (viewEditTodoFormOr viewTodoItem model.maybeTodoForm) filteredTodoList
     )
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
