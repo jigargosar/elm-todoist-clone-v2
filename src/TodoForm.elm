@@ -7,6 +7,7 @@ import Html.Styled.Events as E
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
+import Random
 import UI exposing (btn2, col, ipt2, row)
 
 
@@ -15,17 +16,21 @@ type TodoForm
 
 
 type alias Internal =
-    { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
+    { title : String
+    , maybeProjectId : Maybe ProjectId
+    , maybeDueDate : Maybe Date
+    , projectSortIdx : Int
+    }
 
 
-toPartial : TodoForm -> { title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date }
+toPartial : TodoForm -> Internal
 toPartial (TodoForm internal) =
     internal
 
 
 empty : Internal
 empty =
-    Internal "" Nothing Nothing
+    Internal "" Nothing Nothing Random.maxInt
 
 
 initBy : (Internal -> Internal) -> TodoForm
@@ -33,9 +38,9 @@ initBy func =
     TodoForm <| func empty
 
 
-fromPartial : { a | title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date } -> TodoForm
-fromPartial { title, maybeProjectId, maybeDueDate } =
-    TodoForm <| Internal title maybeProjectId maybeDueDate
+fromPartial : { a | title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date, projectSortIdx : Int } -> TodoForm
+fromPartial { title, maybeProjectId, maybeDueDate, projectSortIdx } =
+    TodoForm <| Internal title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg
