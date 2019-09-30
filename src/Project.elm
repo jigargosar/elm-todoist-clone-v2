@@ -1,8 +1,11 @@
-module Project exposing (Project, mockListGenerator, mockProjects, viewSelectOne)
+module Project exposing (Project, decoder, encoder, mockListGenerator, mockProjects, viewSelectOne)
 
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
+import Json.Decode as JD
+import Json.Decode.Pipeline exposing (required)
+import Json.Encode as JE exposing (object)
 import ProjectId exposing (ProjectId)
 import Random
 
@@ -12,6 +15,23 @@ type alias Project =
     , title : String
     , isDeleted : Bool
     }
+
+
+encoder : Project -> JE.Value
+encoder p =
+    object
+        [ ( "id", ProjectId.encoder p.id )
+        , ( "title", JE.string p.title )
+        , ( "isDeleted", JE.bool p.isDeleted )
+        ]
+
+
+decoder : JD.Decoder Project
+decoder =
+    JD.succeed Project
+        |> required "id" ProjectId.decoder
+        |> required "title" JD.string
+        |> required "isDeleted" JD.bool
 
 
 type alias Internal =

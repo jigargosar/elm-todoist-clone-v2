@@ -94,19 +94,24 @@ port setCache : String -> Cmd msg
 
 type alias Cache =
     { todoList : List Todo
+    , projectList : List Project
     , route : Route
     }
 
 
 defaultCacheValue : Cache
 defaultCacheValue =
-    { todoList = [], route = RouteInbox }
+    { todoList = []
+    , projectList = []
+    , route = RouteInbox
+    }
 
 
 cacheDecoder : JD.Decoder Cache
 cacheDecoder =
     JD.succeed Cache
         |> optional "todoList" (JD.list Todo.decoder) defaultCacheValue.todoList
+        |> optional "projectList" (JD.list Project.decoder) defaultCacheValue.projectList
         |> optional "route" routeDecoder defaultCacheValue.route
 
 
@@ -155,6 +160,7 @@ type alias Flags =
 
 type alias Model =
     { todoList : List Todo
+    , projectList : List Project
     , maybeTodoForm : Maybe TodoForm
     , route : Route
     , zone : Time.Zone
@@ -166,6 +172,7 @@ type alias Model =
 defaultModel : Model
 defaultModel =
     { todoList = defaultCacheValue.todoList
+    , projectList = defaultCacheValue.projectList
     , maybeTodoForm = Nothing
     , route = defaultCacheValue.route
     , zone = Time.utc
@@ -179,8 +186,9 @@ generateMockModel =
     let
         gen : Random.Generator Model
         gen =
-            Random.map (\todoList -> { defaultModel | todoList = todoList })
+            Random.map2 (\todoList projectList -> { defaultModel | todoList = todoList, projectList = projectList })
                 Todo.mockListGenerator
+                Project.mockListGenerator
     in
     Random.step gen
         >> (\( model, seed ) -> { model | seed = seed })
@@ -558,7 +566,7 @@ viewOverDueTodoList { today, todoList, maybeTodoForm } =
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
-viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
+viewTodoListDueOn dueDate { today, todoList, maybeTodoForm } =
     let
         filterPredicate =
             allPass
