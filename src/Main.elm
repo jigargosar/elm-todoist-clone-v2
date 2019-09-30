@@ -669,9 +669,6 @@ viewSearchResults query model =
         filteredTodoList =
             model.todoList |> List.filter pred
 
-        viewTodoItem =
-            viewSearchTodoItem model
-
         filteredProjects =
             model.projectList
                 |> List.filter pred
@@ -688,7 +685,7 @@ viewSearchResults query model =
                 .title >> String.contains query
     in
     (col [] [ H.text "Tasks" ]
-        :: List.map (viewEditTodoFormOr viewTodoItem model) filteredTodoList
+        :: List.map (viewEditTodoFormOr (viewSearchTodoItem model) model) filteredTodoList
     )
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: List.map viewProject filteredProjects)
 
