@@ -104,11 +104,11 @@ unwrapInitial (TodoForm _ initial _) =
 
 setProjectSortIdxIfAdding : Int -> TodoForm -> Maybe TodoForm
 setProjectSortIdxIfAdding projectSortIdx =
-    mapCurrentIfAdding (\f -> { f | projectSortIdx = projectSortIdx })
+    mapIfAdding (\f -> { f | projectSortIdx = projectSortIdx })
 
 
-mapCurrentIfAdding : (Internal -> Internal) -> TodoForm -> Maybe TodoForm
-mapCurrentIfAdding func (TodoForm meta initial current) =
+mapIfAdding : (Internal -> Internal) -> TodoForm -> Maybe TodoForm
+mapIfAdding func (TodoForm meta initial current) =
     case meta of
         Add ->
             Just <| TodoForm meta initial <| func current
