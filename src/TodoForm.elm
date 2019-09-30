@@ -1,5 +1,6 @@
-module TodoForm exposing (Config, Partial, TodoForm, createConfig, fromPartial, getProjectSortIdx, initBy, setProjectSortIdx, toPartial, viewTodoForm)
+module TodoForm exposing (Config, Partial, TodoForm, createConfig, fromPartial, getProjectSortIdx, initBy, initialDueDateEq, setProjectSortIdx, toPartial, viewTodoForm)
 
+import Basics.More exposing (propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -46,9 +47,19 @@ getProjectSortIdx =
     unwrap >> .projectSortIdx
 
 
+initialDueDateEq : Maybe Date -> TodoForm -> Bool
+initialDueDateEq maybeDueDate =
+    unwrapInitial >> propEq .maybeDueDate maybeDueDate
+
+
 unwrap : TodoForm -> Internal
 unwrap (TodoForm _ internal) =
     internal
+
+
+unwrapInitial : TodoForm -> Internal
+unwrapInitial (TodoForm initial _) =
+    initial
 
 
 setProjectSortIdx : Int -> TodoForm -> TodoForm
