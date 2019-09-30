@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, TodoForm, createConfig, fromPartial, initBy, toPartial, viewTodoForm)
+module TodoForm exposing (Config, Partial, TodoForm, createConfig, fromPartial, initBy, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -16,10 +16,23 @@ type TodoForm
 
 
 type alias Internal =
+    Partial {}
+
+
+type alias InternalConstructor =
     { title : String
     , maybeProjectId : Maybe ProjectId
     , maybeDueDate : Maybe Date
     , projectSortIdx : Int
+    }
+
+
+type alias Partial a =
+    { a
+        | title : String
+        , maybeProjectId : Maybe ProjectId
+        , maybeDueDate : Maybe Date
+        , projectSortIdx : Int
     }
 
 
@@ -30,7 +43,7 @@ toPartial (TodoForm internal) =
 
 empty : Internal
 empty =
-    Internal "" Nothing Nothing Random.maxInt
+    InternalConstructor "" Nothing Nothing Random.maxInt
 
 
 initBy : (Internal -> Internal) -> TodoForm
@@ -38,9 +51,9 @@ initBy func =
     TodoForm <| func empty
 
 
-fromPartial : { a | title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date, projectSortIdx : Int } -> TodoForm
+fromPartial : Partial a -> TodoForm
 fromPartial { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    TodoForm <| Internal title maybeProjectId maybeDueDate projectSortIdx
+    TodoForm <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg
