@@ -350,6 +350,7 @@ saveTodoForm ( form, meta ) model =
     )
 
 
+uncurry : (a -> b -> c) -> ( a, b ) -> c
 uncurry fn ( a, b ) =
     fn a b
 
