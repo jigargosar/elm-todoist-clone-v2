@@ -516,13 +516,13 @@ viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
     case route of
         RouteInbox ->
-            viewTodoListForMaybeProjectId Nothing model
+            viewProjectTodoList Nothing model
 
         RouteToday ->
             viewDueTodayAndOverdueTodoList model
 
         RouteProject projectId ->
-            viewTodoListForMaybeProjectId (Just projectId) model
+            viewProjectTodoList (Just projectId) model
 
         RouteNext7Days ->
             viewNext7DaysTodoList model
@@ -647,8 +647,8 @@ viewDueDateTodoItem projectList todo =
 -- VIEW PROJECT_TODO_LIST ROUTE
 
 
-viewTodoListForMaybeProjectId : Maybe ProjectId -> Model -> List (H.Html Msg)
-viewTodoListForMaybeProjectId maybeProjectId model =
+viewProjectTodoList : Maybe ProjectId -> Model -> List (H.Html Msg)
+viewProjectTodoList maybeProjectId model =
     let
         filteredTodoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
