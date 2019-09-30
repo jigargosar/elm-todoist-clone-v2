@@ -79,18 +79,6 @@ routeDecoder =
 
 
 
---    case route of
---        RouteInbox ->
---            enc1 "RouteInbox"
---
---        RouteToday ->
---            enc1 "RouteInbox"
---
---        RouteProject projectId ->
---            enc2 "RouteProject" (ProjectId.encoder projectId)
---
---        RouteNext7Days ->
---            enc1 "RouteNext7Days"
 -- CACHE
 
 
