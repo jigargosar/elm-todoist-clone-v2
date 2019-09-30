@@ -1,4 +1,4 @@
-module TodoForm exposing (Config, TodoForm, createConfig, empty, fromTodo, init, toPartial, viewTodoForm)
+module TodoForm exposing (Config, TodoForm, createConfig, empty, fromPartial, init, toPartial, viewTodoForm)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -7,7 +7,6 @@ import Html.Styled.Events as E
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
-import Todo exposing (Todo)
 import UI exposing (btn2, col, ipt2, row)
 
 
@@ -34,8 +33,8 @@ empty =
     Internal "" Nothing Nothing
 
 
-fromTodo : Todo -> TodoForm
-fromTodo { title, maybeProjectId, maybeDueDate, projectSortIdx } =
+fromPartial : { a | title : String, maybeProjectId : Maybe ProjectId, maybeDueDate : Maybe Date } -> TodoForm
+fromPartial { title, maybeProjectId, maybeDueDate } =
     TodoForm <| Internal title maybeProjectId maybeDueDate
 
 

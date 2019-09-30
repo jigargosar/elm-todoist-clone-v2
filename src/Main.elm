@@ -240,7 +240,7 @@ update msg model =
 
         EditTodoClicked todo ->
             ( model
-                |> setTodoForm ( TodoForm.fromTodo todo, EditTodoMeta todo )
+                |> setTodoForm ( TodoForm.fromPartial todo, EditTodoMeta todo )
             , Cmd.none
             )
 
