@@ -722,6 +722,10 @@ viewEditTodoFormOr viewFunc model todo =
         |> MX.unpack (\_ -> viewFunc model todo) (viewTodoForm model.projectList)
 
 
+viewEditableTodoList viewFunc model todoList =
+    List.map (viewEditTodoFormOr viewFunc model) todoList
+
+
 todoFormConfig : TodoForm.Config Msg
 todoFormConfig =
     TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
