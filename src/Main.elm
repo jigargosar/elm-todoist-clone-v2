@@ -709,9 +709,6 @@ viewSearchResults query model =
             else
                 .title >> String.contains query
 
-        viewProject { title } =
-            col [ A.class "pv1 ph2" ] [ H.text title ]
-
         viewTodoItem =
             viewSearchTodoItem model.today model.projectList
 
@@ -725,6 +722,9 @@ viewSearchResults query model =
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 (List.filter pred model.todoList)
+
+        viewProject { title } =
+            col [ A.class "pv1 ph2" ] [ H.text title ]
 
         projectListHtml =
             model.projectList |> List.filter pred |> List.map viewProject
