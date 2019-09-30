@@ -569,7 +569,7 @@ viewDueTodayAndOverdueTodoList model =
 
 
 viewOverDueTodoList : Model -> List (H.Html Msg)
-viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
+viewOverDueTodoList { today, todoList, maybeTodoForm } =
     let
         filterPredicate =
             allPass
@@ -585,7 +585,7 @@ viewOverDueTodoList ({ today, todoList, maybeTodoForm } as model) =
 
     else
         col [] [ H.text "OverDue" ]
-            :: viewEditableTodoList model filteredTodoList
+            :: List.map (viewEditingFormForTodoOr viewDueDateTodoItem maybeTodoForm) filteredTodoList
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -604,7 +604,7 @@ viewTodoListDueOn dueDate ({ today, todoList, maybeTodoForm } as model) =
             viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate dueDate today ]
-        :: viewEditableTodoList model filteredTodoList
+        :: List.map (viewEditingFormForTodoOr viewDueDateTodoItem maybeTodoForm) filteredTodoList
         ++ [ viewAddTodoFormForInitialDueDate dueDate maybeTodoForm
                 |> Maybe.withDefault addButtonHtml
            ]
@@ -626,11 +626,6 @@ viewEditingFormForTodoOr viewFunc maybeTodoForm todo =
     maybeTodoForm
         |> viewEditFormForTodoId todo.id
         |> Maybe.withDefault (viewFunc todo)
-
-
-viewEditableTodoList : Model -> List Todo -> List (H.Html Msg)
-viewEditableTodoList { maybeTodoForm } =
-    List.map (viewEditingFormForTodoOr viewDueDateTodoItem maybeTodoForm)
 
 
 viewDueDateTodoItem : Todo -> H.Html Msg
