@@ -99,7 +99,7 @@ type alias Flags =
 
 type TodoFormMeta
     = AddTodoMeta
-    | EditTodoMeta Todo
+    | EditTodoMeta TodoId
 
 
 type alias TodoFormWithMeta =
@@ -248,7 +248,7 @@ update msg model =
 
         EditTodoClicked todo ->
             ( model
-                |> setTodoForm ( TodoForm.fromPartial todo, EditTodoMeta todo )
+                |> setTodoForm ( TodoForm.fromPartial todo, EditTodoMeta todo.id )
             , Cmd.none
             )
 
@@ -288,8 +288,8 @@ saveTodoForm ( form, meta ) model =
                     HasSeed.step (Todo.generatorFromPartial partial) model
                         |> uncurry insertTodo
 
-                EditTodoMeta { id } ->
-                    updateTodoWithIdBy id (Todo.patchWithPartial (TodoForm.toPartial form)) model
+                EditTodoMeta todoId ->
+                    updateTodoWithIdBy todoId (Todo.patchWithPartial (TodoForm.toPartial form)) model
     in
     ( { newModel | maybeTodoFormWithMeta = Nothing }
     , Cmd.none
@@ -536,8 +536,8 @@ viewEditableTodoList { maybeTodoFormWithMeta } =
     List.map
         (\todo ->
             case maybeTodoFormWithMeta of
-                Just ( form, EditTodoMeta { id } ) ->
-                    if id == todo.id then
+                Just ( form, EditTodoMeta todoId ) ->
+                    if todoId == todo.id then
                         viewTodoForm form
 
                     else
@@ -596,11 +596,11 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoFormWithMeta, todoList 
                             ++ List.map viewTodoItem r
                    )
 
-        Just ( form, EditTodoMeta editTodo ) ->
+        Just ( form, EditTodoMeta todoId ) ->
             filteredTodoList
                 |> List.map
                     (\todo ->
-                        if editTodo.id == todo.id then
+                        if todoId == todo.id then
                             viewTodoForm form
 
                         else
