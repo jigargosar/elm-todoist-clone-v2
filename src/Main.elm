@@ -238,12 +238,9 @@ update msg model =
             , Cmd.none
             )
 
-        EditTodoClicked ({ id, title, maybeProjectId, maybeDueDate } as todo) ->
+        EditTodoClicked todo ->
             ( model
-                |> setTodoForm
-                    ( TodoForm.init title maybeProjectId maybeDueDate
-                    , EditTodoMeta todo
-                    )
+                |> setTodoForm ( TodoForm.fromTodo todo, EditTodoMeta todo )
             , Cmd.none
             )
 
