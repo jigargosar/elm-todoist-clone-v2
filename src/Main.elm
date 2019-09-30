@@ -678,16 +678,9 @@ viewTodoListForMaybeProjectId maybeProjectId ({ maybeTodoForm, todoList } as mod
                                     ++ List.map viewTodoItem r
                            )
 
-                TodoForm.Edit todoId ->
-                    filteredTodoList
-                        |> List.map
-                            (\todo ->
-                                if idEq todoId todo then
-                                    viewTodoForm form
-
-                                else
-                                    viewTodoItem todo
-                            )
+                TodoForm.Edit _ ->
+                    List.map (viewEditingFormForTodoOr viewTodoItem maybeTodoForm)
+                        filteredTodoList
 
         Nothing ->
             List.map viewTodoItem filteredTodoList
