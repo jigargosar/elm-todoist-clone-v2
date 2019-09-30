@@ -21,12 +21,6 @@ type alias Todo =
     }
 
 
-emptyGenerator : Random.Generator Todo
-emptyGenerator =
-    TodoId.generator
-        |> Random.map (\id -> Todo id "" False False Nothing Nothing 0)
-
-
 mockTitles =
     [ "Get Milk!!"
     , "Submit assignment"
@@ -38,7 +32,13 @@ mockTitles =
 
 mockListGenerator : Random.Generator (List Todo)
 mockListGenerator =
-    Random.list (List.length mockTitles) emptyGenerator
+    let
+        gen : Random.Generator Todo
+        gen =
+            TodoId.generator
+                |> Random.map (\id -> Todo id "" False False Nothing Nothing 0)
+    in
+    Random.list (List.length mockTitles) gen
         |> Random.map (List.map2 setTitle mockTitles >> setSortIndices)
 
 
