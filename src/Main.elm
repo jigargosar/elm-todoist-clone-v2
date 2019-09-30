@@ -662,16 +662,13 @@ viewProjectTodoList maybeProjectId model =
             case TodoForm.getMeta form of
                 TodoForm.Add ->
                     let
-                        formHtml =
-                            viewTodoForm model.projectList form
-
                         formIdx =
-                            clampListLength filteredTodoList (TodoForm.getProjectSortIdx form)
+                            clamp 0 (List.length filteredTodoList) (TodoForm.getProjectSortIdx form)
                     in
                     LX.splitAt formIdx filteredTodoList
                         |> (\( l, r ) ->
                                 List.map viewTodoItem l
-                                    ++ [ formHtml ]
+                                    ++ [ viewTodoForm model.projectList form ]
                                     ++ List.map viewTodoItem r
                            )
 
