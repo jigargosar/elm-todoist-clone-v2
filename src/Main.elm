@@ -293,13 +293,12 @@ update msg model =
             )
 
         EditTodoClicked todo ->
-            ( model
-                |> setTodoForm (TodoForm.initEdit todo)
+            ( model |> setTodoForm (TodoForm.initEdit todo)
             , Cmd.none
             )
 
         PatchTodoForm todoForm ->
-            ( { model | maybeTodoForm = Just todoForm }, Cmd.none )
+            ( model |> setTodoForm todoForm, Cmd.none )
 
         Save ->
             case model.maybeTodoForm of
