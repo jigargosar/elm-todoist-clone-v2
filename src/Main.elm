@@ -660,11 +660,7 @@ viewProjectTodoItem model todo =
             , E.onClick (EditTodoClicked todo)
             ]
             [ H.text todo.title ]
-        , todo.maybeDueDate
-            |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
-                (\dueDate ->
-                    row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
-                )
+        , viewTodoDueDate model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
             , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
@@ -779,6 +775,15 @@ viewTodoProjectPill { projectList } todo =
     in
     row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
         [ H.text <| todoProjectTitle todo ]
+
+
+viewTodoDueDate : { a | today : Date } -> Todo -> H.Html msg
+viewTodoDueDate model todo =
+    todo.maybeDueDate
+        |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
+            (\dueDate ->
+                row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
+            )
 
 
 humanDate : { a | today : Date } -> Date -> String
