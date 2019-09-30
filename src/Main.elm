@@ -239,7 +239,7 @@ update msg model =
             ( model, Cmd.none )
 
         ResetModel ->
-            refreshModel defaultModel
+            refreshModel { defaultModel | todoList = Todo.mockList }
 
         GotToday today ->
             ( { model | today = today }, Cmd.none )
