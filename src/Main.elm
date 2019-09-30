@@ -521,7 +521,19 @@ viewRoute model route =
             viewNext7DaysTodoList model
 
         RouteSearch query ->
-            []
+            let
+                pred : { a | title : String } -> Bool
+                pred =
+                    if query |> String.isEmpty then
+                        always True
+
+                    else
+                        .title >> String.contains query
+
+                filtered =
+                    model.todoList |> List.filter pred
+            in
+            [ col [] (filtered |> List.map viewDueDateTodoItem) ]
 
 
 
