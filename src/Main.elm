@@ -515,38 +515,7 @@ viewRoute model route =
             viewNext7DaysTodoList model
 
         RouteSearch query ->
-            let
-                pred : { a | title : String } -> Bool
-                pred =
-                    if query |> String.isEmpty then
-                        always True
-
-                    else
-                        .title >> String.contains query
-
-                filtered =
-                    model.todoList |> List.filter pred
-
-                viewItem =
-                    viewSearchTodoItem model.today
-            in
-            [ col []
-                (List.map
-                    (\todo ->
-                        case model.maybeTodoForm of
-                            Just form ->
-                                if TodoForm.isEditingFor todo.id form then
-                                    viewTodoForm form
-
-                                else
-                                    viewItem todo
-
-                            _ ->
-                                viewItem todo
-                    )
-                    filtered
-                )
-            ]
+            viewSearchResults query model
 
 
 
@@ -697,6 +666,41 @@ viewProjectTodoItem today todo =
 
 
 -- VIEW SEARCH ROUTE
+
+
+viewSearchResults query model =
+    let
+        pred : { a | title : String } -> Bool
+        pred =
+            if query |> String.isEmpty then
+                always True
+
+            else
+                .title >> String.contains query
+
+        filtered =
+            model.todoList |> List.filter pred
+
+        viewItem =
+            viewSearchTodoItem model.today
+    in
+    [ col []
+        (List.map
+            (\todo ->
+                case model.maybeTodoForm of
+                    Just form ->
+                        if TodoForm.isEditingFor todo.id form then
+                            viewTodoForm form
+
+                        else
+                            viewItem todo
+
+                    _ ->
+                        viewItem todo
+            )
+            filtered
+        )
+    ]
 
 
 viewSearchTodoItem : Date -> Todo -> H.Html Msg
