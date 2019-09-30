@@ -1,6 +1,6 @@
 port module Main exposing (main, viewSearchResults)
 
-import Basics.More exposing (HasId, allPass, clampListLength, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -605,7 +605,7 @@ viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
 viewTodoListDueOn dueDate model =
     let
         titleHtml =
-            col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
+            col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
 
         contentHtml =
             List.map
@@ -655,7 +655,7 @@ viewProjectTodoList maybeProjectId model =
 
         viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
-            viewProjectTodoItem model
+            viewProjectTodoItem model.today
     in
     case model.maybeTodoForm of
         Just form ->
@@ -678,12 +678,12 @@ viewProjectTodoList maybeProjectId model =
                 ++ [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
 
 
-viewProjectTodoItem : { a | today : Date } -> Todo -> H.Html Msg
-viewProjectTodoItem model todo =
+viewProjectTodoItem : Date -> Todo -> H.Html Msg
+viewProjectTodoItem today todo =
     row [ A.class "hide-child relative" ]
         [ viewTodoCheckbox todo
         , viewTodoTitle todo
-        , viewTodoDueDate model todo
+        , viewTodoDueDate today todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
             , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
@@ -730,7 +730,7 @@ viewSearchTodoItem model todo =
     row [ A.class "hide-child relative" ]
         [ viewTodoCheckbox todo
         , viewTodoTitle todo
-        , viewTodoDueDate model todo
+        , viewTodoDueDate model.today todo
         , viewTodoProjectPill model.projectList todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
@@ -794,17 +794,17 @@ viewTodoProjectPill projectList todo =
         [ H.text <| todoProjectTitle todo ]
 
 
-viewTodoDueDate : { a | today : Date } -> Todo -> H.Html msg
-viewTodoDueDate model todo =
+viewTodoDueDate : Date -> Todo -> H.Html msg
+viewTodoDueDate today todo =
     todo.maybeDueDate
         |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
             (\dueDate ->
-                row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate model dueDate) ]
+                row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate today dueDate) ]
             )
 
 
-humanDate : { a | today : Date } -> Date -> String
-humanDate { today } date =
+humanDate : Date -> Date -> String
+humanDate today date =
     let
         addDays ct =
             Date.add Date.Days ct today
