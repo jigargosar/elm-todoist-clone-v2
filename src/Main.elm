@@ -22,7 +22,7 @@ import Time
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, checkbox3, col, ipt2, ipt3, row)
+import UI exposing (btn2, checkbox3, col, ipt3, row)
 
 
 type Route
@@ -119,10 +119,11 @@ cacheModel_ : Model -> Cmd msg
 cacheModel_ model =
     let
         modelEncoder : Model -> Value
-        modelEncoder { todoList, route } =
+        modelEncoder m =
             object
-                [ ( "todoList", JE.list Todo.encoder todoList )
-                , ( "route", routeEncoder route )
+                [ ( "todoList", JE.list Todo.encoder m.todoList )
+                , ( "projectList", JE.list Project.encoder m.projectList )
+                , ( "route", routeEncoder m.route )
                 ]
 
         modelValue =
