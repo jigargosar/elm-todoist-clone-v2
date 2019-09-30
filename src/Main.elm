@@ -187,7 +187,10 @@ generateMockModel =
     let
         gen : Random.Generator Model
         gen =
-            Random.map2 (\todoList projectList -> { defaultModel | todoList = todoList, projectList = projectList })
+            Random.map2
+                (\todoList projectList ->
+                    { defaultModel | todoList = todoList, projectList = projectList }
+                )
                 Todo.mockListGenerator
                 Project.mockListGenerator
     in
