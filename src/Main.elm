@@ -174,15 +174,16 @@ defaultModel =
     }
 
 
-mockModel : Model
-mockModel =
+generateMockModel : Random.Seed -> Model
+generateMockModel =
     let
+        gen : Random.Generator Model
         gen =
             Random.map (\todoList -> { defaultModel | todoList = todoList })
                 Todo.mockListGenerator
     in
-    Random.step gen (Random.initialSeed 0)
-        |> Tuple.first
+    Random.step gen
+        >> (\( model, seed ) -> { model | seed = seed })
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -250,7 +251,7 @@ update msg model =
             ( model, Cmd.none )
 
         ResetModel ->
-            refreshModel mockModel
+            refreshModel (generateMockModel model.seed)
 
         GotToday today ->
             ( { model | today = today }, Cmd.none )
