@@ -576,14 +576,10 @@ viewOverDueTodoList : Model -> List (H.Html Msg)
 viewOverDueTodoList model =
     unlessEmpty
         (\todoList ->
-            col [] [ H.text "OverDue" ] :: viewEditableTodoList viewDueDateTodoItem model todoList
+            col [] [ H.text "OverDue" ]
+                :: viewEditableTodoList (\_ -> viewDueDateTodoItem model.projectList) model todoList
         )
-        (filterTodoList (overDuePred model.today) model)
-
-
-filterTodoList : (Todo -> Bool) -> { b | todoList : List Todo } -> List Todo
-filterTodoList pred =
-    .todoList >> List.filter pred
+        (List.filter (overDuePred model.today) model.todoList)
 
 
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
@@ -592,10 +588,21 @@ viewTodoListDueOn dueDate model =
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model dueDate ]
 
+        isEditingFor todoId =
+            model.maybeTodoForm
+                |> MX.filter (TodoForm.isEditingFor todoId)
+
         contentHtml =
-            viewEditableTodoList viewDueDateTodoItem
-                model
-                (filterTodoList (dueOnPred dueDate) model)
+            List.map
+                (\todo ->
+                    case isEditingFor todo.id of
+                        Just form ->
+                            viewTodoForm model.projectList form
+
+                        Nothing ->
+                            viewDueDateTodoItem model.projectList todo
+                )
+                (List.filter (dueOnPred dueDate) model.todoList)
 
         footerHtml =
             case
@@ -611,12 +618,12 @@ viewTodoListDueOn dueDate model =
     [ titleHtml ] ++ contentHtml ++ [ footerHtml ]
 
 
-viewDueDateTodoItem : { a | projectList : List Project } -> Todo -> H.Html Msg
-viewDueDateTodoItem model todo =
+viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
+viewDueDateTodoItem projectList todo =
     row [ A.class "hide-child relative" ]
         [ viewTodoCheckbox todo
         , viewTodoTitle todo
-        , viewTodoProjectPill model todo
+        , viewTodoProjectPill projectList todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -715,7 +722,7 @@ viewSearchTodoItem model todo =
         [ viewTodoCheckbox todo
         , viewTodoTitle todo
         , viewTodoDueDate model todo
-        , viewTodoProjectPill model todo
+        , viewTodoProjectPill model.projectList todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
         ]
@@ -767,7 +774,7 @@ viewTodoTitle todo =
         [ H.text todo.title ]
 
 
-viewTodoProjectPill { projectList } todo =
+viewTodoProjectPill projectList todo =
     let
         todoProjectTitle { maybeProjectId } =
             projectList
