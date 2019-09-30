@@ -597,11 +597,7 @@ viewDueDateTodoItem model todo =
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
             ]
-        , row
-            [ A.class "pa1 flex-grow-1"
-            , E.onClick (EditTodoClicked todo)
-            ]
-            [ H.text todo.title ]
+        , viewTodoTitle todo
         , viewTodoProjectPill model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "X" (DeleteTodo todo.id) ]
@@ -655,11 +651,7 @@ viewProjectTodoItem model todo =
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
             ]
-        , row
-            [ A.class "pa1 flex-grow-1"
-            , E.onClick (EditTodoClicked todo)
-            ]
-            [ H.text todo.title ]
+        , viewTodoTitle todo
         , viewTodoDueDate model todo
         , row [ A.class "child absolute right-0 bg-white-90" ]
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
@@ -711,11 +703,7 @@ viewSearchTodoItem model todo =
         [ row [ A.class "pa1" ]
             [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
             ]
-        , row
-            [ A.class "pa1 flex-grow-1"
-            , E.onClick (EditTodoClicked todo)
-            ]
-            [ H.text todo.title ]
+        , viewTodoTitle todo
         , todo.maybeDueDate
             |> MX.unwrap (row [ A.class "self-start pa1 f7 code" ] [ H.text "[]" ])
                 (\dueDate ->
@@ -764,6 +752,15 @@ viewTodoForm =
 
 
 -- VIEW TODO_ITEM HELPERS
+
+
+viewTodoTitle : Todo -> H.Html Msg
+viewTodoTitle todo =
+    row
+        [ A.class "pa1 flex-grow-1"
+        , E.onClick (EditTodoClicked todo)
+        ]
+        [ H.text todo.title ]
 
 
 viewTodoProjectPill { projectList } todo =
