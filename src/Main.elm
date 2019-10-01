@@ -610,7 +610,7 @@ viewTodoListDueOn dueDate model =
 
         viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
-            viewProjectTodoItem model.today
+            viewDueDateTodoItem model.projectList
 
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
