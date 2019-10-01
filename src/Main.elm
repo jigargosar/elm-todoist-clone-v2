@@ -605,6 +605,80 @@ viewAddTodoButtonFor kind =
             H.text ""
 
 
+viewTodoListItems kind model maybeTodoForm =
+    let
+        todoList =
+            filteredTodoList kind model model.todoList
+
+        viewTodoItem =
+            viewTodoListItem kind model
+
+        viewAddBtn =
+            viewAddTodoButtonFor kind
+
+        viewForm : TodoForm -> H.Html Msg
+        viewForm =
+            viewTodoForm model.projectList
+    in
+    case kind of
+        OverDueTodoList ->
+            List.map
+                (\todo ->
+                    editFormForTodoId todo.id model.maybeTodoForm
+                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                )
+                todoList
+
+        DueAtTodoList dueDate ->
+            case model.maybeTodoForm of
+                Just form ->
+                    let
+                        showAddForm =
+                            TodoForm.isAddingForInitialDueDate dueDate form
+                    in
+                    case TodoForm.getMeta form of
+                        TodoForm.Add ->
+                            List.map viewTodoItem todoList
+                                ++ (if showAddForm then
+                                        [ viewForm form ]
+
+                                    else
+                                        [ viewAddBtn ]
+                                   )
+
+                        TodoForm.Edit todoId ->
+                            List.map
+                                (ifElse (idEq todoId) (\_ -> viewForm form) viewTodoItem)
+                                todoList
+
+                Nothing ->
+                    List.map viewTodoItem todoList ++ [ viewAddBtn ]
+
+        ProjectTodoList _ ->
+            case model.maybeTodoForm of
+                Just form ->
+                    case TodoForm.getMeta form of
+                        TodoForm.Add ->
+                            List.map viewTodoItem todoList
+                                |> insertAt (TodoForm.getProjectSortIdx form) (viewForm form)
+
+                        TodoForm.Edit todoId ->
+                            List.map
+                                (ifElse (idEq todoId) (\_ -> viewForm form) viewTodoItem)
+                                todoList
+
+                Nothing ->
+                    List.map viewTodoItem todoList ++ [ viewAddBtn ]
+
+        SearchResultTodoList _ ->
+            List.map
+                (\todo ->
+                    editFormForTodoId todo.id model.maybeTodoForm
+                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                )
+                todoList
+
+
 
 -- VIEW DUE_DATE TODO_ROUTES
 
