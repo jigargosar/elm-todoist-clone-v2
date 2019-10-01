@@ -409,10 +409,6 @@ insertTodo todo model =
     }
 
 
-
---    ( model, Cmd.none )
-
-
 subscriptions : Model -> Sub msg
 subscriptions _ =
     Sub.none
