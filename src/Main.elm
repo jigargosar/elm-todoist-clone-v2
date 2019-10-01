@@ -578,21 +578,16 @@ viewOverDueTodoList model =
     unlessEmpty
         (\todoList ->
             let
-                viewTodoItem =
-                    viewDueDateTodoItem model.projectList
-
                 titleHtml =
                     col [] [ H.text "OverDue" ]
 
                 viewEditableTodo todo =
                     model.maybeTodoForm
                         |> MX.filter (TodoForm.isEditingFor todo.id)
-                        |> MX.unpack (\_ -> viewTodoItem todo) (viewTodoForm model.projectList)
-
-                contentHtmlList =
-                    List.map viewEditableTodo todoList
+                        |> MX.unpack (\_ -> viewDueDateTodoItem model.projectList todo)
+                            (viewTodoForm model.projectList)
             in
-            titleHtml :: contentHtmlList
+            titleHtml :: List.map viewEditableTodo todoList
         )
         (List.filter (overDuePred model.today) model.todoList)
 
