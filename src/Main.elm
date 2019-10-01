@@ -584,21 +584,13 @@ viewOverDueTodoList model =
                 titleHtml =
                     col [] [ H.text "OverDue" ]
 
+                viewEditableTodo todo =
+                    model.maybeTodoForm
+                        |> MX.filter (TodoForm.isEditingFor todo.id)
+                        |> MX.unpack (\_ -> viewTodoItem todo) (viewTodoForm model.projectList)
+
                 contentHtmlList =
-                    case model.maybeTodoForm of
-                        Just form ->
-                            let
-                                formHtml =
-                                    viewTodoForm model.projectList form
-
-                                isEditingTodo { id } =
-                                    TodoForm.isEditingFor id form
-                            in
-                            List.map (ifElse isEditingTodo (\_ -> formHtml) viewTodoItem)
-                                todoList
-
-                        Nothing ->
-                            List.map viewTodoItem todoList
+                    List.map viewEditableTodo todoList
             in
             titleHtml :: contentHtmlList
         )
