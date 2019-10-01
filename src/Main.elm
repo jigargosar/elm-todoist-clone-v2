@@ -568,9 +568,37 @@ viewTodoListItem kind model =
             viewDueDateTodoItem model.projectList
 
         ProjectTodoList _ ->
+            let
+                viewProjectTodoItem : Date -> Todo -> H.Html Msg
+                viewProjectTodoItem today todo =
+                    row [ A.class "hide-child relative" ]
+                        [ viewTodoCheckbox todo
+                        , viewTodoTitle todo
+                        , viewTodoDueDate today todo
+                        , row [ A.class "child absolute right-0 bg-white-90" ]
+                            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+                            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+                            , btn2 "UP" (MoveUp todo.id)
+                            , btn2 "DN" (MoveDown todo.id)
+                            , btn2 "X" (DeleteTodo todo.id)
+                            ]
+                        ]
+            in
             viewProjectTodoItem model.today
 
         SearchResultTodoList _ ->
+            let
+                viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
+                viewSearchTodoItem today projectList todo =
+                    row [ A.class "hide-child relative" ]
+                        [ viewTodoCheckbox todo
+                        , viewTodoTitle todo
+                        , viewTodoDueDate today todo
+                        , viewTodoProjectPill projectList todo
+                        , row [ A.class "child absolute right-0 bg-white-90" ]
+                            [ btn2 "X" (DeleteTodo todo.id) ]
+                        ]
+            in
             viewSearchTodoItem model.today model.projectList
 
 
@@ -692,12 +720,15 @@ viewTodoListDueOn dueDate model =
 viewProjectTodoList : Maybe ProjectId -> Model -> List (H.Html Msg)
 viewProjectTodoList maybeProjectId model =
     let
+        kind =
+            ProjectTodoList maybeProjectId
+
         todoList =
             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
 
         viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
-            viewProjectTodoItem model.today
+            viewTodoListItem kind model
     in
     case model.maybeTodoForm of
         Just form ->
@@ -720,22 +751,6 @@ viewProjectTodoList maybeProjectId model =
                 ++ [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
 
 
-viewProjectTodoItem : Date -> Todo -> H.Html Msg
-viewProjectTodoItem today todo =
-    row [ A.class "hide-child relative" ]
-        [ viewTodoCheckbox todo
-        , viewTodoTitle todo
-        , viewTodoDueDate today todo
-        , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
-            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
-            , btn2 "UP" (MoveUp todo.id)
-            , btn2 "DN" (MoveDown todo.id)
-            , btn2 "X" (DeleteTodo todo.id)
-            ]
-        ]
-
-
 
 -- VIEW SEARCH ROUTE
 
@@ -751,8 +766,11 @@ viewSearchResults query model =
             else
                 .title >> String.contains query
 
+        kind =
+            SearchResultTodoList query
+
         viewTodoItem =
-            viewSearchTodoItem model.today model.projectList
+            viewTodoListItem kind model
 
         viewForm =
             viewTodoForm model.projectList
@@ -773,18 +791,6 @@ viewSearchResults query model =
     in
     (col [] [ H.text "Tasks" ] :: todoListHtml)
         ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: projectListHtml)
-
-
-viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
-viewSearchTodoItem today projectList todo =
-    row [ A.class "hide-child relative" ]
-        [ viewTodoCheckbox todo
-        , viewTodoTitle todo
-        , viewTodoDueDate today todo
-        , viewTodoProjectPill projectList todo
-        , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "X" (DeleteTodo todo.id) ]
-        ]
 
 
 
