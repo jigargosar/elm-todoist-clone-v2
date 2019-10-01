@@ -518,6 +518,10 @@ navBtn isActive title msg =
         [ H.text title ]
 
 
+
+-- TodoListView
+
+
 viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
     let
@@ -542,10 +546,6 @@ viewRoute model route =
 
         RouteSearch query ->
             viewTodoList (SearchResultTodoList query)
-
-
-
--- TodoListView
 
 
 type TodoListKind
