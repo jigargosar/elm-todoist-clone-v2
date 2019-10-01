@@ -541,7 +541,7 @@ viewRoute model route =
                 |> List.concatMap (\date -> viewTodoList <| DueAtTodoList date)
 
         RouteSearch query ->
-            viewSearchResults query model
+            viewTodoList (SearchResultTodoList query)
 
 
 
