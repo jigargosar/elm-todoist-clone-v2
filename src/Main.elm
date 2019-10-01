@@ -740,7 +740,7 @@ viewSearchResults query model =
 
 
 
--- VIEW TODO_FORM HELPERS
+-- VIEW TODO_FORM
 
 
 todoFormConfig : TodoForm.Config Msg
