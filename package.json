@@ -7,7 +7,7 @@
     "last 2 Chrome versions"
   ],
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "pnpx webpack-dev-server",
     "genId": "node src/genId.js TodoId ProjectId"
   },
   "keywords": [],
