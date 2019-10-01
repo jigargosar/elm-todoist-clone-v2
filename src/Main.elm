@@ -410,7 +410,7 @@ insertTodo todo model =
     let
         projectTodoList =
             sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
-                |> LX.splitAt (todo.projectSortIdx |> Debug.log "projectSortIdx")
+                |> LX.splitAt todo.projectSortIdx
                 |> (\( l, r ) -> l ++ [ todo ] ++ r)
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
