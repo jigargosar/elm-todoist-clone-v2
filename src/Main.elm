@@ -750,44 +750,6 @@ editFormForTodoId todoId maybeTodoForm =
 
 
 
--- VIEW PROJECT_TODO_LIST ROUTE
-
-
-viewProjectTodoList : Maybe ProjectId -> Model -> List (H.Html Msg)
-viewProjectTodoList maybeProjectId model =
-    let
-        kind =
-            ProjectTodoList maybeProjectId
-
-        todoList =
-            sortedTodoListForMaybeProjectId maybeProjectId model.todoList
-
-        viewTodoItem : Todo -> H.Html Msg
-        viewTodoItem =
-            viewTodoListItem kind model
-    in
-    case model.maybeTodoForm of
-        Just form ->
-            let
-                formHtml =
-                    viewTodoForm model.projectList form
-            in
-            case TodoForm.getMeta form of
-                TodoForm.Add ->
-                    List.map viewTodoItem todoList
-                        |> insertAt (TodoForm.getProjectSortIdx form) formHtml
-
-                TodoForm.Edit todoId ->
-                    List.map
-                        (ifElse (idEq todoId) (\_ -> formHtml) viewTodoItem)
-                        todoList
-
-        Nothing ->
-            List.map viewTodoItem todoList
-                ++ [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
-
-
-
 -- VIEW TODO_FORM
 
 
