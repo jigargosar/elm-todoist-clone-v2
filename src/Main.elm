@@ -682,6 +682,10 @@ viewTodoListContent kind model maybeTodoForm todoList =
                     List.map viewTodoItem todoList ++ viewAddBtn
 
 
+viewTodoListSection :
+    TodoListKind
+    -> { a | todoList : List Todo, today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm }
+    -> List (H.Html Msg)
 viewTodoListSection kind model =
     let
         todoList : List Todo
@@ -693,13 +697,13 @@ viewTodoListSection kind model =
                 OverDueTodoList ->
                     True
 
-                DueAtTodoList date ->
+                DueAtTodoList _ ->
                     False
 
-                ProjectTodoList maybe ->
+                ProjectTodoList _ ->
                     False
 
-                SearchResultTodoList string ->
+                SearchResultTodoList _ ->
                     False
     in
     if shouldHideWhenTodoListEmpty && todoList == [] then
