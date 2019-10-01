@@ -734,7 +734,8 @@ viewTodoListSection kind model =
         []
 
     else
-        viewTodoListTitle kind model :: viewTodoListContent kind model model.maybeTodoForm todoList
+        viewTodoListTitle kind model
+            :: viewTodoListContent kind model model.maybeTodoForm todoList
 
 
 
