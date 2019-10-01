@@ -165,11 +165,11 @@ type Patch
 applyPatches : Posix -> List Patch -> Todo -> Todo
 applyPatches now patches todo =
     List.foldl applyPatch todo patches
-        |> setUpdatedAtIfNotEq now todo
+        |> setUpdatedAtIfChanged now todo
 
 
-setUpdatedAtIfNotEq : Posix -> Todo -> Todo -> Todo
-setUpdatedAtIfNotEq now oldTodo newTodo =
+setUpdatedAtIfChanged : Posix -> Todo -> Todo -> Todo
+setUpdatedAtIfChanged now oldTodo newTodo =
     if oldTodo /= newTodo then
         { newTodo | updatedAt = now }
 
