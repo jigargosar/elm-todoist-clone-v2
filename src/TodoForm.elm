@@ -12,6 +12,7 @@ module TodoForm exposing
     , isEditingFor
     , setProjectSortIdxIfAdding
     , toPartialWithMeta
+    , toPatchesWithMeta
     , viewTodoForm
     )
 
@@ -62,6 +63,20 @@ type alias Partial a =
 toPartialWithMeta : TodoForm -> ( Meta, Partial {} )
 toPartialWithMeta (TodoForm meta _ internal) =
     ( meta, internal )
+
+
+toPatchesWithMeta : TodoForm -> ( Meta, List Todo.Patch )
+toPatchesWithMeta (TodoForm meta _ current) =
+    ( meta, toPatches current )
+
+
+toPatches : Internal -> List Todo.Patch
+toPatches m =
+    [ Todo.Title m.title
+    , Todo.Project m.maybeProjectId
+    , Todo.DueDate m.maybeDueDate
+    , Todo.ProjectSortIdx m.projectSortIdx
+    ]
 
 
 unwrapMeta : TodoForm -> Meta

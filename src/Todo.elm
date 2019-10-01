@@ -1,4 +1,13 @@
-module Todo exposing (Todo, applyPatches, decoder, encoder, generatorFromPartial, mockListGenerator, patchWithPartial)
+module Todo exposing
+    ( Patch(..)
+    , Todo
+    , applyPatches
+    , decoder
+    , encoder
+    , generatorFromPartial
+    , mockListGenerator
+    , patchWithPartial
+    )
 
 import Date exposing (Date)
 import Json.Decode as JD
