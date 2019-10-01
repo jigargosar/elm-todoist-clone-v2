@@ -716,7 +716,7 @@ viewTodoListSection kind model =
         todoList =
             todoListFor kind model model.todoList
 
-        shouldHideWhenTodoListEmpty =
+        hideWhenEmpty =
             case kind of
                 OverDueTodoList ->
                     True
@@ -730,7 +730,7 @@ viewTodoListSection kind model =
                 SearchResultTodoList _ ->
                     False
     in
-    if shouldHideWhenTodoListEmpty && todoList == [] then
+    if hideWhenEmpty && todoList == [] then
         []
 
     else
