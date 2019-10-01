@@ -22,6 +22,7 @@ import Html.Styled.Attributes as A
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Extra as JDX
+import Json.Decode.Pipeline exposing (required)
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
@@ -148,59 +149,36 @@ createConfig =
     Config
 
 
-succeedWhenTrue : a -> JD.Decoder Bool -> JD.Decoder a
-succeedWhenTrue msg =
+succeedIf : (a -> Bool) -> Decoder a -> Decoder a
+succeedIf pred =
     JD.andThen
-        (\bool ->
-            if bool then
-                JD.succeed msg
+        (\val ->
+            if pred val then
+                JD.succeed val
 
             else
-                JD.fail "failing because false"
+                JD.fail "pred failed"
         )
 
 
-succeedWhenEq : a -> b -> JD.Decoder a -> JD.Decoder b
-succeedWhenEq val msg =
-    JD.andThen
-        (\decodedVal ->
-            if decodedVal == val then
-                JD.succeed msg
-
-            else
-                JD.fail "failing because notEq"
-        )
+succeedIfEq : a -> Decoder a -> Decoder a
+succeedIfEq val =
+    succeedIf ((==) val)
 
 
-modifierDecoder : String -> JD.Decoder Bool
-modifierDecoder modifier =
-    JD.field modifier JD.bool
+enter : a -> Decoder a
+enter msg =
+    JD.succeed (\_ _ _ _ _ -> msg)
+        |> required "ctrlKey" (succeedIfEq False JD.bool)
+        |> required "shiftKey" (succeedIfEq False JD.bool)
+        |> required "altKey" (succeedIfEq False JD.bool)
+        |> required "metaKey" (succeedIfEq False JD.bool)
+        |> required "key" (succeedIfEq "Enter" JD.string)
 
 
-keyDecoder : JD.Decoder String
-keyDecoder =
-    JD.field "key" JD.string
-
-
-modifierDown : String -> JD.Decoder Bool
-modifierDown modifier =
-    modifierDecoder modifier |> succeedWhenEq True True
-
-
-keyEq : String -> Decoder Bool
-keyEq key =
-    succeedWhenEq key True keyDecoder
-
-
-all : List (Decoder Bool) -> Decoder Bool
-all =
-    JDX.combine >> (JD.map <| List.all identity)
-
-
-ctrlEnter : a -> Decoder a
-ctrlEnter msg =
-    all [ modifierDown "ctrlKey", keyEq "Enter" ]
-        |> succeedWhenTrue msg
+onKeyDown : List (Decoder a) -> H.Attribute a
+onKeyDown =
+    E.on "keydown" << JD.oneOf
 
 
 viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
@@ -218,7 +196,7 @@ viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta ini
         dueDateChanged maybeDueDate =
             onChange { model | maybeDueDate = maybeDueDate }
     in
-    col [ A.class "pa1" ]
+    col [ A.class "pa1", onKeyDown [ enter onSave ] ]
         [ col [ A.class "pv1" ]
             [ ipt2 model.title titleChanged
             ]
