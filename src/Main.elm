@@ -605,6 +605,12 @@ viewAddTodoButtonFor kind =
             []
 
 
+viewTodoListContent :
+    TodoListKind
+    -> { a | projectList : List Project, today : Date }
+    -> Maybe TodoForm
+    -> List Todo
+    -> List (H.Html Msg)
 viewTodoListContent kind model maybeTodoForm todoList =
     let
         viewTodoItem =
