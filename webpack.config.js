@@ -15,24 +15,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.s?css$/,
-        loader: [
-          'style-loader',
-          'css-loader',
-          // { loader: 'css-loader', options: { importLoaders: 1 } },
-          // {
-          //   loader: 'postcss-loader',
-          //   options: {
-          //     // ident: 'postcss',
-          //     plugins: [
-          //       require('postcss-import'),
-          //       require('precss'),
-          //       require('tailwindcss'),
-          //       require('autoprefixer'),
-          //     ],
-          //   },
-          // },
-        ],
+        test: /\.css$/,
+        loader: ['style-loader', 'css-loader'],
       },
       // { test: /\.tsx?$/, loader: ['ts-loader'] },
       {
@@ -48,25 +32,12 @@ module.exports = {
     ],
   },
   plugins: [new HtmlWebpackPlugin({ template: './src/index.html' })],
-  optimization: {
-    // splitChunks: false,
-    // runtimeChunk: true,
-    // splitChunks: {
-    //   cacheGroups: {
-    //     vendors: {
-    //       test: /[\\/]node_modules[\\/]/,
-    //     },
-    //   },
-    // },
-  },
   // https://webpack.js.org/configuration/stats/
   // stats: 'errors-warnings',
   stats: {
     children: false,
     modules: false,
   },
-  // devtool: isProduction ? 'source-map' : 'eval-source-map',
-  // devtool: isProduction ? 'source-map' : false,
   devtool: false,
   // https://webpack.js.org/configuration/dev-server/
   devServer: {
