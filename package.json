@@ -7,10 +7,11 @@
     "last 2 Chrome versions"
   ],
   "scripts": {
-    "start": "webpack-dev-server",
-    "open": "wait-on http://localhost:8080/ && start http://localhost:8080/",
+    "start": "npx webpack-dev-server",
+    "open": "npx wait-on http://localhost:8080/ && start http://localhost:8080/",
     "genId": "node src/genId.js TodoId ProjectId",
-    "build": "webpack -p"
+    "build": "npx webpack -p",
+    "serve": "npx serve dist"
   },
   "keywords": [],
   "author": "",
