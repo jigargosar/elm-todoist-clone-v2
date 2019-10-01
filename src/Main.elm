@@ -557,6 +557,19 @@ type TodoListKind
 
 filteredTodoList : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
 filteredTodoList kind model =
+    let
+        overDuePred today =
+            allPass
+                [ propEq .isDone False
+                , .maybeDueDate >> MX.unwrap False (\dueDate -> Date.compare dueDate today == LT)
+                ]
+
+        dueOnPred dueDate =
+            allPass
+                [ propEq .isDone False
+                , propEq .maybeDueDate (Just dueDate)
+                ]
+    in
     case kind of
         OverDueTodoList ->
             List.filter (overDuePred model.today)
@@ -732,20 +745,6 @@ dateRange : Int -> Int -> Date -> List Date
 dateRange from to refDate =
     List.range from to
         |> List.map (\ct -> Date.add Date.Days ct refDate)
-
-
-overDuePred today =
-    allPass
-        [ propEq .isDone False
-        , .maybeDueDate >> MX.unwrap False (\dueDate -> Date.compare dueDate today == LT)
-        ]
-
-
-dueOnPred dueDate =
-    allPass
-        [ propEq .maybeDueDate (Just dueDate)
-        , propEq .isDone False
-        ]
 
 
 
