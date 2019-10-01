@@ -888,6 +888,7 @@ viewTodoTitle todo =
         [ H.text todo.title ]
 
 
+displayProjectTitle : List Project -> Maybe ProjectId -> String
 displayProjectTitle projectList maybeProjectId =
     projectList
         |> LX.find (.id >> (\id -> Just id == maybeProjectId))
