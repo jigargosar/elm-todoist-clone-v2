@@ -739,16 +739,6 @@ viewTodoListSection kind model =
 
 
 
--- VIEW DUE_DATE TODO_ROUTES
-
-
-dateRange : Int -> Int -> Date -> List Date
-dateRange from to refDate =
-    List.range from to
-        |> List.map (\ct -> Date.add Date.Days ct refDate)
-
-
-
 -- VIEW TODO_FORM
 
 
@@ -860,6 +850,16 @@ viewTodoDueDate today todo =
             (\dueDate ->
                 row [ A.class "self-start pa1 f7 code" ] [ H.text (humanDate today dueDate) ]
             )
+
+
+
+-- DATE HELPERS
+
+
+dateRange : Int -> Int -> Date -> List Date
+dateRange from to refDate =
+    List.range from to
+        |> List.map (\ct -> Date.add Date.Days ct refDate)
 
 
 humanDate : Date -> Date -> String
