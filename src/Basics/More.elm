@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -19,6 +19,11 @@ type alias HasId a id =
 idEq : id -> HasId a id -> Bool
 idEq id_ { id } =
     id == id_
+
+
+findById : a -> List (HasId b a) -> Maybe (HasId b a)
+findById id =
+    List.Extra.find <| idEq id
 
 
 propEq : (big -> small) -> small -> big -> Bool

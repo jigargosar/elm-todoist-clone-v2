@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import HasSeed
@@ -299,14 +299,10 @@ update msg model =
             ( updateTodoWith todoId (Todo.applyPatches now patches) model, Cmd.none )
 
         MoveUp todoId ->
-            ( updateTodoWith todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx - 1 }) model
-            , Cmd.none
-            )
+            ( model, patchTodoProjectSortIdxBy -1 todoId model )
 
         MoveDown todoId ->
-            ( updateTodoWith todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx + 1 }) model
-            , Cmd.none
-            )
+            ( model, patchTodoProjectSortIdxBy 1 todoId model )
 
         SetTodoIsDone todoId isDone ->
             ( model |> mapTodoList (updateWhenIdEq todoId (\todo -> { todo | isDone = isDone }))
@@ -354,6 +350,18 @@ update msg model =
 
         Cancel ->
             ( { model | maybeTodoForm = Nothing }, Cmd.none )
+
+
+patchTodoProjectSortIdxBy : Int -> TodoId -> Model -> Cmd Msg
+patchTodoProjectSortIdxBy offset todoId model =
+    findById todoId model.todoList
+        |> Maybe.map (.projectSortIdx >> (+) offset >> Todo.ProjectSortIdx >> applyTodoPatch todoId)
+        |> Maybe.withDefault Cmd.none
+
+
+applyTodoPatch : TodoId -> Todo.Patch -> Cmd Msg
+applyTodoPatch todoId patch =
+    Time.now |> Task.perform (PatchTodo todoId [ patch ])
 
 
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
