@@ -548,6 +548,30 @@ type TodoListKind
     | SearchResultTodoList String
 
 
+filteredTodoList kind model =
+    case kind of
+        OverDueTodoList ->
+            List.filter (overDuePred model.today)
+
+        DueAtTodoList dueDate ->
+            List.filter (dueOnPred dueDate)
+
+        ProjectTodoList maybeProjectId ->
+            sortedTodoListForMaybeProjectId maybeProjectId
+
+        SearchResultTodoList query ->
+            let
+                pred : { a | title : String } -> Bool
+                pred =
+                    if query |> String.isEmpty then
+                        always True
+
+                    else
+                        .title >> String.contains query
+            in
+            List.filter pred
+
+
 
 -- VIEW DUE_DATE TODO_ROUTES
 
