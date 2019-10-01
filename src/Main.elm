@@ -610,8 +610,8 @@ viewTodoListDueOn dueDate model =
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
 
-        l : List (H.Html Msg)
-        l =
+        contentHtmlList : List (H.Html Msg)
+        contentHtmlList =
             case model.maybeTodoForm of
                 Just form ->
                     let
@@ -640,7 +640,7 @@ viewTodoListDueOn dueDate model =
                     List.map viewTodoItem todoList
                         ++ [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
     in
-    [ titleHtml ] ++ l
+    [ titleHtml ] ++ contentHtmlList
 
 
 viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
