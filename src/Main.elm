@@ -253,6 +253,7 @@ setTodoForm form model =
 type Msg
     = NoOp
     | InsertNewTodoFromPartial (TodoForm.Partial {}) Posix
+    | PatchTodoFromPartial TodoId (TodoForm.Partial {}) Posix
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | MoveUp TodoId
@@ -293,6 +294,9 @@ update msg model =
                 |> uncurry insertTodo
             , Cmd.none
             )
+
+        PatchTodoFromPartial todoId partial now ->
+            ( updateTodoWithIdBy todoId (Todo.patchWithPartial now partial) model, Cmd.none )
 
         MoveUp todoId ->
             ( updateTodoWithIdBy todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx - 1 }) model
@@ -364,7 +368,7 @@ saveTodoForm form model =
                     ( model, Time.now |> Task.perform (InsertNewTodoFromPartial partial) )
 
                 TodoForm.Edit todoId ->
-                    ( updateTodoWithIdBy todoId (Todo.patchWithPartial partial) model, Cmd.none )
+                    ( model, Time.now |> Task.perform (PatchTodoFromPartial todoId partial) )
     in
     ( { newModel | maybeTodoForm = Nothing }
     , cmd

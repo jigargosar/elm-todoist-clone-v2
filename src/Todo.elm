@@ -20,6 +20,7 @@ type alias Todo =
     , maybeDueDate : Maybe Date
     , projectSortIdx : Int
     , createdAt : Posix
+    , updatedAt : Posix
     }
 
 
@@ -37,13 +38,18 @@ mockTitles =
     ]
 
 
+defaultPosix : Posix
+defaultPosix =
+    Time.millisToPosix 0
+
+
 mockListGenerator : Random.Generator (List Todo)
 mockListGenerator =
     let
         gen : Random.Generator Todo
         gen =
             TodoId.generator
-                |> Random.map (\id -> Todo id "" False False Nothing Nothing 0 (Time.millisToPosix 0))
+                |> Random.map (\id -> Todo id "" False False Nothing Nothing 0 defaultPosix defaultPosix)
     in
     Random.list (List.length mockTitles) gen
         |> Random.map (List.map2 setTitle mockTitles >> setSortIndices)
@@ -69,24 +75,37 @@ setSortIndices =
     List.indexedMap setProjectSortIdx
 
 
+posixDecoder : JD.Decoder Posix
+posixDecoder =
+    JD.int |> JD.map Time.millisToPosix
+
+
 decoder : JD.Decoder Todo
 decoder =
+    let
+        optionalPosix field =
+            optional field posixDecoder defaultPosix
+    in
     JD.succeed Todo
         |> required "id" TodoId.decoder
         |> required "title" JD.string
         |> required "isDone" JD.bool
         |> optional "isDeleted" JD.bool False
-        |> optional "maybeProjectId"
-            (ProjectId.decoder |> JD.map Just)
-            Nothing
+        |> optional "maybeProjectId" (ProjectId.decoder |> JD.map Just) Nothing
         |> optional "maybeDueDate" (JD.string |> JD.map (Date.fromIsoString >> Result.toMaybe)) Nothing
         |> optional "projectSortIdx" JD.int 0
-        |> optional "createdAt" (JD.int |> JD.map Time.millisToPosix) (Time.millisToPosix 0)
+        |> optionalPosix "createdAt"
+        |> optionalPosix "updatedAt"
 
 
 maybeEncoder : (a -> Value) -> Maybe a -> Value
 maybeEncoder =
     MX.unwrap JE.null
+
+
+posixEncoder : Posix -> Value
+posixEncoder posix =
+    JE.int (Time.posixToMillis posix)
 
 
 encoder : Todo -> Value
@@ -99,7 +118,8 @@ encoder ({ id, title, isDone, isDeleted, maybeProjectId, maybeDueDate, projectSo
         , ( "maybeProjectId", maybeEncoder ProjectId.encoder maybeProjectId )
         , ( "maybeDueDate", maybeEncoder (Date.toIsoString >> JE.string) maybeDueDate )
         , ( "projectSortIdx", JE.int projectSortIdx )
-        , ( "createdAt", JE.int (Time.posixToMillis m.createdAt) )
+        , ( "createdAt", posixEncoder m.createdAt )
+        , ( "updatedAt", posixEncoder m.updatedAt )
         ]
 
 
@@ -114,7 +134,7 @@ type alias Partial a =
 
 fromPartial : TodoId -> Posix -> Partial a -> Todo
 fromPartial id now { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    Todo id title False False maybeProjectId maybeDueDate projectSortIdx now
+    Todo id title False False maybeProjectId maybeDueDate projectSortIdx now now
 
 
 generatorFromPartial : Posix -> Partial a -> Random.Generator Todo
@@ -123,11 +143,12 @@ generatorFromPartial now partial =
         |> Random.map (\id -> fromPartial id now partial)
 
 
-patchWithPartial : Partial a -> Todo -> Todo
-patchWithPartial p todo =
+patchWithPartial : Posix -> Partial a -> Todo -> Todo
+patchWithPartial now p todo =
     { todo
         | title = p.title
         , maybeProjectId = p.maybeProjectId
         , maybeDueDate = p.maybeDueDate
         , projectSortIdx = p.projectSortIdx
+        , updatedAt = now
     }
