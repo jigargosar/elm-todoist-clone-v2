@@ -611,13 +611,18 @@ todoListFor kind model =
                 [ propEq .isDone False
                 , propEq .maybeDueDate (Just dueDate)
                 ]
+
+        sortByCreatedAt =
+            List.sortBy (.createdAt >> Time.posixToMillis)
     in
     case kind of
         OverDueTodoList ->
             List.filter (overDuePred model.today)
+                >> sortByCreatedAt
 
         DueAtTodoList dueDate ->
             List.filter (dueOnPred dueDate)
+                >> sortByCreatedAt
 
         ProjectTodoList maybeProjectId ->
             sortedTodoListForMaybeProjectId maybeProjectId
