@@ -149,11 +149,20 @@ createConfig =
     Config
 
 
-noModifiers : msg -> Decoder msg
-noModifiers msg =
+noModifiersDown : msg -> Decoder msg
+noModifiersDown msg =
     JDX.when modifiersDecoder
         (\{ ctrlKey, shiftKey, altKey, metaKey } ->
             not (ctrlKey || shiftKey || altKey || metaKey)
+        )
+        (JD.succeed msg)
+
+
+onlyCtrlDown : msg -> Decoder msg
+onlyCtrlDown msg =
+    JDX.when modifiersDecoder
+        (\{ ctrlKey, shiftKey, altKey, metaKey } ->
+            ctrlKey && not (shiftKey || altKey || metaKey)
         )
         (JD.succeed msg)
 
@@ -184,13 +193,19 @@ keyName =
     JD.field "key" JD.string
 
 
+is : a -> a -> Bool
 is =
     (==)
 
 
 enter : msg -> Decoder msg
 enter msg =
-    JDX.when keyName (is "Enter") (noModifiers msg)
+    JDX.when keyName (is "Enter") (noModifiersDown msg)
+
+
+ctrlEnter : msg -> Decoder msg
+ctrlEnter msg =
+    JDX.when keyName (is "Enter") (onlyCtrlDown msg)
 
 
 onKeyDown : List (Decoder a) -> H.Attribute a
