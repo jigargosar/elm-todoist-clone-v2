@@ -308,7 +308,10 @@ update msg model =
 
         AddTodoOnDueDateClicked dueDate ->
             ( model
-                |> setTodoForm (TodoForm.initAdd (\d -> { d | maybeDueDate = Just dueDate }))
+                |> setTodoForm
+                    (TodoForm.initAdd
+                        (\d -> { d | maybeDueDate = Just dueDate })
+                    )
             , Cmd.none
             )
 
