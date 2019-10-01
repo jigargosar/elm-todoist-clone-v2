@@ -20,14 +20,13 @@ import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
-import Key
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
 import Todo exposing (Todo)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, col, ipt2, ipt3, row)
+import UI exposing (btn2, col, ipt3, row)
 
 
 type Meta
@@ -162,7 +161,7 @@ viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta ini
         dueDateChanged maybeDueDate =
             onChange { model | maybeDueDate = maybeDueDate }
     in
-    H.form [ A.class "flex flex-column pa1", Key.onKeyDown [{- Key.ctrlEnter onSave -}], E.onSubmit onSave ]
+    H.form [ A.class "flex flex-column pa1", E.onSubmit onSave ]
         [ col [ A.class "pv1" ]
             [ ipt3 model.title titleChanged [ A.autofocus True ]
             ]
