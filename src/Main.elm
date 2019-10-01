@@ -573,6 +573,22 @@ filteredTodoList kind model =
             List.filter pred
 
 
+viewAddTodoButtonFor : TodoListKind -> H.Html Msg
+viewAddTodoButtonFor kind =
+    case kind of
+        OverDueTodoList ->
+            H.text ""
+
+        DueAtTodoList dueDate ->
+            viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
+
+        ProjectTodoList maybeProjectId ->
+            viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId)
+
+        SearchResultTodoList _ ->
+            H.text ""
+
+
 
 -- VIEW DUE_DATE TODO_ROUTES
 
