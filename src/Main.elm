@@ -358,7 +358,12 @@ patchTodoProjectSortIdxBy offset todoId model =
 
 applyTodoPatch : TodoId -> Todo.Patch -> Cmd Msg
 applyTodoPatch todoId patch =
-    Time.now |> Task.perform (PatchTodo todoId [ patch ])
+    applyTodoPatches todoId [ patch ]
+
+
+applyTodoPatches : TodoId -> List Todo.Patch -> Cmd Msg
+applyTodoPatches todoId todoPatches =
+    Time.now |> Task.perform (PatchTodo todoId todoPatches)
 
 
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
@@ -373,7 +378,7 @@ saveTodoForm form model =
                     ( model, Time.now |> Task.perform (InsertNewTodoWithPatches patches) )
 
                 TodoForm.Edit todoId ->
-                    ( model, Time.now |> Task.perform (PatchTodo todoId patches) )
+                    ( model, applyTodoPatches todoId patches )
     in
     ( { newModel | maybeTodoForm = Nothing }
     , cmd
