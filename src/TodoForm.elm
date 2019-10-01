@@ -27,7 +27,7 @@ import ProjectId exposing (ProjectId)
 import Random
 import Todo exposing (Todo)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, col, ipt2, row)
+import UI exposing (btn2, col, ipt2, ipt3, row)
 
 
 type Meta
@@ -164,7 +164,7 @@ viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta ini
     in
     col [ A.class "pa1", Key.onKeyDown [ Key.ctrlEnter onSave ] ]
         [ col [ A.class "pv1" ]
-            [ ipt2 model.title titleChanged
+            [ ipt3 model.title titleChanged [ A.autofocus True ]
             ]
         , Project.viewSelectOne model.maybeProjectId projectChanged projectList
         , viewDueDateInput model.maybeDueDate dueDateChanged
