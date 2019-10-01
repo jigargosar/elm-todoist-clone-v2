@@ -1,7 +1,6 @@
 module TodoForm exposing
     ( Config
     , Meta(..)
-    , Partial
     , TodoForm
     , createConfig
     , getMeta
@@ -11,7 +10,6 @@ module TodoForm exposing
     , isAddingForInitialDueDate
     , isEditingFor
     , setProjectSortIdxIfAdding
-    , toPartialWithMeta
     , toPatchesWithMeta
     , viewTodoForm
     )
@@ -40,29 +38,11 @@ type TodoForm
 
 
 type alias Internal =
-    Partial {}
-
-
-type alias InternalConstructor =
     { title : String
     , maybeProjectId : Maybe ProjectId
     , maybeDueDate : Maybe Date
     , projectSortIdx : Int
     }
-
-
-type alias Partial a =
-    { a
-        | title : String
-        , maybeProjectId : Maybe ProjectId
-        , maybeDueDate : Maybe Date
-        , projectSortIdx : Int
-    }
-
-
-toPartialWithMeta : TodoForm -> ( Meta, Partial {} )
-toPartialWithMeta (TodoForm meta _ internal) =
-    ( meta, internal )
 
 
 toPatchesWithMeta : TodoForm -> ( Meta, List Todo.Patch )
@@ -134,7 +114,7 @@ mapIfAdding func (TodoForm meta initial current) =
 
 empty : Internal
 empty =
-    InternalConstructor "" Nothing Nothing Random.maxInt
+    Internal "" Nothing Nothing Random.maxInt
 
 
 initAdd : (Internal -> Internal) -> TodoForm
@@ -149,7 +129,7 @@ init meta internal =
 
 initEdit : Todo -> TodoForm
 initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    init (Edit id) <| InternalConstructor title maybeProjectId maybeDueDate projectSortIdx
+    init (Edit id) <| Internal title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg
