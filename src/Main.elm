@@ -555,8 +555,8 @@ type TodoListKind
     | SearchResultTodoList String
 
 
-filteredTodoList : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
-filteredTodoList kind model =
+todoListFor : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
+todoListFor kind model =
     let
         overDuePred today =
             allPass
@@ -714,7 +714,7 @@ viewTodoListSection kind model =
     let
         todoList : List Todo
         todoList =
-            filteredTodoList kind model model.todoList
+            todoListFor kind model model.todoList
 
         shouldHideWhenTodoListEmpty =
             case kind of
