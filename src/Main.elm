@@ -371,17 +371,14 @@ saveTodoForm form model =
     let
         ( meta, patches ) =
             TodoForm.toPatchesWithMeta form
-
-        ( newModel, cmd ) =
-            case meta of
-                TodoForm.Add ->
-                    ( model, Time.now |> Task.perform (InsertNewTodoWithPatches patches) )
-
-                TodoForm.Edit todoId ->
-                    ( model, applyTodoPatches todoId patches )
     in
-    ( { newModel | maybeTodoForm = Nothing }
-    , cmd
+    ( { model | maybeTodoForm = Nothing }
+    , case meta of
+        TodoForm.Add ->
+            Time.now |> Task.perform (InsertNewTodoWithPatches patches)
+
+        TodoForm.Edit todoId ->
+            applyTodoPatches todoId patches
     )
 
 
