@@ -34,10 +34,10 @@ type Meta
 
 
 type TodoForm
-    = TodoForm Meta Internal Internal
+    = TodoForm Meta Fields Fields
 
 
-type alias Internal =
+type alias Fields =
     { title : String
     , maybeProjectId : Maybe ProjectId
     , maybeDueDate : Maybe Date
@@ -50,7 +50,7 @@ toPatchesWithMeta (TodoForm meta _ current) =
     ( meta, toPatches current )
 
 
-toPatches : Internal -> List Todo.Patch
+toPatches : Fields -> List Todo.Patch
 toPatches m =
     [ Todo.Title m.title
     , Todo.Project m.maybeProjectId
@@ -87,12 +87,12 @@ isAddingForInitialDueDate dueDate =
         ]
 
 
-unwrap : TodoForm -> Internal
+unwrap : TodoForm -> Fields
 unwrap (TodoForm _ _ internal) =
     internal
 
 
-unwrapInitial : TodoForm -> Internal
+unwrapInitial : TodoForm -> Fields
 unwrapInitial (TodoForm _ initial _) =
     initial
 
@@ -102,7 +102,7 @@ setProjectSortIdxIfAdding projectSortIdx =
     mapIfAdding (\f -> { f | projectSortIdx = projectSortIdx })
 
 
-mapIfAdding : (Internal -> Internal) -> TodoForm -> Maybe TodoForm
+mapIfAdding : (Fields -> Fields) -> TodoForm -> Maybe TodoForm
 mapIfAdding func (TodoForm meta initial current) =
     case meta of
         Add ->
@@ -112,24 +112,24 @@ mapIfAdding func (TodoForm meta initial current) =
             Nothing
 
 
-empty : Internal
+empty : Fields
 empty =
-    Internal "" Nothing Nothing Random.maxInt
+    Fields "" Nothing Nothing Random.maxInt
 
 
-initAdd : (Internal -> Internal) -> TodoForm
+initAdd : (Fields -> Fields) -> TodoForm
 initAdd func =
     init Add <| func empty
 
 
-init : Meta -> Internal -> TodoForm
+init : Meta -> Fields -> TodoForm
 init meta internal =
     TodoForm meta internal internal
 
 
 initEdit : Todo -> TodoForm
 initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    init (Edit id) <| Internal title maybeProjectId maybeDueDate projectSortIdx
+    init (Edit id) <| Fields title maybeProjectId maybeDueDate projectSortIdx
 
 
 type Config msg
