@@ -555,6 +555,38 @@ type TodoListKind
     | SearchResultTodoList String
 
 
+viewTodoListSection :
+    TodoListKind
+    -> { a | todoList : List Todo, today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm }
+    -> List (H.Html Msg)
+viewTodoListSection kind model =
+    let
+        todoList : List Todo
+        todoList =
+            todoListFor kind model model.todoList
+
+        hideWhenEmpty =
+            case kind of
+                OverDueTodoList ->
+                    True
+
+                DueAtTodoList _ ->
+                    False
+
+                ProjectTodoList _ ->
+                    False
+
+                SearchResultTodoList _ ->
+                    False
+    in
+    if hideWhenEmpty && todoList == [] then
+        []
+
+    else
+        viewTodoListTitle kind model
+            :: viewTodoListContent kind model model.maybeTodoForm todoList
+
+
 todoListFor : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
 todoListFor kind model =
     let
@@ -714,38 +746,6 @@ viewTodoListContent kind model maybeTodoForm todoList =
 
                 Nothing ->
                     List.map viewTodoItem todoList ++ viewAddBtn
-
-
-viewTodoListSection :
-    TodoListKind
-    -> { a | todoList : List Todo, today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm }
-    -> List (H.Html Msg)
-viewTodoListSection kind model =
-    let
-        todoList : List Todo
-        todoList =
-            todoListFor kind model model.todoList
-
-        hideWhenEmpty =
-            case kind of
-                OverDueTodoList ->
-                    True
-
-                DueAtTodoList _ ->
-                    False
-
-                ProjectTodoList _ ->
-                    False
-
-                SearchResultTodoList _ ->
-                    False
-    in
-    if hideWhenEmpty && todoList == [] then
-        []
-
-    else
-        viewTodoListTitle kind model
-            :: viewTodoListContent kind model model.maybeTodoForm todoList
 
 
 
