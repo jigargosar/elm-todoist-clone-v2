@@ -573,6 +573,22 @@ filteredTodoList kind model =
             List.filter pred
 
 
+viewTodoListTitle : TodoListKind -> { a | today : Date, projectList : List Project } -> H.Html Msg
+viewTodoListTitle kind model =
+    case kind of
+        OverDueTodoList ->
+            col [] [ H.text "OverDue" ]
+
+        DueAtTodoList dueDate ->
+            col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
+
+        ProjectTodoList maybeProjectId ->
+            col [] [ H.text <| displayProjectTitle model.projectList maybeProjectId ]
+
+        SearchResultTodoList _ ->
+            col [] [ H.text "Tasks" ]
+
+
 viewAddTodoButtonFor : TodoListKind -> H.Html Msg
 viewAddTodoButtonFor kind =
     case kind of
@@ -872,12 +888,16 @@ viewTodoTitle todo =
         [ H.text todo.title ]
 
 
+displayProjectTitle projectList maybeProjectId =
+    projectList
+        |> LX.find (.id >> (\id -> Just id == maybeProjectId))
+        |> MX.unwrap "Inbox" .title
+
+
 viewTodoProjectPill projectList todo =
     let
         todoProjectTitle { maybeProjectId } =
-            projectList
-                |> LX.find (.id >> (\id -> Just id == maybeProjectId))
-                |> MX.unwrap "Inbox" .title
+            displayProjectTitle projectList maybeProjectId
     in
     row [ A.class "self-start lh-solid pa1 f7 ba br-pill bg-black-10" ]
         [ H.text <| todoProjectTitle todo ]
