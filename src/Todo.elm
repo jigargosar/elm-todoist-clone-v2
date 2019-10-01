@@ -1,4 +1,4 @@
-module Todo exposing (Todo, decoder, encoder, generatorFromPartial, mockListGenerator, patchWithPartial)
+module Todo exposing (Todo, applyPatches, decoder, encoder, generatorFromPartial, mockListGenerator, patchWithPartial)
 
 import Date exposing (Date)
 import Json.Decode as JD
@@ -152,3 +152,45 @@ patchWithPartial now p todo =
         , projectSortIdx = p.projectSortIdx
         , updatedAt = now
     }
+
+
+type Patch
+    = Title String
+    | Project (Maybe ProjectId)
+    | ProjectSortIdx Int
+    | DueDate (Maybe Date)
+    | Completed Bool
+
+
+applyPatches : Posix -> List Patch -> Todo -> Todo
+applyPatches now patches todo =
+    List.foldl applyPatch todo patches
+        |> setUpdatedAtIfNotEq now todo
+
+
+setUpdatedAtIfNotEq : Posix -> Todo -> Todo -> Todo
+setUpdatedAtIfNotEq now oldTodo newTodo =
+    if oldTodo /= newTodo then
+        { newTodo | updatedAt = now }
+
+    else
+        newTodo
+
+
+applyPatch : Patch -> Todo -> Todo
+applyPatch patch todo =
+    case patch of
+        Title v ->
+            { todo | title = v }
+
+        Project v ->
+            { todo | maybeProjectId = v }
+
+        ProjectSortIdx v ->
+            { todo | projectSortIdx = v }
+
+        DueDate v ->
+            { todo | maybeDueDate = v }
+
+        Completed v ->
+            { todo | isDone = v }
