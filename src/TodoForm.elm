@@ -166,14 +166,26 @@ succeedIfEq val =
     succeedIf ((==) val)
 
 
-enter : a -> Decoder a
+modifierIs bool modifier =
+    required modifier (succeedIfEq bool JD.bool)
+
+
+noModifiers : b -> Decoder b
+noModifiers msg =
+    JD.succeed (\_ _ _ _ -> msg)
+        |> modifierIs False "ctrlKey"
+        |> modifierIs False "shiftKey"
+        |> modifierIs False "altKey"
+        |> modifierIs False "ctrlKey"
+
+
+keyDecoder : Decoder String
+keyDecoder =
+    JD.field "key" JD.string
+
+
 enter msg =
-    JD.succeed (\_ _ _ _ _ -> msg)
-        |> required "ctrlKey" (succeedIfEq False JD.bool)
-        |> required "shiftKey" (succeedIfEq False JD.bool)
-        |> required "altKey" (succeedIfEq False JD.bool)
-        |> required "metaKey" (succeedIfEq False JD.bool)
-        |> required "key" (succeedIfEq "Enter" JD.string)
+    JDX.when keyDecoder ((==) "Enter") (noModifiers msg)
 
 
 onKeyDown : List (Decoder a) -> H.Attribute a
