@@ -47,7 +47,7 @@ routeEncoder route =
             enc1 "RouteInbox"
 
         RouteToday ->
-            enc1 "RouteInbox"
+            enc1 "RouteToday"
 
         RouteProject projectId ->
             enc2 "RouteProject" (ProjectId.encoder projectId)
@@ -520,15 +520,21 @@ navBtn isActive title msg =
 
 viewRoute : Model -> Route -> List (H.Html Msg)
 viewRoute model route =
+    let
+        viewTodoList : TodoListKind -> List (H.Html Msg)
+        viewTodoList kind =
+            viewTodoListSection kind model
+    in
     case route of
         RouteInbox ->
             viewProjectTodoList Nothing model
 
-        RouteToday ->
-            viewDueTodayAndOverdueTodoList model
-
         RouteProject projectId ->
-            viewProjectTodoList (Just projectId) model
+            viewTodoList (ProjectTodoList <| Just projectId)
+
+        RouteToday ->
+            [ OverDueTodoList, DueAtTodoList model.today ]
+                |> List.concatMap viewTodoList
 
         RouteNext7Days ->
             viewNext7DaysTodoList model
