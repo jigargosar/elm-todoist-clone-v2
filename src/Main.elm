@@ -254,7 +254,7 @@ type Msg
     = NoOp
     | InsertNewTodoWithPatches (List Todo.Patch) Posix
     | PatchTodo TodoId (List Todo.Patch) Posix
-    | SetTodoIsDone TodoId Bool
+    | SetTodoCompleted TodoId Bool
     | DeleteTodo TodoId
     | MoveUp TodoId
     | MoveDown TodoId
@@ -290,8 +290,7 @@ update msg model =
             )
 
         InsertNewTodoWithPatches patches now ->
-            ( HasSeed.step (Todo.generator now patches) model
-                |> uncurry insertTodo
+            ( HasSeed.step (Todo.generator now patches) model |> uncurry insertTodo
             , Cmd.none
             )
 
@@ -304,10 +303,8 @@ update msg model =
         MoveDown todoId ->
             ( model, patchTodoProjectSortIdxBy 1 todoId model )
 
-        SetTodoIsDone todoId isDone ->
-            ( model |> mapTodoList (updateWhenIdEq todoId (\todo -> { todo | isDone = isDone }))
-            , Cmd.none
-            )
+        SetTodoCompleted todoId isDone ->
+            ( model, applyTodoPatch todoId (Todo.Completed isDone) )
 
         AddTodoOnDueDateClicked dueDate ->
             ( model
@@ -834,7 +831,7 @@ viewTodoListItem kind model =
 viewTodoCheckbox : Todo -> H.Html Msg
 viewTodoCheckbox todo =
     row [ A.class "pa1" ]
-        [ checkbox3 todo.isDone (SetTodoIsDone todo.id) [ A.class "sz-24" ]
+        [ checkbox3 todo.isDone (SetTodoCompleted todo.id) [ A.class "sz-24" ]
         ]
 
 
