@@ -573,11 +573,6 @@ editFormForTodoId todoId maybeTodoForm =
         |> MX.filter (TodoForm.isEditingFor todoId)
 
 
-addFormWithInitialDueDate dueDate maybeTodoForm =
-    maybeTodoForm
-        |> MX.filter (TodoForm.isAddingForInitialDueDate dueDate)
-
-
 viewOverDueTodoList : Model -> List (H.Html Msg)
 viewOverDueTodoList model =
     unlessEmpty
