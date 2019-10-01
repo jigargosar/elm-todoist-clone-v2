@@ -682,6 +682,33 @@ viewTodoListContent kind model maybeTodoForm todoList =
                     List.map viewTodoItem todoList ++ viewAddBtn
 
 
+viewTodoListSection kind model =
+    let
+        todoList : List Todo
+        todoList =
+            filteredTodoList kind model model.todoList
+
+        shouldHideWhenTodoListEmpty =
+            case kind of
+                OverDueTodoList ->
+                    True
+
+                DueAtTodoList date ->
+                    False
+
+                ProjectTodoList maybe ->
+                    False
+
+                SearchResultTodoList string ->
+                    False
+    in
+    if shouldHideWhenTodoListEmpty && todoList == [] then
+        []
+
+    else
+        viewTodoListTitle kind model :: viewTodoListContent kind model model.maybeTodoForm todoList
+
+
 
 -- VIEW DUE_DATE TODO_ROUTES
 
