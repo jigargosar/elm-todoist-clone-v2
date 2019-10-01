@@ -252,7 +252,7 @@ setTodoForm form model =
 
 type Msg
     = NoOp
-    | InsertNewTodoWithPatches (List Todo.Patch) Posix
+    | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
     | DeleteTodo TodoId
@@ -289,7 +289,7 @@ update msg model =
             , Cmd.none
             )
 
-        InsertNewTodoWithPatches patches now ->
+        InsertTodoWithPatches patches now ->
             ( HasSeed.step (Todo.generator now patches) model |> uncurry insertTodo
             , Cmd.none
             )
@@ -377,7 +377,7 @@ saveTodoForm form model =
     ( { model | maybeTodoForm = Nothing }
     , case meta of
         TodoForm.Add ->
-            Time.now |> Task.perform (InsertNewTodoWithPatches patches)
+            Time.now |> Task.perform (InsertTodoWithPatches patches)
 
         TodoForm.Edit todoId ->
             applyTodoPatches todoId patches
