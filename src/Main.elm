@@ -296,15 +296,15 @@ update msg model =
             )
 
         PatchTodoFromPartial todoId partial now ->
-            ( updateTodo todoId (Todo.patchWithPartial now partial) model, Cmd.none )
+            ( updateTodoWith todoId (Todo.patchWithPartial now partial) model, Cmd.none )
 
         MoveUp todoId ->
-            ( updateTodo todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx - 1 }) model
+            ( updateTodoWith todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx - 1 }) model
             , Cmd.none
             )
 
         MoveDown todoId ->
-            ( updateTodo todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx + 1 }) model
+            ( updateTodoWith todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx + 1 }) model
             , Cmd.none
             )
 
@@ -381,8 +381,8 @@ sortedTodoListForMaybeProjectId maybeProjectId =
         >> List.sortBy .projectSortIdx
 
 
-updateTodo : TodoId -> (Todo -> Todo) -> Model -> Model
-updateTodo id func model =
+updateTodoWith : TodoId -> (Todo -> Todo) -> Model -> Model
+updateTodoWith id func model =
     LX.find (idEq id) model.todoList
         |> Maybe.map
             (\todo ->
