@@ -26,7 +26,7 @@ import ProjectId exposing (ProjectId)
 import Random
 import Todo exposing (Todo)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, col, ipt3, row)
+import UI exposing (btn2, col, ipt3, row, submit)
 
 
 type Meta
@@ -167,7 +167,7 @@ viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta ini
             ]
         , Project.viewSelectOne model.maybeProjectId projectChanged projectList
         , viewDueDateInput model.maybeDueDate dueDateChanged
-        , row [ A.class "pv1" ] [ btn2 "Save" onSave, btn2 "Cancel" onCancel ]
+        , row [ A.class "pv1" ] [ submit "Save" [], btn2 "Cancel" onCancel ]
         ]
 
 

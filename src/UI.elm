@@ -49,6 +49,11 @@ btn2 title msg =
     btn3 title msg []
 
 
+submit : String -> List (H.Attribute msg) -> H.Html msg
+submit title attrs =
+    H.button (A.class "ph2 pv1 color-primary" :: attrs) [ H.text title ]
+
+
 btn1 : String -> H.Html msg
 btn1 title =
     H.button [ A.class "ph2 pv1 color-primary" ] [ H.text title ]
