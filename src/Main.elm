@@ -289,7 +289,7 @@ update msg model =
             )
 
         InsertNewTodoFromPartial partial now ->
-            ( HasSeed.step (Todo.generatorFromPartial partial) model
+            ( HasSeed.step (Todo.generatorFromPartial now partial) model
                 |> uncurry insertTodo
             , Cmd.none
             )
