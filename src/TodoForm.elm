@@ -15,7 +15,7 @@ module TodoForm exposing
     , viewTodoForm
     )
 
-import Basics.More exposing (allPass, ifElse, propEq)
+import Basics.More exposing (allPass, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -149,43 +149,48 @@ createConfig =
     Config
 
 
-succeedIf : (a -> Bool) -> Decoder a -> Decoder a
-succeedIf pred =
-    JD.andThen
-        (\val ->
-            if pred val then
-                JD.succeed val
-
-            else
-                JD.fail "pred failed"
-        )
-
-
-succeedIfEq : a -> Decoder a -> Decoder a
-succeedIfEq val =
-    succeedIf ((==) val)
-
-
-modifierIs bool modifier =
-    required modifier (succeedIfEq bool JD.bool)
-
-
-noModifiers : b -> Decoder b
+noModifiers : msg -> Decoder msg
 noModifiers msg =
-    JD.succeed (\_ _ _ _ -> msg)
-        |> modifierIs False "ctrlKey"
-        |> modifierIs False "shiftKey"
-        |> modifierIs False "altKey"
-        |> modifierIs False "ctrlKey"
+    JDX.when modifiersDecoder
+        (\{ ctrlKey, shiftKey, altKey, metaKey } ->
+            not (ctrlKey || shiftKey || altKey || metaKey)
+        )
+        (JD.succeed msg)
 
 
-keyDecoder : Decoder String
-keyDecoder =
+type alias Modifiers =
+    { ctrlKey : Bool
+    , shiftKey : Bool
+    , altKey : Bool
+    , metaKey : Bool
+    }
+
+
+modifiersDecoder : Decoder Modifiers
+modifiersDecoder =
+    let
+        bool name =
+            required name JD.bool
+    in
+    JD.succeed Modifiers
+        |> bool "ctrlKey"
+        |> bool "shiftKey"
+        |> bool "altKey"
+        |> bool "metaKey"
+
+
+keyName : Decoder String
+keyName =
     JD.field "key" JD.string
 
 
+is =
+    (==)
+
+
+enter : msg -> Decoder msg
 enter msg =
-    JDX.when keyDecoder ((==) "Enter") (noModifiers msg)
+    JDX.when keyName (is "Enter") (noModifiers msg)
 
 
 onKeyDown : List (Decoder a) -> H.Attribute a
