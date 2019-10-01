@@ -15,11 +15,13 @@ module TodoForm exposing
     , viewTodoForm
     )
 
-import Basics.More exposing (allPass, propEq)
+import Basics.More exposing (allPass, ifElse, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
+import Json.Decode as JD exposing (Decoder)
+import Json.Decode.Extra as JDX
 import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
@@ -144,6 +146,61 @@ type Config msg
 createConfig : { onSave : msg, onCancel : msg, toMsg : TodoForm -> msg } -> Config msg
 createConfig =
     Config
+
+
+succeedWhenTrue : a -> JD.Decoder Bool -> JD.Decoder a
+succeedWhenTrue msg =
+    JD.andThen
+        (\bool ->
+            if bool then
+                JD.succeed msg
+
+            else
+                JD.fail "failing because false"
+        )
+
+
+succeedWhenEq : a -> b -> JD.Decoder a -> JD.Decoder b
+succeedWhenEq val msg =
+    JD.andThen
+        (\decodedVal ->
+            if decodedVal == val then
+                JD.succeed msg
+
+            else
+                JD.fail "failing because notEq"
+        )
+
+
+modifierDecoder : String -> JD.Decoder Bool
+modifierDecoder modifier =
+    JD.field modifier JD.bool
+
+
+keyDecoder : JD.Decoder String
+keyDecoder =
+    JD.field "key" JD.string
+
+
+modifierDown : String -> JD.Decoder Bool
+modifierDown modifier =
+    modifierDecoder modifier |> succeedWhenEq True True
+
+
+keyEq : String -> Decoder Bool
+keyEq key =
+    succeedWhenEq key True keyDecoder
+
+
+all : List (Decoder Bool) -> Decoder Bool
+all =
+    JDX.combine >> (JD.map <| List.all identity)
+
+
+ctrlEnter : a -> Decoder a
+ctrlEnter msg =
+    all [ modifierDown "ctrlKey", keyEq "Enter" ]
+        |> succeedWhenTrue msg
 
 
 viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
