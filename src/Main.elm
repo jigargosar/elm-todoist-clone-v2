@@ -586,7 +586,10 @@ viewOverDueTodoList model =
                 viewTodoItem =
                     viewDueDateTodoItem model.projectList
 
-                _ =
+                titleHtml =
+                    col [] [ H.text "OverDue" ]
+
+                contentHtmlList =
                     case model.maybeTodoForm of
                         Just form ->
                             let
@@ -602,17 +605,7 @@ viewOverDueTodoList model =
                         Nothing ->
                             List.map viewTodoItem todoList
             in
-            col [] [ H.text "OverDue" ]
-                :: List.map
-                    (\todo ->
-                        case editFormForTodoId todo.id model.maybeTodoForm of
-                            Just form ->
-                                viewTodoForm model.projectList form
-
-                            Nothing ->
-                                viewDueDateTodoItem model.projectList todo
-                    )
-                    todoList
+            titleHtml :: contentHtmlList
         )
         (List.filter (overDuePred model.today) model.todoList)
 
