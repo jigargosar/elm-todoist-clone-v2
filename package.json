@@ -7,8 +7,8 @@
     "last 2 Chrome versions"
   ],
   "scripts": {
-    "start": "pnpx webpack-dev-server",
-    "open": "pnpx wait-on http://localhost:8080/ && start http://localhost:8080/",
+    "start": "webpack-dev-server",
+    "open": "wait-on http://localhost:8080/ && start http://localhost:8080/",
     "genId": "node src/genId.js TodoId ProjectId"
   },
   "keywords": [],
