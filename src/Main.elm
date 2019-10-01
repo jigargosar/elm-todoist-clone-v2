@@ -253,7 +253,7 @@ setTodoForm form model =
 type Msg
     = NoOp
     | InsertNewTodoWithPatches (List Todo.Patch) Posix
-    | PatchTodo TodoId (List Todo.Patch) Posix
+    | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
     | DeleteTodo TodoId
     | MoveUp TodoId
@@ -294,7 +294,7 @@ update msg model =
             , Cmd.none
             )
 
-        PatchTodo todoId patches now ->
+        ApplyTodoPatches todoId patches now ->
             ( applyTodoPatchesWithNow todoId now patches model, Cmd.none )
 
         MoveUp todoId ->
@@ -362,7 +362,7 @@ patchTodo todoId patch =
 
 applyTodoPatches : TodoId -> List Todo.Patch -> Cmd Msg
 applyTodoPatches todoId todoPatches =
-    Time.now |> Task.perform (PatchTodo todoId todoPatches)
+    Time.now |> Task.perform (ApplyTodoPatches todoId todoPatches)
 
 
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
