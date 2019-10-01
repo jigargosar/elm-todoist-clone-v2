@@ -538,6 +538,43 @@ viewRoute model route =
 
 
 
+-- TodoListView
+
+
+type TodoListKind
+    = OverDueTodoList
+    | DueAtTodoList Date
+    | ProjectTodoList (Maybe ProjectId)
+    | SearchResultTodoList String
+
+
+viewTodoListItem kind model =
+    let
+        viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
+        viewDueDateTodoItem projectList todo =
+            row [ A.class "hide-child relative" ]
+                [ viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoProjectPill projectList todo
+                , row [ A.class "child absolute right-0 bg-white-90" ]
+                    [ btn2 "X" (DeleteTodo todo.id) ]
+                ]
+    in
+    case kind of
+        OverDueTodoList ->
+            viewDueDateTodoItem model.projectList
+
+        DueAtTodoList _ ->
+            viewDueDateTodoItem model.projectList
+
+        ProjectTodoList _ ->
+            viewProjectTodoItem model.today
+
+        SearchResultTodoList _ ->
+            viewSearchTodoItem model.today model.projectList
+
+
+
 -- VIEW DUE_DATE TODO_ROUTES
 
 
@@ -594,7 +631,7 @@ viewOverDueTodoList model =
                 viewEditableTodo todo =
                     model.maybeTodoForm
                         |> MX.filter (TodoForm.isEditingFor todo.id)
-                        |> MX.unpack (\_ -> viewDueDateTodoItem model.projectList todo)
+                        |> MX.unpack (\_ -> viewTodoListItem OverDueTodoList model todo)
                             (viewTodoForm model.projectList)
             in
             titleHtml :: List.map viewEditableTodo todoList
@@ -610,7 +647,7 @@ viewTodoListDueOn dueDate model =
 
         viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
-            viewDueDateTodoItem model.projectList
+            viewTodoListItem (DueAtTodoList dueDate) model
 
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
@@ -646,17 +683,6 @@ viewTodoListDueOn dueDate model =
                         ++ [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
     in
     [ titleHtml ] ++ contentHtmlList
-
-
-viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
-viewDueDateTodoItem projectList todo =
-    row [ A.class "hide-child relative" ]
-        [ viewTodoCheckbox todo
-        , viewTodoTitle todo
-        , viewTodoProjectPill projectList todo
-        , row [ A.class "child absolute right-0 bg-white-90" ]
-            [ btn2 "X" (DeleteTodo todo.id) ]
-        ]
 
 
 
