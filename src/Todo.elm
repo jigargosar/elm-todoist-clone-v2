@@ -5,9 +5,7 @@ module Todo exposing
     , decoder
     , encoder
     , generator
-    , generatorFromPartial
     , mockListGenerator
-    , patchWithPartial
     )
 
 import Date exposing (Date)
@@ -133,26 +131,6 @@ encoder ({ id, title, isDone, isDeleted, maybeProjectId, maybeDueDate, projectSo
         ]
 
 
-type alias Partial a =
-    { a
-        | title : String
-        , maybeProjectId : Maybe ProjectId
-        , maybeDueDate : Maybe Date
-        , projectSortIdx : Int
-    }
-
-
-fromPartial : TodoId -> Posix -> Partial a -> Todo
-fromPartial id now { title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    Todo id title False False maybeProjectId maybeDueDate projectSortIdx now now
-
-
-generatorFromPartial : Posix -> Partial a -> Random.Generator Todo
-generatorFromPartial now partial =
-    TodoId.generator
-        |> Random.map (\id -> fromPartial id now partial)
-
-
 generator : Posix -> List Patch -> Generator Todo
 generator now patches =
     TodoId.generator
@@ -161,17 +139,6 @@ generator now patches =
                 Todo id "" False False Nothing Nothing 0 now now
                     |> applyPatches now patches
             )
-
-
-patchWithPartial : Posix -> Partial a -> Todo -> Todo
-patchWithPartial now p todo =
-    { todo
-        | title = p.title
-        , maybeProjectId = p.maybeProjectId
-        , maybeDueDate = p.maybeDueDate
-        , projectSortIdx = p.projectSortIdx
-        , updatedAt = now
-    }
 
 
 type Patch
