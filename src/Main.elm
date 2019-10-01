@@ -252,8 +252,8 @@ setTodoForm form model =
 
 type Msg
     = NoOp
-    | InsertNewTodoFromPartial (TodoForm.Partial {}) Posix
-    | PatchTodoFromPartial TodoId (TodoForm.Partial {}) Posix
+    | InsertNewTodoWithPatches (List Todo.Patch) Posix
+    | PatchTodo TodoId (List Todo.Patch) Posix
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | MoveUp TodoId
@@ -289,14 +289,14 @@ update msg model =
             , Cmd.none
             )
 
-        InsertNewTodoFromPartial partial now ->
-            ( HasSeed.step (Todo.generatorFromPartial now partial) model
+        InsertNewTodoWithPatches patches now ->
+            ( HasSeed.step (Todo.generator now patches) model
                 |> uncurry insertTodo
             , Cmd.none
             )
 
-        PatchTodoFromPartial todoId partial now ->
-            ( updateTodoWith todoId (Todo.patchWithPartial now partial) model, Cmd.none )
+        PatchTodo todoId patches now ->
+            ( updateTodoWith todoId (Todo.applyPatches now patches) model, Cmd.none )
 
         MoveUp todoId ->
             ( updateTodoWith todoId (\todo -> { todo | projectSortIdx = todo.projectSortIdx - 1 }) model
@@ -359,16 +359,16 @@ update msg model =
 saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
 saveTodoForm form model =
     let
-        ( meta, partial ) =
-            TodoForm.toPartialWithMeta form
+        ( meta, patches ) =
+            TodoForm.toPatchesWithMeta form
 
         ( newModel, cmd ) =
             case meta of
                 TodoForm.Add ->
-                    ( model, Time.now |> Task.perform (InsertNewTodoFromPartial partial) )
+                    ( model, Time.now |> Task.perform (InsertNewTodoWithPatches patches) )
 
                 TodoForm.Edit todoId ->
-                    ( model, Time.now |> Task.perform (PatchTodoFromPartial todoId partial) )
+                    ( model, Time.now |> Task.perform (PatchTodo todoId patches) )
     in
     ( { newModel | maybeTodoForm = Nothing }
     , cmd

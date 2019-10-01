@@ -4,6 +4,7 @@ module Todo exposing
     , applyPatches
     , decoder
     , encoder
+    , generator
     , generatorFromPartial
     , mockListGenerator
     , patchWithPartial
@@ -15,7 +16,7 @@ import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, object)
 import Maybe.Extra as MX
 import ProjectId exposing (ProjectId)
-import Random
+import Random exposing (Generator)
 import Time exposing (Posix)
 import TodoId exposing (TodoId)
 
@@ -150,6 +151,16 @@ generatorFromPartial : Posix -> Partial a -> Random.Generator Todo
 generatorFromPartial now partial =
     TodoId.generator
         |> Random.map (\id -> fromPartial id now partial)
+
+
+generator : Posix -> List Patch -> Generator Todo
+generator now patches =
+    TodoId.generator
+        |> Random.map
+            (\id ->
+                Todo id "" False False Nothing Nothing 0 now now
+                    |> applyPatches now patches
+            )
 
 
 patchWithPartial : Posix -> Partial a -> Todo -> Todo
