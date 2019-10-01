@@ -18,7 +18,7 @@ import ProjectId exposing (ProjectId)
 import Random
 import Return
 import Task
-import Time
+import Time exposing (Posix)
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
@@ -252,6 +252,7 @@ setTodoForm form model =
 
 type Msg
     = NoOp
+    | InsertNewTodoFromPartial (TodoForm.Partial {}) Posix
     | SetTodoIsDone TodoId Bool
     | DeleteTodo TodoId
     | MoveUp TodoId
@@ -284,6 +285,12 @@ update msg model =
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
+            , Cmd.none
+            )
+
+        InsertNewTodoFromPartial partial now ->
+            ( HasSeed.step (Todo.generatorFromPartial partial) model
+                |> uncurry insertTodo
             , Cmd.none
             )
 
@@ -351,17 +358,16 @@ saveTodoForm form model =
         ( meta, partial ) =
             TodoForm.toPartialWithMeta form
 
-        newModel =
+        ( newModel, cmd ) =
             case meta of
                 TodoForm.Add ->
-                    HasSeed.step (Todo.generatorFromPartial partial) model
-                        |> uncurry insertTodo
+                    ( model, Time.now |> Task.perform (InsertNewTodoFromPartial partial) )
 
                 TodoForm.Edit todoId ->
-                    updateTodoWithIdBy todoId (Todo.patchWithPartial partial) model
+                    ( updateTodoWithIdBy todoId (Todo.patchWithPartial partial) model, Cmd.none )
     in
     ( { newModel | maybeTodoForm = Nothing }
-    , Cmd.none
+    , cmd
     )
 
 
