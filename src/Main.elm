@@ -1,4 +1,4 @@
-port module Main exposing (main, viewSearchResults)
+port module Main exposing (main)
 
 import Basics.More exposing (HasId, allPass, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
@@ -527,7 +527,7 @@ viewRoute model route =
     in
     case route of
         RouteInbox ->
-            viewProjectTodoList Nothing model
+            viewTodoList (ProjectTodoList <| Nothing)
 
         RouteProject projectId ->
             viewTodoList (ProjectTodoList <| Just projectId)
@@ -730,16 +730,6 @@ dateRange from to refDate =
         |> List.map (\ct -> Date.add Date.Days ct refDate)
 
 
-viewNext7DaysTodoList : Model -> List (H.Html Msg)
-viewNext7DaysTodoList model =
-    dateRange 0 6 model.today
-        |> List.concatMap (\date -> viewTodoListDueOn date model)
-
-
-viewDueTodayAndOverdueTodoList model =
-    viewOverDueTodoList model ++ viewTodoListDueOn model.today model
-
-
 overDuePred today =
     allPass
         [ propEq .isDone False
@@ -754,85 +744,9 @@ dueOnPred dueDate =
         ]
 
 
-unlessEmpty func list =
-    if List.isEmpty list then
-        []
-
-    else
-        func list
-
-
 editFormForTodoId todoId maybeTodoForm =
     maybeTodoForm
         |> MX.filter (TodoForm.isEditingFor todoId)
-
-
-viewOverDueTodoList : Model -> List (H.Html Msg)
-viewOverDueTodoList model =
-    unlessEmpty
-        (\todoList ->
-            let
-                titleHtml =
-                    col [] [ H.text "OverDue" ]
-
-                viewEditableTodo todo =
-                    model.maybeTodoForm
-                        |> MX.filter (TodoForm.isEditingFor todo.id)
-                        |> MX.unpack (\_ -> viewTodoListItem OverDueTodoList model todo)
-                            (viewTodoForm model.projectList)
-            in
-            titleHtml :: List.map viewEditableTodo todoList
-        )
-        (List.filter (overDuePred model.today) model.todoList)
-
-
-viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
-viewTodoListDueOn dueDate model =
-    let
-        todoList =
-            List.filter (dueOnPred dueDate) model.todoList
-
-        kind =
-            DueAtTodoList dueDate
-
-        viewTodoItem : Todo -> H.Html Msg
-        viewTodoItem =
-            viewTodoListItem kind model
-
-        titleHtml =
-            col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
-
-        contentHtmlList : List (H.Html Msg)
-        contentHtmlList =
-            case model.maybeTodoForm of
-                Just form ->
-                    let
-                        formHtml =
-                            viewTodoForm model.projectList form
-
-                        showAddForm =
-                            TodoForm.isAddingForInitialDueDate dueDate form
-                    in
-                    case TodoForm.getMeta form of
-                        TodoForm.Add ->
-                            List.map viewTodoItem todoList
-                                ++ (if showAddForm then
-                                        [ formHtml ]
-
-                                    else
-                                        [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
-                                   )
-
-                        TodoForm.Edit todoId ->
-                            List.map
-                                (ifElse (idEq todoId) (\_ -> formHtml) viewTodoItem)
-                                todoList
-
-                Nothing ->
-                    List.map viewTodoItem todoList
-                        ++ [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
-    in
-    [ titleHtml ] ++ contentHtmlList
 
 
 
@@ -871,48 +785,6 @@ viewProjectTodoList maybeProjectId model =
         Nothing ->
             List.map viewTodoItem todoList
                 ++ [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
-
-
-
--- VIEW SEARCH ROUTE
-
-
-viewSearchResults : String -> Model -> List (H.Html Msg)
-viewSearchResults query model =
-    let
-        pred : { a | title : String } -> Bool
-        pred =
-            if query |> String.isEmpty then
-                always True
-
-            else
-                .title >> String.contains query
-
-        kind =
-            SearchResultTodoList query
-
-        viewTodoItem =
-            viewTodoListItem kind model
-
-        viewForm =
-            viewTodoForm model.projectList
-
-        todoListHtml =
-            List.map
-                (\todo ->
-                    editFormForTodoId todo.id model.maybeTodoForm
-                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
-                )
-                (List.filter pred model.todoList)
-
-        viewProject { title } =
-            col [ A.class "pv1 ph2" ] [ H.text title ]
-
-        projectListHtml =
-            model.projectList |> List.filter pred |> List.map viewProject
-    in
-    (col [] [ H.text "Tasks" ] :: todoListHtml)
-        ++ (col [ A.class "pt3 pb1" ] [ H.text "Projects" ] :: projectListHtml)
 
 
 
