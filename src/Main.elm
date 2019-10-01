@@ -639,28 +639,6 @@ viewTodoListDueOn dueDate model =
                 Nothing ->
                     List.map viewTodoItem todoList
                         ++ [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
-
-        contentHtml =
-            List.map
-                (\todo ->
-                    case editFormForTodoId todo.id model.maybeTodoForm of
-                        Just form ->
-                            viewTodoForm model.projectList form
-
-                        Nothing ->
-                            viewDueDateTodoItem model.projectList todo
-                )
-                (List.filter (dueOnPred dueDate) model.todoList)
-
-        footerHtml =
-            case
-                addFormWithInitialDueDate dueDate model.maybeTodoForm
-            of
-                Just form ->
-                    viewTodoForm model.projectList form
-
-                Nothing ->
-                    viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
     [ titleHtml ] ++ l
 
