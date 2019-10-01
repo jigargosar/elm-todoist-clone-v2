@@ -644,9 +644,12 @@ viewTodoListDueOn dueDate model =
         todoList =
             List.filter (dueOnPred dueDate) model.todoList
 
+        kind =
+            DueAtTodoList dueDate
+
         viewTodoItem : Todo -> H.Html Msg
         viewTodoItem =
-            viewTodoListItem (DueAtTodoList dueDate) model
+            viewTodoListItem kind model
 
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
