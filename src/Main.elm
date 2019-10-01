@@ -723,15 +723,16 @@ viewTodoListSection kind model =
 -- VIEW DUE_DATE TODO_ROUTES
 
 
+dateRange : Int -> Int -> Date -> List Date
+dateRange from to refDate =
+    List.range from to
+        |> List.map (\ct -> Date.add Date.Days ct refDate)
+
+
 viewNext7DaysTodoList : Model -> List (H.Html Msg)
 viewNext7DaysTodoList model =
-    let
-        dateRange : Int -> Int -> List Date
-        dateRange from to =
-            List.range from to
-                |> List.map (\ct -> Date.add Date.Days ct model.today)
-    in
-    dateRange 0 6 |> List.concatMap (\date -> viewTodoListDueOn date model)
+    dateRange 0 6 model.today
+        |> List.concatMap (\date -> viewTodoListDueOn date model)
 
 
 viewDueTodayAndOverdueTodoList model =
