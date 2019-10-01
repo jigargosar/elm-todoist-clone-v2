@@ -629,6 +629,14 @@ viewTodoListItems kind model maybeTodoForm =
                 )
                 todoList
 
+        SearchResultTodoList _ ->
+            List.map
+                (\todo ->
+                    editFormForTodoId todo.id model.maybeTodoForm
+                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                )
+                todoList
+
         DueAtTodoList dueDate ->
             case model.maybeTodoForm of
                 Just form ->
@@ -669,14 +677,6 @@ viewTodoListItems kind model maybeTodoForm =
 
                 Nothing ->
                     List.map viewTodoItem todoList ++ [ viewAddBtn ]
-
-        SearchResultTodoList _ ->
-            List.map
-                (\todo ->
-                    editFormForTodoId todo.id model.maybeTodoForm
-                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
-                )
-                todoList
 
 
 
