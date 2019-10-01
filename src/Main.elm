@@ -216,6 +216,15 @@ init flags =
             }
     in
     refreshModel model
+        |> Return.andThen resetIfFirstTime
+
+
+resetIfFirstTime model =
+    if model.projectList == [] then
+        update ResetModel model
+
+    else
+        ( model, Cmd.none )
 
 
 refreshModel : Model -> ( Model, Cmd Msg )
