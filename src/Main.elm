@@ -589,27 +589,24 @@ viewTodoListTitle kind model =
             col [] [ H.text "Tasks" ]
 
 
-viewAddTodoButtonFor : TodoListKind -> H.Html Msg
+viewAddTodoButtonFor : TodoListKind -> List (H.Html Msg)
 viewAddTodoButtonFor kind =
     case kind of
         OverDueTodoList ->
-            H.text ""
+            []
 
         DueAtTodoList dueDate ->
-            viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
+            [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
 
         ProjectTodoList maybeProjectId ->
-            viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId)
+            [ viewAddTodoButton (InsertTodoInProjectAtClicked Random.maxInt maybeProjectId) ]
 
         SearchResultTodoList _ ->
-            H.text ""
+            []
 
 
-viewTodoListItems kind model maybeTodoForm =
+viewTodoListContent kind model maybeTodoForm todoList =
     let
-        todoList =
-            filteredTodoList kind model model.todoList
-
         viewTodoItem =
             viewTodoListItem kind model
 
@@ -624,7 +621,7 @@ viewTodoListItems kind model maybeTodoForm =
         OverDueTodoList ->
             List.map
                 (\todo ->
-                    editFormForTodoId todo.id model.maybeTodoForm
+                    editFormForTodoId todo.id maybeTodoForm
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 todoList
@@ -632,13 +629,13 @@ viewTodoListItems kind model maybeTodoForm =
         SearchResultTodoList _ ->
             List.map
                 (\todo ->
-                    editFormForTodoId todo.id model.maybeTodoForm
+                    editFormForTodoId todo.id maybeTodoForm
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 todoList
 
         DueAtTodoList dueDate ->
-            case model.maybeTodoForm of
+            case maybeTodoForm of
                 Just form ->
                     let
                         showAddForm =
@@ -651,7 +648,7 @@ viewTodoListItems kind model maybeTodoForm =
                                         [ viewForm form ]
 
                                     else
-                                        [ viewAddBtn ]
+                                        viewAddBtn
                                    )
 
                         TodoForm.Edit todoId ->
@@ -660,10 +657,10 @@ viewTodoListItems kind model maybeTodoForm =
                                 todoList
 
                 Nothing ->
-                    List.map viewTodoItem todoList ++ [ viewAddBtn ]
+                    List.map viewTodoItem todoList ++ viewAddBtn
 
         ProjectTodoList _ ->
-            case model.maybeTodoForm of
+            case maybeTodoForm of
                 Just form ->
                     case TodoForm.getMeta form of
                         TodoForm.Add ->
@@ -676,7 +673,7 @@ viewTodoListItems kind model maybeTodoForm =
                                 todoList
 
                 Nothing ->
-                    List.map viewTodoItem todoList ++ [ viewAddBtn ]
+                    List.map viewTodoItem todoList ++ viewAddBtn
 
 
 
