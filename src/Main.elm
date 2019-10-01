@@ -582,6 +582,26 @@ viewOverDueTodoList : Model -> List (H.Html Msg)
 viewOverDueTodoList model =
     unlessEmpty
         (\todoList ->
+            let
+                viewTodoItem =
+                    viewDueDateTodoItem model.projectList
+
+                _ =
+                    case model.maybeTodoForm of
+                        Just form ->
+                            let
+                                formHtml =
+                                    viewTodoForm model.projectList form
+
+                                isEditingTodo { id } =
+                                    TodoForm.isEditingFor id form
+                            in
+                            List.map (ifElse isEditingTodo (\_ -> formHtml) viewTodoItem)
+                                todoList
+
+                        Nothing ->
+                            List.map viewTodoItem todoList
+            in
             col [] [ H.text "OverDue" ]
                 :: List.map
                     (\todo ->
