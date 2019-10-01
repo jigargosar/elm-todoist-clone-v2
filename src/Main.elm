@@ -611,6 +611,11 @@ viewTodoListTitle kind model =
 
 viewAddTodoButtonFor : TodoListKind -> List (H.Html Msg)
 viewAddTodoButtonFor kind =
+    let
+        viewAddTodoButton : Msg -> H.Html Msg
+        viewAddTodoButton onClick =
+            row [ A.class "pa1" ] [ btn2 "add task" onClick ]
+    in
     case kind of
         OverDueTodoList ->
             []
@@ -886,11 +891,6 @@ humanDate today date =
 
 
 -- VIEW HELPERS
-
-
-viewAddTodoButton : Msg -> H.Html Msg
-viewAddTodoButton onClick =
-    row [ A.class "pa1" ] [ btn2 "add task" onClick ]
 
 
 main : Program Flags Model Msg
