@@ -548,6 +548,7 @@ type TodoListKind
     | SearchResultTodoList String
 
 
+filteredTodoList : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
 filteredTodoList kind model =
     case kind of
         OverDueTodoList ->
@@ -561,7 +562,7 @@ filteredTodoList kind model =
 
         SearchResultTodoList query ->
             let
-                pred : { a | title : String } -> Bool
+                pred : Todo -> Bool
                 pred =
                     if query |> String.isEmpty then
                         always True
