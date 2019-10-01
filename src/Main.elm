@@ -295,7 +295,7 @@ update msg model =
             )
 
         PatchTodo todoId patches now ->
-            ( updateTodoWith todoId (Todo.applyPatches now patches) model, Cmd.none )
+            ( applyTodoPatchesWithNow todoId now patches model, Cmd.none )
 
         MoveUp todoId ->
             ( model, patchTodoProjectSortIdxBy -1 todoId model )
@@ -304,7 +304,7 @@ update msg model =
             ( model, patchTodoProjectSortIdxBy 1 todoId model )
 
         SetTodoCompleted todoId isDone ->
-            ( model, applyTodoPatch todoId (Todo.Completed isDone) )
+            ( model, patchTodo todoId (Todo.Completed isDone) )
 
         AddTodoOnDueDateClicked dueDate ->
             ( model
@@ -352,12 +352,12 @@ update msg model =
 patchTodoProjectSortIdxBy : Int -> TodoId -> Model -> Cmd Msg
 patchTodoProjectSortIdxBy offset todoId model =
     findById todoId model.todoList
-        |> Maybe.map (.projectSortIdx >> (+) offset >> Todo.ProjectSortIdx >> applyTodoPatch todoId)
+        |> Maybe.map (.projectSortIdx >> (+) offset >> Todo.ProjectSortIdx >> patchTodo todoId)
         |> Maybe.withDefault Cmd.none
 
 
-applyTodoPatch : TodoId -> Todo.Patch -> Cmd Msg
-applyTodoPatch todoId patch =
+patchTodo : TodoId -> Todo.Patch -> Cmd Msg
+patchTodo todoId patch =
     applyTodoPatches todoId [ patch ]
 
 
@@ -388,19 +388,19 @@ sortedTodoListForMaybeProjectId maybeProjectId =
         >> List.sortBy .projectSortIdx
 
 
-updateTodoWith : TodoId -> (Todo -> Todo) -> Model -> Model
-updateTodoWith id func model =
-    LX.find (idEq id) model.todoList
+applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> Model
+applyTodoPatchesWithNow todoId now patches model =
+    findById todoId model.todoList
         |> Maybe.map
-            (\todo ->
-                updateTodoHelp todo (func todo) model
-            )
+            (patchTodoWithNowHelp now patches model)
         |> Maybe.withDefault model
 
 
-updateTodoHelp : Todo -> Todo -> Model -> Model
-updateTodoHelp oldTodo newTodo model =
+patchTodoWithNowHelp now patches model oldTodo =
     let
+        newTodo =
+            Todo.applyPatches now patches oldTodo
+
         projectTodoList =
             if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
                 (newTodo
