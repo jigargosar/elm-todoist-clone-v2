@@ -11,7 +11,7 @@
     "open": "npx wait-on http://localhost:8080/ && start http://localhost:8080/",
     "genId": "node src/genId.js TodoId ProjectId",
     "build": "npx webpack -p",
-    "serve": "npx serve dist"
+    "serve": "npx serve dist --port 8081 && npx wait-on http://localhost:8081/ "
   },
   "keywords": [],
   "author": "",
