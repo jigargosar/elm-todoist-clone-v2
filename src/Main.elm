@@ -548,60 +548,6 @@ type TodoListKind
     | SearchResultTodoList String
 
 
-viewTodoListItem kind model =
-    let
-        viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
-        viewDueDateTodoItem projectList todo =
-            row [ A.class "hide-child relative" ]
-                [ viewTodoCheckbox todo
-                , viewTodoTitle todo
-                , viewTodoProjectPill projectList todo
-                , row [ A.class "child absolute right-0 bg-white-90" ]
-                    [ btn2 "X" (DeleteTodo todo.id) ]
-                ]
-    in
-    case kind of
-        OverDueTodoList ->
-            viewDueDateTodoItem model.projectList
-
-        DueAtTodoList _ ->
-            viewDueDateTodoItem model.projectList
-
-        ProjectTodoList _ ->
-            let
-                viewProjectTodoItem : Date -> Todo -> H.Html Msg
-                viewProjectTodoItem today todo =
-                    row [ A.class "hide-child relative" ]
-                        [ viewTodoCheckbox todo
-                        , viewTodoTitle todo
-                        , viewTodoDueDate today todo
-                        , row [ A.class "child absolute right-0 bg-white-90" ]
-                            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
-                            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
-                            , btn2 "UP" (MoveUp todo.id)
-                            , btn2 "DN" (MoveDown todo.id)
-                            , btn2 "X" (DeleteTodo todo.id)
-                            ]
-                        ]
-            in
-            viewProjectTodoItem model.today
-
-        SearchResultTodoList _ ->
-            let
-                viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
-                viewSearchTodoItem today projectList todo =
-                    row [ A.class "hide-child relative" ]
-                        [ viewTodoCheckbox todo
-                        , viewTodoTitle todo
-                        , viewTodoDueDate today todo
-                        , viewTodoProjectPill projectList todo
-                        , row [ A.class "child absolute right-0 bg-white-90" ]
-                            [ btn2 "X" (DeleteTodo todo.id) ]
-                        ]
-            in
-            viewSearchTodoItem model.today model.projectList
-
-
 
 -- VIEW DUE_DATE TODO_ROUTES
 
@@ -808,7 +754,62 @@ viewTodoForm =
 
 
 
--- VIEW TODO_ITEM HELPERS
+-- VIEW TODO_LIST_ITEM
+
+
+viewTodoListItem : TodoListKind -> { a | projectList : List Project, today : Date } -> Todo -> H.Html Msg
+viewTodoListItem kind model =
+    let
+        viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
+        viewDueDateTodoItem projectList todo =
+            row [ A.class "hide-child relative" ]
+                [ viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoProjectPill projectList todo
+                , row [ A.class "child absolute right-0 bg-white-90" ]
+                    [ btn2 "X" (DeleteTodo todo.id) ]
+                ]
+    in
+    case kind of
+        OverDueTodoList ->
+            viewDueDateTodoItem model.projectList
+
+        DueAtTodoList _ ->
+            viewDueDateTodoItem model.projectList
+
+        ProjectTodoList _ ->
+            let
+                viewProjectTodoItem : Date -> Todo -> H.Html Msg
+                viewProjectTodoItem today todo =
+                    row [ A.class "hide-child relative" ]
+                        [ viewTodoCheckbox todo
+                        , viewTodoTitle todo
+                        , viewTodoDueDate today todo
+                        , row [ A.class "child absolute right-0 bg-white-90" ]
+                            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+                            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+                            , btn2 "UP" (MoveUp todo.id)
+                            , btn2 "DN" (MoveDown todo.id)
+                            , btn2 "X" (DeleteTodo todo.id)
+                            ]
+                        ]
+            in
+            viewProjectTodoItem model.today
+
+        SearchResultTodoList _ ->
+            let
+                viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
+                viewSearchTodoItem today projectList todo =
+                    row [ A.class "hide-child relative" ]
+                        [ viewTodoCheckbox todo
+                        , viewTodoTitle todo
+                        , viewTodoDueDate today todo
+                        , viewTodoProjectPill projectList todo
+                        , row [ A.class "child absolute right-0 bg-white-90" ]
+                            [ btn2 "X" (DeleteTodo todo.id) ]
+                        ]
+            in
+            viewSearchTodoItem model.today model.projectList
 
 
 viewTodoCheckbox : Todo -> H.Html Msg
