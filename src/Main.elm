@@ -629,12 +629,16 @@ viewTodoListContent kind model maybeTodoForm todoList =
         viewForm : TodoForm -> H.Html Msg
         viewForm =
             viewTodoForm model.projectList
+
+        editFormForTodoId todoId =
+            maybeTodoForm
+                |> MX.filter (TodoForm.isEditingFor todoId)
     in
     case kind of
         OverDueTodoList ->
             List.map
                 (\todo ->
-                    editFormForTodoId todo.id maybeTodoForm
+                    editFormForTodoId todo.id
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 todoList
@@ -642,7 +646,7 @@ viewTodoListContent kind model maybeTodoForm todoList =
         SearchResultTodoList _ ->
             List.map
                 (\todo ->
-                    editFormForTodoId todo.id maybeTodoForm
+                    editFormForTodoId todo.id
                         |> MX.unpack (\_ -> viewTodoItem todo) viewForm
                 )
                 todoList
@@ -742,11 +746,6 @@ dueOnPred dueDate =
         [ propEq .maybeDueDate (Just dueDate)
         , propEq .isDone False
         ]
-
-
-editFormForTodoId todoId maybeTodoForm =
-    maybeTodoForm
-        |> MX.filter (TodoForm.isEditingFor todoId)
 
 
 
