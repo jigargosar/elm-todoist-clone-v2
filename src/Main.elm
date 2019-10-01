@@ -537,7 +537,9 @@ viewRoute model route =
                 |> List.concatMap viewTodoList
 
         RouteNext7Days ->
-            viewNext7DaysTodoList model
+            -- viewNext7DaysTodoList model
+            dateRange 0 6 model.today
+                |> List.concatMap (\date -> viewTodoList <| DueAtTodoList date)
 
         RouteSearch query ->
             viewSearchResults query model
