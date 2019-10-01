@@ -600,8 +600,45 @@ viewOverDueTodoList model =
 viewTodoListDueOn : Date -> Model -> List (H.Html Msg)
 viewTodoListDueOn dueDate model =
     let
+        todoList =
+            List.filter (dueOnPred dueDate) model.todoList
+
+        viewTodoItem : Todo -> H.Html Msg
+        viewTodoItem =
+            viewProjectTodoItem model.today
+
         titleHtml =
             col [ A.class "ph1 pb1 pt3" ] [ H.text <| humanDate model.today dueDate ]
+
+        l : List (H.Html Msg)
+        l =
+            case model.maybeTodoForm of
+                Just form ->
+                    let
+                        formHtml =
+                            viewTodoForm model.projectList form
+
+                        showAddForm =
+                            TodoForm.isAddingForInitialDueDate dueDate form
+                    in
+                    case TodoForm.getMeta form of
+                        TodoForm.Add ->
+                            List.map viewTodoItem todoList
+                                ++ (if showAddForm then
+                                        [ formHtml ]
+
+                                    else
+                                        [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
+                                   )
+
+                        TodoForm.Edit todoId ->
+                            List.map
+                                (ifElse (idEq todoId) (\_ -> formHtml) viewTodoItem)
+                                todoList
+
+                Nothing ->
+                    List.map viewTodoItem todoList
+                        ++ [ viewAddTodoButton (AddTodoOnDueDateClicked dueDate) ]
 
         contentHtml =
             List.map
@@ -625,7 +662,7 @@ viewTodoListDueOn dueDate model =
                 Nothing ->
                     viewAddTodoButton (AddTodoOnDueDateClicked dueDate)
     in
-    [ titleHtml ] ++ contentHtml ++ [ footerHtml ]
+    [ titleHtml ] ++ l
 
 
 viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
