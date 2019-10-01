@@ -162,7 +162,7 @@ viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta ini
         dueDateChanged maybeDueDate =
             onChange { model | maybeDueDate = maybeDueDate }
     in
-    col [ A.class "pa1", Key.onKeyDown [ Key.ctrlEnter onSave ] ]
+    H.form [ A.class "flex flex-column pa1", Key.onKeyDown [{- Key.ctrlEnter onSave -}], E.onSubmit onSave ]
         [ col [ A.class "pv1" ]
             [ ipt3 model.title titleChanged [ A.autofocus True ]
             ]
