@@ -1,6 +1,8 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+console.log(process.env.NODE_ENV)
+
 // https://webpack.js.org/configuration/
 module.exports = {
   mode: 'development',
