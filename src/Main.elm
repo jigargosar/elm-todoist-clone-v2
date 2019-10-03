@@ -932,15 +932,9 @@ viewProjectTodoItem model todo =
                 )
                 (content { handleClass = "", hideHoverActions = True })
 
-        viewDropTarget isPlaceHolder =
+        viewDropTarget rootClass =
             row
-                ((A.class <|
-                    if isPlaceHolder then
-                        "o-0"
-
-                    else
-                        ""
-                 )
+                (A.class rootClass
                     :: A.class "hide-child relative"
                     :: A.id domId
                     :: (dndSystem.dropEvents projectSortIdx
@@ -963,12 +957,12 @@ viewProjectTodoItem model todo =
         Just idx ->
             if idx == projectSortIdx then
                 col []
-                    [ viewDropTarget True
+                    [ viewDropTarget "o-0"
                     , viewDragged
                     ]
 
             else
-                viewDropTarget False
+                viewDropTarget ""
 
 
 viewTodoCheckbox : Todo -> H.Html Msg
