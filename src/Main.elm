@@ -891,9 +891,6 @@ viewProjectTodoItem model todo =
         projectSortIdx =
             todo.projectSortIdx
 
-        draggedIndex =
-            dndSystem.draggedIndex model.draggable
-
         viewHelp { rootAttrs, handleClass, actionsClass } =
             row
                 (A.class "hide-child relative"
@@ -938,7 +935,7 @@ viewProjectTodoItem model todo =
                 , actionsClass = "hidden"
                 }
     in
-    case draggedIndex of
+    case dndSystem.draggedIndex model.draggable of
         Nothing ->
             -- viewDraggable
             viewHelp
