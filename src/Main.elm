@@ -856,7 +856,15 @@ viewTodoListItem kind model =
             let
                 viewProjectTodoItem : Date -> Todo -> H.Html Msg
                 viewProjectTodoItem today todo =
-                    row [ A.class "hide-child relative" ]
+                    let
+                        domId =
+                            TodoId.toString todo.id
+                    in
+                    row
+                        (A.class "hide-child relative"
+                            :: A.id domId
+                            :: (List.map A.fromUnstyled <| dndSystem.dragEvents todo.projectSortIdx domId)
+                        )
                         [ viewTodoCheckbox todo
                         , viewTodoTitle todo
                         , viewTodoDueDate today todo
