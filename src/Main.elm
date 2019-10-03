@@ -894,11 +894,21 @@ viewProjectTodoItem model todo =
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
+        hoverContent =
+            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
+            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
+            , btn2 "UP" (MoveUp todo.id)
+            , btn2 "DN" (MoveDown todo.id)
+            , btn2 "X" (DeleteTodo todo.id)
+            ]
+
         content =
-            [ row [ A.class "child hidden bg-white-90 pointer b code" ] [ H.text "::" ]
+            [ row [ A.class "child bg-white-90 pointer b code" ] [ H.text "::" ]
             , viewTodoCheckbox todo
             , viewTodoTitle todo
             , viewTodoDueDate today todo
+            , row [ A.class "child absolute right-0 bg-white-90" ]
+                hoverContent
             ]
 
         viewDragged =
@@ -936,19 +946,7 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                (content
-                    ++ [ row [ A.class "child absolute right-0 bg-white-90" ]
-                            hoverContent
-                       ]
-                )
-
-        hoverContent =
-            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
-            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
-            , btn2 "UP" (MoveUp todo.id)
-            , btn2 "DN" (MoveDown todo.id)
-            , btn2 "X" (DeleteTodo todo.id)
-            ]
+                content
     in
     case draggedIndex of
         Nothing ->
