@@ -894,16 +894,22 @@ viewProjectTodoItem model todo =
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
-        viewHelp { rootAttrs, handleAttrs, hoverActionsAttrs } =
+        viewHelp { rootAttrs, handleClass, hoverActionsAttrs } =
             row
-                (A.class "hide-child relative" :: rootAttrs)
+                (A.class "hide-child relative"
+                    :: A.id domId
+                    :: (dndSystem.dropEvents projectSortIdx
+                            |> List.map A.fromUnstyled
+                       )
+                    ++ rootAttrs
+                )
                 [ row
                     ([ A.class "opacity-transition-none bg-white-90 pointer b code"
                      ]
                         ++ (dndSystem.dragEvents projectSortIdx domId
                                 |> List.map A.fromUnstyled
                            )
-                        ++ handleAttrs
+                        ++ [ A.class handleClass ]
                     )
                     [ H.text "::" ]
                 , viewTodoCheckbox todo
@@ -931,26 +937,21 @@ viewProjectTodoItem model todo =
                     HA.class "z-999"
                         :: dndSystem.draggedStyles model.draggable
                         |> List.map A.fromUnstyled
-                , handleAttrs = []
+                , handleClass = ""
                 , hoverActionsAttrs = [ A.class "hidden" ]
                 }
 
         viewDropTarget rootClass =
             viewHelp
-                { rootAttrs =
-                    A.class rootClass
-                        :: A.id domId
-                        :: (dndSystem.dropEvents projectSortIdx
-                                |> List.map A.fromUnstyled
-                           )
-                , handleAttrs = [ A.class "hidden" ]
+                { rootAttrs = [ A.class rootClass ]
+                , handleClass = "hidden"
                 , hoverActionsAttrs = [ A.class "hidden" ]
                 }
 
         viewDraggable =
             viewHelp
-                { rootAttrs = [ A.id domId ]
-                , handleAttrs = [ A.class "child" ]
+                { rootAttrs = []
+                , handleClass = "child"
                 , hoverActionsAttrs = [ A.class "" ]
                 }
     in
