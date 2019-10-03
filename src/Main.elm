@@ -935,7 +935,11 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                (content ++ [ row [ A.class "child absolute right-0 bg-white-90" ] hoverContent ])
+                (content
+                    ++ [ row [ A.class "child absolute right-0 bg-white-90" ]
+                            hoverContent
+                       ]
+                )
 
         hoverContent =
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
