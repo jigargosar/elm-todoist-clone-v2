@@ -6,6 +6,7 @@ import Date exposing (Date)
 import DnDList
 import HasSeed
 import Html
+import Html.Attributes as HA
 import Html.Styled as H
 import Html.Styled.Attributes as A
 import Html.Styled.Events as E
@@ -157,7 +158,7 @@ stringOrValueDecoder decoder =
 dndConfig : DnDList.Config Msg
 dndConfig =
     { message = DnDListMsg
-    , movement = DnDList.Free
+    , movement = DnDList.Vertical
     }
 
 
@@ -867,24 +868,41 @@ viewTodoListItem kind model =
                         domId =
                             TodoId.toString todo.id
 
+                        draggedAttrs : List (H.Attribute Msg)
                         draggedAttrs =
-                            dndSystem.draggedIndex model.draggable
+                            (case dndSystem.draggedIndex model.draggable of
+                                Nothing ->
+                                    HA.id domId
+                                        :: dndSystem.dragEvents todo.projectSortIdx domId
+
+                                Just idx ->
+                                    if idx == todo.projectSortIdx then
+                                        HA.class "z-999" :: dndSystem.draggedStyles model.draggable
+
+                                    else
+                                        dndSystem.dropEvents todo.projectSortIdx
+                            )
+                                |> List.map A.fromUnstyled
+
+                        notDragging =
+                            dndSystem.draggedIndex model.draggable == Nothing
                     in
                     row
-                        (A.class "hide-child relative"
-                            :: A.id domId
-                            :: (List.map A.fromUnstyled <| dndSystem.dragEvents todo.projectSortIdx domId)
-                        )
+                        (A.class "hide-child relative" :: draggedAttrs)
                         [ viewTodoCheckbox todo
                         , viewTodoTitle todo
                         , viewTodoDueDate today todo
-                        , row [ A.class "child absolute right-0 bg-white-90" ]
-                            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
-                            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
-                            , btn2 "UP" (MoveUp todo.id)
-                            , btn2 "DN" (MoveDown todo.id)
-                            , btn2 "X" (DeleteTodo todo.id)
-                            ]
+                        , if notDragging then
+                            row [ A.class "child absolute right-0 bg-white-90" ]
+                                [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+                                , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+                                , btn2 "UP" (MoveUp todo.id)
+                                , btn2 "DN" (MoveDown todo.id)
+                                , btn2 "X" (DeleteTodo todo.id)
+                                ]
+
+                          else
+                            H.text ""
                         ]
             in
             viewProjectTodoItem model.today
