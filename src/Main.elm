@@ -907,44 +907,45 @@ viewProjectTodoItem model todo =
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
+        content =
+            [ viewTodoCheckbox todo
+            , viewTodoTitle todo
+            , viewTodoDueDate today todo
+            ]
+
         viewDragged =
             row
                 (A.class "hide-child relative" :: dragStyles)
-                [ viewTodoCheckbox todo
-                , viewTodoTitle todo
-                , viewTodoDueDate today todo
-                ]
+                content
 
-        viewPlaceHolder =
+        viewDropTarget isPlaceHolder =
             row
-                (A.class "o-0 hide-child relative" :: A.id domId :: dropEvents)
-                [ viewTodoCheckbox todo
-                , viewTodoTitle todo
-                , viewTodoDueDate today todo
-                ]
+                ((A.class <|
+                    if isPlaceHolder then
+                        "o-0"
 
-        viewDropable =
-            row
-                (A.class "hide-child relative" :: A.id domId :: dropEvents)
-                [ viewTodoCheckbox todo
-                , viewTodoTitle todo
-                , viewTodoDueDate today todo
-                ]
+                    else
+                        ""
+                 )
+                    :: A.class "hide-child relative"
+                    :: A.id domId
+                    :: dropEvents
+                )
+                content
 
         viewDraggable =
             row
                 (A.class "hide-child relative" :: A.id domId :: dragEvents)
-                [ viewTodoCheckbox todo
-                , viewTodoTitle todo
-                , viewTodoDueDate today todo
-                , row [ A.class "child absolute right-0 bg-white-90" ]
-                    [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
-                    , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
-                    , btn2 "UP" (MoveUp todo.id)
-                    , btn2 "DN" (MoveDown todo.id)
-                    , btn2 "X" (DeleteTodo todo.id)
-                    ]
-                ]
+                (content
+                    ++ [ row [ A.class "child absolute right-0 bg-white-90" ]
+                            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+                            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+                            , btn2 "UP" (MoveUp todo.id)
+                            , btn2 "DN" (MoveDown todo.id)
+                            , btn2 "X" (DeleteTodo todo.id)
+                            ]
+                       ]
+                )
     in
     case draggedIndex of
         Nothing ->
@@ -953,12 +954,12 @@ viewProjectTodoItem model todo =
         Just idx ->
             if idx == projectSortIdx then
                 col []
-                    [ viewPlaceHolder
+                    [ viewDropTarget True
                     , viewDragged
                     ]
 
             else
-                viewDropable
+                viewDropTarget False
 
 
 viewTodoCheckbox : Todo -> H.Html Msg
