@@ -917,10 +917,10 @@ viewProjectTodoItem model todo =
                      ]
                         ++ [ A.class actionsClass ]
                     )
-                    hoverContent
+                    actionsContent
                 ]
 
-        hoverContent =
+        actionsContent =
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
             , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
             , btn2 "UP" (MoveUp todo.id)
