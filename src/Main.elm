@@ -894,6 +894,29 @@ viewProjectTodoItem model todo =
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
+        viewHelp { rootAttrs, handleAttrs, hoverActionsAttrs } =
+            row
+                (A.class "hide-child relative" :: rootAttrs)
+                [ row
+                    ([ A.class "opacity-transition-none bg-white-90 pointer b code"
+                     ]
+                        ++ (dndSystem.dragEvents projectSortIdx domId
+                                |> List.map A.fromUnstyled
+                           )
+                        ++ handleAttrs
+                    )
+                    [ H.text "::" ]
+                , viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoDueDate today todo
+                , row
+                    ([ A.class "opacity-transition-none child absolute right-0 bg-white-90"
+                     ]
+                        ++ hoverActionsAttrs
+                    )
+                    hoverContent
+                ]
+
         hoverContent =
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
             , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
@@ -923,14 +946,14 @@ viewProjectTodoItem model todo =
             ]
 
         viewDragged =
-            row
-                (A.class "hide-child relative"
-                    :: (HA.class "z-999"
-                            :: dndSystem.draggedStyles model.draggable
-                            |> List.map A.fromUnstyled
-                       )
-                )
-                (content { handleClass = "", hideHoverActions = True })
+            viewHelp
+                { rootAttrs =
+                    HA.class "z-999"
+                        :: dndSystem.draggedStyles model.draggable
+                        |> List.map A.fromUnstyled
+                , handleAttrs = []
+                , hoverActionsAttrs = [ A.class "hidden" ]
+                }
 
         viewDropTarget rootClass =
             row
