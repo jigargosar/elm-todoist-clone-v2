@@ -906,18 +906,16 @@ viewProjectTodoItem model todo =
 
         draggedAttrs : List (H.Attribute Msg)
         draggedAttrs =
-            (case dndSystem.draggedIndex model.draggable of
+            case draggedIndex of
                 Nothing ->
-                    dndSystem.dragEvents todo.projectSortIdx domId
+                    dragEvents
 
                 Just idx ->
-                    if idx == todo.projectSortIdx then
-                        HA.class "z-999" :: dndSystem.draggedStyles model.draggable
+                    if idx == projectSortIdx then
+                        dragStyles
 
                     else
-                        dndSystem.dropEvents todo.projectSortIdx
-            )
-                |> List.map A.fromUnstyled
+                        dropEvents
 
         notDragging =
             dndSystem.draggedIndex model.draggable == Nothing
@@ -932,24 +930,56 @@ viewProjectTodoItem model todo =
 
                 Nothing ->
                     1
-    in
-    row
-        (A.class "hide-child relative" :: A.id domId :: draggedAttrs)
-        [ viewTodoCheckbox todo
-        , viewTodoTitle todo
-        , viewTodoDueDate today todo
-        , if notDragging then
-            row [ A.class "child absolute right-0 bg-white-90" ]
-                [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
-                , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
-                , btn2 "UP" (MoveUp todo.id)
-                , btn2 "DN" (MoveDown todo.id)
-                , btn2 "X" (DeleteTodo todo.id)
+
+        viewDragged =
+            row
+                (A.class "hide-child relative" :: dragStyles)
+                [ viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoDueDate today todo
                 ]
 
-          else
-            H.text ""
-        ]
+        viewPlaceHolder =
+            row
+                (A.class "o-0 hide-child relative" :: A.id domId :: dropEvents)
+                [ viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoDueDate today todo
+                ]
+
+        viewDropable =
+            row
+                (A.class "hide-child relative" :: A.id domId :: dropEvents)
+                [ viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoDueDate today todo
+                ]
+
+        viewDraggable =
+            row
+                (A.class "hide-child relative" :: A.id domId :: dragEvents)
+                [ viewTodoCheckbox todo
+                , viewTodoTitle todo
+                , viewTodoDueDate today todo
+                , row [ A.class "child absolute right-0 bg-white-90" ]
+                    [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+                    , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+                    , btn2 "UP" (MoveUp todo.id)
+                    , btn2 "DN" (MoveDown todo.id)
+                    , btn2 "X" (DeleteTodo todo.id)
+                    ]
+                ]
+    in
+    case draggedIndex of
+        Nothing ->
+            viewDraggable
+
+        Just idx ->
+            if idx == projectSortIdx then
+                viewPlaceHolder
+
+            else
+                viewDropable
 
 
 viewTodoCheckbox : Todo -> H.Html Msg
