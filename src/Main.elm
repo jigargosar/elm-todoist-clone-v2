@@ -838,7 +838,7 @@ viewTodoListContent kind model maybeTodoForm todoList =
 
 viewTodoListItem :
     TodoListKind
-    -> { a | projectList : List Project, draggable : DnDList.Draggable, today : Date }
+    -> Model
     -> Todo
     -> H.Html Msg
 viewTodoListItem kind model =
@@ -861,50 +861,7 @@ viewTodoListItem kind model =
             viewDueDateTodoItem model.projectList
 
         ProjectTodoList _ ->
-            let
-                viewProjectTodoItem : Date -> Todo -> H.Html Msg
-                viewProjectTodoItem today todo =
-                    let
-                        domId =
-                            TodoId.toString todo.id
-
-                        draggedAttrs : List (H.Attribute Msg)
-                        draggedAttrs =
-                            (case dndSystem.draggedIndex model.draggable of
-                                Nothing ->
-                                    dndSystem.dragEvents todo.projectSortIdx domId
-
-                                Just idx ->
-                                    if idx == todo.projectSortIdx then
-                                        HA.class "z-999" :: dndSystem.draggedStyles model.draggable
-
-                                    else
-                                        dndSystem.dropEvents todo.projectSortIdx
-                            )
-                                |> List.map A.fromUnstyled
-
-                        notDragging =
-                            dndSystem.draggedIndex model.draggable == Nothing
-                    in
-                    row
-                        (A.class "hide-child relative" :: A.id domId :: draggedAttrs)
-                        [ viewTodoCheckbox todo
-                        , viewTodoTitle todo
-                        , viewTodoDueDate today todo
-                        , if notDragging then
-                            row [ A.class "child absolute right-0 bg-white-90" ]
-                                [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
-                                , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
-                                , btn2 "UP" (MoveUp todo.id)
-                                , btn2 "DN" (MoveDown todo.id)
-                                , btn2 "X" (DeleteTodo todo.id)
-                                ]
-
-                          else
-                            H.text ""
-                        ]
-            in
-            viewProjectTodoItem model.today
+            viewProjectTodoItem model
 
         SearchResultTodoList _ ->
             let
@@ -920,6 +877,52 @@ viewTodoListItem kind model =
                         ]
             in
             viewSearchTodoItem model.today model.projectList
+
+
+viewProjectTodoItem : Model -> Todo -> H.Html Msg
+viewProjectTodoItem model todo =
+    let
+        today =
+            model.today
+
+        domId =
+            TodoId.toString todo.id
+
+        draggedAttrs : List (H.Attribute Msg)
+        draggedAttrs =
+            (case dndSystem.draggedIndex model.draggable of
+                Nothing ->
+                    dndSystem.dragEvents todo.projectSortIdx domId
+
+                Just idx ->
+                    if idx == todo.projectSortIdx then
+                        HA.class "z-999" :: dndSystem.draggedStyles model.draggable
+
+                    else
+                        dndSystem.dropEvents todo.projectSortIdx
+            )
+                |> List.map A.fromUnstyled
+
+        notDragging =
+            dndSystem.draggedIndex model.draggable == Nothing
+    in
+    row
+        (A.class "hide-child relative" :: A.id domId :: draggedAttrs)
+        [ viewTodoCheckbox todo
+        , viewTodoTitle todo
+        , viewTodoDueDate today todo
+        , if notDragging then
+            row [ A.class "child absolute right-0 bg-white-90" ]
+                [ btn2 "Insert Above" (InsertTodoInProjectAtClicked todo.projectSortIdx todo.maybeProjectId)
+                , btn2 "Insert Below" (InsertTodoInProjectAtClicked (todo.projectSortIdx + 1) todo.maybeProjectId)
+                , btn2 "UP" (MoveUp todo.id)
+                , btn2 "DN" (MoveDown todo.id)
+                , btn2 "X" (DeleteTodo todo.id)
+                ]
+
+          else
+            H.text ""
+        ]
 
 
 viewTodoCheckbox : Todo -> H.Html Msg
