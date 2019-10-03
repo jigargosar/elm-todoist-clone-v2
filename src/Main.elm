@@ -894,7 +894,7 @@ viewProjectTodoItem model todo =
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
-        viewHelp { rootAttrs, handleClass, hoverActionsAttrs } =
+        viewHelp { rootAttrs, handleClass, actionsClass } =
             row
                 (A.class "hide-child relative"
                     :: A.id domId
@@ -918,7 +918,7 @@ viewProjectTodoItem model todo =
                 , row
                     ([ A.class "opacity-transition-none child absolute right-0 bg-white-90"
                      ]
-                        ++ hoverActionsAttrs
+                        ++ [ A.class actionsClass ]
                     )
                     hoverContent
                 ]
@@ -931,39 +931,35 @@ viewProjectTodoItem model todo =
             , btn2 "X" (DeleteTodo todo.id)
             ]
 
-        viewDragged =
-            viewHelp
-                { rootAttrs =
-                    HA.class "z-999"
-                        :: dndSystem.draggedStyles model.draggable
-                        |> List.map A.fromUnstyled
-                , handleClass = ""
-                , hoverActionsAttrs = [ A.class "hidden" ]
-                }
-
         viewDropTarget rootClass =
             viewHelp
                 { rootAttrs = [ A.class rootClass ]
                 , handleClass = "hidden"
-                , hoverActionsAttrs = [ A.class "hidden" ]
-                }
-
-        viewDraggable =
-            viewHelp
-                { rootAttrs = []
-                , handleClass = "child"
-                , hoverActionsAttrs = [ A.class "" ]
+                , actionsClass = "hidden"
                 }
     in
     case draggedIndex of
         Nothing ->
-            viewDraggable
+            -- viewDraggable
+            viewHelp
+                { rootAttrs = []
+                , handleClass = "child"
+                , actionsClass = ""
+                }
 
         Just idx ->
             if idx == projectSortIdx then
                 col []
                     [ viewDropTarget "o-0"
-                    , viewDragged
+                    , -- viewDragged
+                      viewHelp
+                        { rootAttrs =
+                            HA.class "z-999"
+                                :: dndSystem.draggedStyles model.draggable
+                                |> List.map A.fromUnstyled
+                        , handleClass = ""
+                        , actionsClass = "hidden"
+                        }
                     ]
 
             else
