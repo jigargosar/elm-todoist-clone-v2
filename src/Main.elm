@@ -891,11 +891,6 @@ viewProjectTodoItem model todo =
         projectSortIdx =
             todo.projectSortIdx
 
-        dragStyles =
-            HA.class "z-999"
-                :: dndSystem.draggedStyles model.draggable
-                |> List.map A.fromUnstyled
-
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
@@ -907,7 +902,12 @@ viewProjectTodoItem model todo =
 
         viewDragged =
             row
-                (A.class "hide-child relative" :: dragStyles)
+                (A.class "hide-child relative"
+                    :: (HA.class "z-999"
+                            :: dndSystem.draggedStyles model.draggable
+                            |> List.map A.fromUnstyled
+                       )
+                )
                 content
 
         viewDropTarget isPlaceHolder =
