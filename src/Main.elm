@@ -956,15 +956,17 @@ viewProjectTodoItem model todo =
                 }
 
         viewDropTarget rootClass =
-            row
-                (A.class rootClass
-                    :: A.class "hide-child relative"
-                    :: A.id domId
-                    :: (dndSystem.dropEvents projectSortIdx
-                            |> List.map A.fromUnstyled
-                       )
-                )
-                (content { handleClass = "hidden", hideHoverActions = True })
+            viewHelp
+                { rootAttrs =
+                    A.class rootClass
+                        :: A.class "hide-child relative"
+                        :: A.id domId
+                        :: (dndSystem.dropEvents projectSortIdx
+                                |> List.map A.fromUnstyled
+                           )
+                , handleAttrs = [ A.class "hidden" ]
+                , hoverActionsAttrs = [ A.class "hidden" ]
+                }
 
         viewDraggable =
             row
