@@ -904,32 +904,8 @@ viewProjectTodoItem model todo =
             dndSystem.dropEvents todo.projectSortIdx
                 |> List.map A.fromUnstyled
 
-        draggedAttrs : List (H.Attribute Msg)
-        draggedAttrs =
-            case draggedIndex of
-                Nothing ->
-                    dragEvents
-
-                Just idx ->
-                    if idx == projectSortIdx then
-                        dragStyles
-
-                    else
-                        dropEvents
-
-        notDragging =
-            dndSystem.draggedIndex model.draggable == Nothing
-
         draggedIndex =
             dndSystem.draggedIndex model.draggable
-
-        _ =
-            case draggedIndex of
-                Just idx ->
-                    1
-
-                Nothing ->
-                    1
 
         viewDragged =
             row
