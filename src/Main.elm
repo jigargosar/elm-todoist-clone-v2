@@ -895,7 +895,7 @@ viewProjectTodoItem model todo =
             dndSystem.draggedIndex model.draggable
 
         content =
-            [ row [ A.class "child bg-white-90 pointer b code" ] [ H.text "::" ]
+            [ row [ A.class "child hidden bg-white-90 pointer b code" ] [ H.text "::" ]
             , viewTodoCheckbox todo
             , viewTodoTitle todo
             , viewTodoDueDate today todo
