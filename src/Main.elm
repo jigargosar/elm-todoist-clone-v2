@@ -899,25 +899,16 @@ viewProjectTodoItem model todo =
         draggedIndex =
             dndSystem.draggedIndex model.draggable
 
-        contentItems =
+        content =
             [ viewTodoCheckbox todo
             , viewTodoTitle todo
             , viewTodoDueDate today todo
             ]
 
-        hoverContent =
-            row [ A.class "child absolute right-0 bg-white-90" ]
-                [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
-                , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
-                , btn2 "UP" (MoveUp todo.id)
-                , btn2 "DN" (MoveDown todo.id)
-                , btn2 "X" (DeleteTodo todo.id)
-                ]
-
         viewDragged =
             row
                 (A.class "hide-child relative" :: dragStyles)
-                contentItems
+                content
 
         viewDropTarget isPlaceHolder =
             row
@@ -934,7 +925,7 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                contentItems
+                content
 
         viewDraggable =
             row
@@ -944,7 +935,15 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                (contentItems ++ [ hoverContent ])
+                (content ++ [ row [ A.class "child absolute right-0 bg-white-90" ] hoverContent ])
+
+        hoverContent =
+            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
+            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
+            , btn2 "UP" (MoveUp todo.id)
+            , btn2 "DN" (MoveDown todo.id)
+            , btn2 "X" (DeleteTodo todo.id)
+            ]
     in
     case draggedIndex of
         Nothing ->
