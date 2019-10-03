@@ -905,7 +905,7 @@ viewProjectTodoItem model todo =
         content { handleClass, hideHoverActions } =
             [ row
                 [ A.class handleClass
-                , A.class "bg-white-90 pointer b code"
+                , A.class "opacity-transition-none bg-white-90 pointer b code"
                 ]
                 [ H.text "::" ]
             , viewTodoCheckbox todo
@@ -913,7 +913,7 @@ viewProjectTodoItem model todo =
             , viewTodoDueDate today todo
             , row
                 [ A.classList [ ( "hidden", hideHoverActions ) ]
-                , A.class "child absolute right-0 bg-white-90"
+                , A.class "opacity-transition-none child absolute right-0 bg-white-90"
                 ]
                 hoverContent
             ]

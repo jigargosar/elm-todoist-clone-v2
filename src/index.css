@@ -75,3 +75,7 @@ button {
 .hidden {
   visibility: hidden;
 }
+
+.opacity-transition-none{
+  transition: opacity 0ms !important;
+}
