@@ -895,7 +895,8 @@ viewProjectTodoItem model todo =
             dndSystem.draggedIndex model.draggable
 
         content =
-            [ viewTodoCheckbox todo
+            [ row [ A.class "child absolute left--1 bg-white-90 pointer b code" ] [ H.text "::" ]
+            , viewTodoCheckbox todo
             , viewTodoTitle todo
             , viewTodoDueDate today todo
             ]
@@ -935,8 +936,7 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                (row [ A.class "child absolute left--1 bg-white-90 pointer" ] [ H.text "::" ]
-                    :: content
+                (content
                     ++ [ row [ A.class "child absolute right-0 bg-white-90" ]
                             hoverContent
                        ]
