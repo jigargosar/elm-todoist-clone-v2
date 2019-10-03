@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Basics.More exposing (HasId, allPass, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
+import DnDList
 import HasSeed
 import Html
 import Html.Styled as H
@@ -150,6 +151,22 @@ stringOrValueDecoder decoder =
 
 
 
+-- DND SYSTEM
+
+
+dndConfig : DnDList.Config Msg
+dndConfig =
+    { message = DnDListMsg
+    , movement = DnDList.Free
+    }
+
+
+dndSystem : DnDList.System Msg TodoId
+dndSystem =
+    DnDList.create dndConfig
+
+
+
 -- MODEL
 
 
@@ -160,7 +177,8 @@ type alias Flags =
 
 
 type alias Model =
-    { todoList : List Todo
+    { draggable : DnDList.Draggable
+    , todoList : List Todo
     , projectList : List Project
     , maybeTodoForm : Maybe TodoForm
     , route : Route
@@ -172,7 +190,8 @@ type alias Model =
 
 defaultModel : Model
 defaultModel =
-    { todoList = defaultCacheValue.todoList
+    { draggable = dndSystem.draggable
+    , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
     , maybeTodoForm = Nothing
     , route = defaultCacheValue.route
@@ -252,6 +271,7 @@ setTodoForm form model =
 
 type Msg
     = NoOp
+    | DnDListMsg DnDList.Msg
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
@@ -274,6 +294,15 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        DnDListMsg dndMsg ->
+            let
+                ( draggable, items ) =
+                    dndSystem.update dndMsg model.draggable []
+            in
+            ( { model | draggable = draggable }
+            , dndSystem.commands model.draggable
+            )
 
         ResetModel ->
             refreshModel (generateMockModel model.seed)
