@@ -935,7 +935,8 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                (content
+                (row [ A.class "child absolute left--1 bg-white-90 pointer" ] [ H.text "::" ]
+                    :: content
                     ++ [ row [ A.class "child absolute right-0 bg-white-90" ]
                             hoverContent
                        ]
