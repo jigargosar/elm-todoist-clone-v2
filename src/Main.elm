@@ -888,6 +888,22 @@ viewProjectTodoItem model todo =
         domId =
             TodoId.toString todo.id
 
+        projectSortIdx =
+            todo.projectSortIdx
+
+        dragEvents =
+            dndSystem.dragEvents todo.projectSortIdx domId
+                |> List.map A.fromUnstyled
+
+        dragStyles =
+            HA.class "z-999"
+                :: dndSystem.draggedStyles model.draggable
+                |> List.map A.fromUnstyled
+
+        dropEvents =
+            dndSystem.dropEvents todo.projectSortIdx
+                |> List.map A.fromUnstyled
+
         draggedAttrs : List (H.Attribute Msg)
         draggedAttrs =
             (case dndSystem.draggedIndex model.draggable of
