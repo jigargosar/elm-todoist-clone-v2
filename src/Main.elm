@@ -904,9 +904,13 @@ viewProjectTodoItem model todo =
 
         content { handleClass, hideHoverActions } =
             [ row
-                [ A.class handleClass
-                , A.class "opacity-transition-none bg-white-90 pointer b code"
-                ]
+                ([ A.class handleClass
+                 , A.class "opacity-transition-none bg-white-90 pointer b code"
+                 ]
+                    ++ (dndSystem.dragEvents projectSortIdx domId
+                            |> List.map A.fromUnstyled
+                       )
+                )
                 [ H.text "::" ]
             , viewTodoCheckbox todo
             , viewTodoTitle todo
@@ -948,10 +952,7 @@ viewProjectTodoItem model todo =
         viewDraggable =
             row
                 (A.class "hide-child relative"
-                    :: A.id domId
-                    :: (dndSystem.dragEvents projectSortIdx domId
-                            |> List.map A.fromUnstyled
-                       )
+                    :: [ A.id domId ]
                 )
                 (content { handleClass = "child", hideHoverActions = False })
     in
