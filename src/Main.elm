@@ -905,6 +905,17 @@ viewProjectTodoItem model todo =
 
         notDragging =
             dndSystem.draggedIndex model.draggable == Nothing
+
+        draggedIndex =
+            dndSystem.draggedIndex model.draggable
+
+        _ =
+            case draggedIndex of
+                Just idx ->
+                    1
+
+                Nothing ->
+                    1
     in
     row
         (A.class "hide-child relative" :: A.id domId :: draggedAttrs)
