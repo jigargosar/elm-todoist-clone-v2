@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, eqById, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Date exposing (Date)
 import DnDList
@@ -161,7 +161,7 @@ dndConfig =
     }
 
 
-dndSystem : DnDList.System Msg TodoId
+dndSystem : DnDList.System Msg Todo
 dndSystem =
     DnDList.create dndConfig
 
@@ -297,12 +297,38 @@ update msg model =
 
         DnDListMsg dndMsg ->
             let
-                ( draggable, items ) =
-                    dndSystem.update dndMsg model.draggable []
+                maybeMaybeProjectId =
+                    case model.route of
+                        RouteProject projectId ->
+                            Just (Just projectId)
+
+                        RouteInbox ->
+                            Just Nothing
+
+                        _ ->
+                            Nothing
             in
-            ( { model | draggable = draggable }
-            , dndSystem.commands model.draggable
-            )
+            case maybeMaybeProjectId of
+                Just maybeProjectId ->
+                    let
+                        projectTodoList =
+                            sortedTodoListForMaybeProjectId maybeProjectId model.todoList
+
+                        ( draggable, newProjectTodoList ) =
+                            dndSystem.update dndMsg model.draggable projectTodoList
+
+                        updatedTodoList =
+                            newProjectTodoList |> List.indexedMap (\i t -> { t | projectSortIdx = i })
+                    in
+                    ( { model
+                        | draggable = draggable
+                        , todoList = List.foldr (\t -> LX.setIf (eqById t) t) model.todoList updatedTodoList
+                      }
+                    , dndSystem.commands model.draggable
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         ResetModel ->
             refreshModel (generateMockModel model.seed)

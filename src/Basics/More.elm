@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 
@@ -14,6 +14,16 @@ when pred func val =
 
 type alias HasId a id =
     { a | id : id }
+
+
+eqBy : (b -> a) -> b -> b -> Bool
+eqBy func a b =
+    func a == func b
+
+
+eqById : HasId a id -> HasId a id -> Bool
+eqById =
+    eqBy .id
 
 
 idEq : id -> HasId a id -> Bool
