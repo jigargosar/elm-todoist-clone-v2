@@ -872,8 +872,7 @@ viewTodoListItem kind model =
                         draggedAttrs =
                             (case dndSystem.draggedIndex model.draggable of
                                 Nothing ->
-                                    HA.id domId
-                                        :: dndSystem.dragEvents todo.projectSortIdx domId
+                                    dndSystem.dragEvents todo.projectSortIdx domId
 
                                 Just idx ->
                                     if idx == todo.projectSortIdx then
@@ -888,7 +887,7 @@ viewTodoListItem kind model =
                             dndSystem.draggedIndex model.draggable == Nothing
                     in
                     row
-                        (A.class "hide-child relative" :: draggedAttrs)
+                        (A.class "hide-child relative" :: A.id domId :: draggedAttrs)
                         [ viewTodoCheckbox todo
                         , viewTodoTitle todo
                         , viewTodoDueDate today todo
