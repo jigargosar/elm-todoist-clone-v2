@@ -902,12 +902,19 @@ viewProjectTodoItem model todo =
             , btn2 "X" (DeleteTodo todo.id)
             ]
 
-        content =
-            [ row [ A.class "child bg-white-90 pointer b code" ] [ H.text "::" ]
+        content { handleClass, hideHoverActions } =
+            [ row
+                [ A.class handleClass
+                , A.class "bg-white-90 pointer b code"
+                ]
+                [ H.text "::" ]
             , viewTodoCheckbox todo
             , viewTodoTitle todo
             , viewTodoDueDate today todo
-            , row [ A.class "child absolute right-0 bg-white-90" ]
+            , row
+                [ A.classList [ ( "hidden", hideHoverActions ) ]
+                , A.class "child absolute right-0 bg-white-90"
+                ]
                 hoverContent
             ]
 
@@ -919,7 +926,7 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                content
+                (content { handleClass = "", hideHoverActions = True })
 
         viewDropTarget isPlaceHolder =
             row
@@ -936,7 +943,7 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                content
+                (content { handleClass = "hidden", hideHoverActions = True })
 
         viewDraggable =
             row
@@ -946,7 +953,7 @@ viewProjectTodoItem model todo =
                             |> List.map A.fromUnstyled
                        )
                 )
-                content
+                (content { handleClass = "child", hideHoverActions = False })
     in
     case draggedIndex of
         Nothing ->
