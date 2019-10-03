@@ -493,9 +493,11 @@ insertTodo todo model =
     }
 
 
-subscriptions : Model -> Sub msg
-subscriptions _ =
-    Sub.none
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ dndSystem.subscriptions model.draggable
+        ]
 
 
 getSearchQuery : Route -> String
@@ -631,7 +633,7 @@ type TodoListKind
 
 viewTodoListSection :
     TodoListKind
-    -> { a | todoList : List Todo, today : Date, projectList : List Project, maybeTodoForm : Maybe TodoForm }
+    -> Model
     -> List (H.Html Msg)
 viewTodoListSection kind model =
     let
@@ -748,7 +750,7 @@ todoFormConfig =
 
 viewTodoListContent :
     TodoListKind
-    -> { a | projectList : List Project, today : Date }
+    -> Model
     -> Maybe TodoForm
     -> List Todo
     -> List (H.Html Msg)
@@ -830,9 +832,14 @@ viewTodoListContent kind model maybeTodoForm todoList =
 
 -- VIEW TODO_FORM
 -- VIEW TODO_LIST_ITEM
+--viewTodoListItem : TodoListKind -> { a | projectList : List Project, today : Date } -> Todo -> H.Html Msg
 
 
-viewTodoListItem : TodoListKind -> { a | projectList : List Project, today : Date } -> Todo -> H.Html Msg
+viewTodoListItem :
+    TodoListKind
+    -> { a | projectList : List Project, draggable : DnDList.Draggable, today : Date }
+    -> Todo
+    -> H.Html Msg
 viewTodoListItem kind model =
     let
         viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
@@ -859,6 +866,9 @@ viewTodoListItem kind model =
                     let
                         domId =
                             TodoId.toString todo.id
+
+                        draggedAttrs =
+                            dndSystem.draggedIndex model.draggable
                     in
                     row
                         (A.class "hide-child relative"
