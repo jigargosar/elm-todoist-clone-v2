@@ -976,7 +976,10 @@ viewProjectTodoItem model todo =
 
         Just idx ->
             if idx == projectSortIdx then
-                viewPlaceHolder
+                col []
+                    [ viewPlaceHolder
+                    , viewDragged
+                    ]
 
             else
                 viewDropable
