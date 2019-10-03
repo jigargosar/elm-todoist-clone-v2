@@ -891,17 +891,9 @@ viewProjectTodoItem model todo =
         projectSortIdx =
             todo.projectSortIdx
 
-        dragEvents =
-            dndSystem.dragEvents projectSortIdx domId
-                |> List.map A.fromUnstyled
-
         dragStyles =
             HA.class "z-999"
                 :: dndSystem.draggedStyles model.draggable
-                |> List.map A.fromUnstyled
-
-        dropEvents =
-            dndSystem.dropEvents projectSortIdx
                 |> List.map A.fromUnstyled
 
         draggedIndex =
@@ -938,13 +930,20 @@ viewProjectTodoItem model todo =
                  )
                     :: A.class "hide-child relative"
                     :: A.id domId
-                    :: dropEvents
+                    :: (dndSystem.dropEvents projectSortIdx
+                            |> List.map A.fromUnstyled
+                       )
                 )
                 contentItems
 
         viewDraggable =
             row
-                (A.class "hide-child relative" :: A.id domId :: dragEvents)
+                (A.class "hide-child relative"
+                    :: A.id domId
+                    :: (dndSystem.dragEvents projectSortIdx domId
+                            |> List.map A.fromUnstyled
+                       )
+                )
                 (contentItems ++ [ hoverContent ])
     in
     case draggedIndex of
