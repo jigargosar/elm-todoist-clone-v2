@@ -945,9 +945,7 @@ viewProjectTodoItem model todo =
 
         viewDraggable =
             row
-                (A.class "hide-child relative"
-                    :: [ A.id domId ]
-                )
+                (A.class "hide-child relative" :: [ A.id domId ])
                 (content { handleClass = "child", hideHoverActions = False })
     in
     case draggedIndex of
