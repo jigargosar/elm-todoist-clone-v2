@@ -925,26 +925,6 @@ viewProjectTodoItem model todo =
             , btn2 "X" (DeleteTodo todo.id)
             ]
 
-        content { handleClass, hideHoverActions } =
-            [ row
-                ([ A.class handleClass
-                 , A.class "opacity-transition-none bg-white-90 pointer b code"
-                 ]
-                    ++ (dndSystem.dragEvents projectSortIdx domId
-                            |> List.map A.fromUnstyled
-                       )
-                )
-                [ H.text "::" ]
-            , viewTodoCheckbox todo
-            , viewTodoTitle todo
-            , viewTodoDueDate today todo
-            , row
-                [ A.classList [ ( "hidden", hideHoverActions ) ]
-                , A.class "opacity-transition-none child absolute right-0 bg-white-90"
-                ]
-                hoverContent
-            ]
-
         viewDragged =
             viewHelp
                 { rootAttrs =
@@ -959,7 +939,6 @@ viewProjectTodoItem model todo =
             viewHelp
                 { rootAttrs =
                     A.class rootClass
-                        :: A.class "hide-child relative"
                         :: A.id domId
                         :: (dndSystem.dropEvents projectSortIdx
                                 |> List.map A.fromUnstyled
@@ -969,9 +948,11 @@ viewProjectTodoItem model todo =
                 }
 
         viewDraggable =
-            row
-                (A.class "hide-child relative" :: [ A.id domId ])
-                (content { handleClass = "child", hideHoverActions = False })
+            viewHelp
+                { rootAttrs = [ A.id domId ]
+                , handleAttrs = [ A.class "child" ]
+                , hoverActionsAttrs = [ A.class "" ]
+                }
     in
     case draggedIndex of
         Nothing ->
