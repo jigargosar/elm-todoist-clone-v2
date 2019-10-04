@@ -191,7 +191,7 @@ type alias SchedulePopup =
 
 
 type alias Model =
-    { draggable : DnDList.Model
+    { dnd : DnDList.Model
     , todoList : List Todo
     , projectList : List Project
     , maybeTodoForm : Maybe TodoForm
@@ -205,7 +205,7 @@ type alias Model =
 
 defaultModel : Model
 defaultModel =
-    { draggable = dndSystem.model
+    { dnd = dndSystem.model
     , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
     , maybeTodoForm = Nothing
@@ -365,16 +365,16 @@ update msg model =
                             sortedTodoListForMaybeProjectId maybeProjectId model.todoList
 
                         ( draggable, newProjectTodoList ) =
-                            dndSystem.update dndMsg model.draggable projectTodoList
+                            dndSystem.update dndMsg model.dnd projectTodoList
 
                         updatedTodoList =
                             newProjectTodoList |> List.indexedMap (\i t -> { t | projectSortIdx = i })
                     in
                     ( { model
-                        | draggable = draggable
+                        | dnd = draggable
                         , todoList = List.foldr (\t -> LX.setIf (eqById t) t) model.todoList updatedTodoList
                       }
-                    , dndSystem.commands model.draggable
+                    , dndSystem.commands model.dnd
                     )
 
                 Nothing ->
@@ -546,7 +546,7 @@ insertTodo todo model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ dndSystem.subscriptions model.draggable
+        [ dndSystem.subscriptions model.dnd
         , model.maybeTodoContextMenu
             |> MX.unwrap Sub.none
                 (\_ ->
@@ -1061,7 +1061,7 @@ viewProjectTodoItem model viewContextMenu todo =
                 , actionsClass = "hidden"
                 }
     in
-    case dndSystem.info model.draggable of
+    case dndSystem.info model.dnd of
         Nothing ->
             -- viewDraggable
             viewHelp
@@ -1078,7 +1078,7 @@ viewProjectTodoItem model viewContextMenu todo =
                       viewHelp
                         { rootAttrs =
                             HA.class "z-999"
-                                :: dndSystem.ghostStyles model.draggable
+                                :: dndSystem.ghostStyles model.dnd
                                 |> List.map A.fromUnstyled
                         , handleClass = ""
                         , actionsClass = "hidden"
