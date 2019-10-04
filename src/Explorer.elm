@@ -23,4 +23,9 @@ view _ =
 
 main : Program {} Model Msg
 main =
-    Browser.element { init = \_ -> ( Model, Cmd.none ), view = view, update = update, subscriptions = \_ -> Sub.none }
+    Browser.element
+        { init = \_ -> ( Model, Cmd.none )
+        , view = view
+        , update = update
+        , subscriptions = \_ -> Sub.none
+        }
