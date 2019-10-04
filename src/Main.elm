@@ -1074,7 +1074,7 @@ viewProjectTodoItem model viewContextMenu todo =
             if dragIndex == projectSortIdx then
                 col []
                     [ viewDropTarget "o-0"
-                    , -- viewDragged
+                    , -- viewGhost
                       viewHelp
                         { rootAttrs =
                             HA.class "z-999"
