@@ -940,6 +940,7 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
+viewTodoContextMenuTrigger : TodoListKind -> Todo -> Model -> H.Html Msg
 viewTodoContextMenuTrigger kind todo model =
     let
         insertAt offset =
