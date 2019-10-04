@@ -932,6 +932,12 @@ viewTodoContextMenuTrigger kind todo model =
                     , ( "Schedule", EditTodoClicked todo )
                     , ( "Delete", DeleteTodo todo.id )
                     ]
+
+        viewMI ( title, msg ) =
+            col [ A.class "pa1", E.onClick msg ] [ H.text title ]
+
+        viewItems =
+            List.map viewMI items
     in
     row [ A.class " relative" ]
         [ model.maybeTodoContextMenu
@@ -942,12 +948,7 @@ viewTodoContextMenuTrigger kind todo model =
                         [ A.class "absolute right-0 bg-white shadow-1 z-999"
                         , style "min-width" "150px"
                         ]
-                        (items
-                            |> List.map
-                                (\( title, msg ) ->
-                                    col [ A.class "pa1", E.onClick msg ] [ H.text title ]
-                                )
-                        )
+                        viewItems
                 )
         , col
             [ A.class "opacity-transition-none child pointer"
