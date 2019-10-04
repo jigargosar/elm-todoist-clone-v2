@@ -860,8 +860,14 @@ viewTodoListItem kind model =
                 [ viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoProjectPill projectList todo
-                , row [ A.class "child absolute right-0 bg-white-90" ]
-                    [ btn2 "X" (DeleteTodo todo.id) ]
+                , viewCommonMoreMenu todo
+                ]
+
+        viewCommonMoreMenu todo =
+            viewTodoMoreMenu todo.id
+                model
+                [ ( "Edit", EditTodoClicked todo )
+                , ( "Delete", DeleteTodo todo.id )
                 ]
     in
     case kind of
@@ -883,8 +889,7 @@ viewTodoListItem kind model =
                         , viewTodoTitle todo
                         , viewTodoDueDate today todo
                         , viewTodoProjectPill projectList todo
-                        , row [ A.class "child absolute right-0 bg-white-90" ]
-                            [ btn2 "X" (DeleteTodo todo.id) ]
+                        , viewCommonMoreMenu todo
                         ]
             in
             viewSearchTodoItem model.today model.projectList
