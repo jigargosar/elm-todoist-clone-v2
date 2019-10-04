@@ -934,7 +934,24 @@ viewTodoContextMenuTrigger kind todo model =
                     ]
 
         viewScheduleMI =
-            col [ A.class "pa1", E.onClick <| TodoContextMenuScheduleClicked todo ] [ H.text "Schedule" ]
+            col [ A.class " relative" ]
+                [ model.maybeTodoContextMenu
+                    |> MX.filter .schedulePopup
+                    |> MX.unwrap (H.text "")
+                        (\_ ->
+                            col
+                                [ A.class "absolute right-1 bg-white shadow-1 z-999"
+                                , style "min-width" "150px"
+                                ]
+                                [ col [] [ H.text "Select Due Date" ] ]
+                        )
+                , col
+                    [ A.class "pa1"
+                    , onClickStopPropagation <|
+                        TodoContextMenuScheduleClicked todo
+                    ]
+                    [ H.text "Schedule" ]
+                ]
 
         viewMI ( title, msg ) =
             col [ A.class "pa1", E.onClick msg ] [ H.text title ]
