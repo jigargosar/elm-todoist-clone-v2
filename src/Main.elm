@@ -182,6 +182,7 @@ type alias Model =
     , todoList : List Todo
     , projectList : List Project
     , maybeTodoForm : Maybe TodoForm
+    , maybeTodoContextMenu : Maybe TodoId
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -195,6 +196,7 @@ defaultModel =
     , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
     , maybeTodoForm = Nothing
+    , maybeTodoContextMenu = Nothing
     , route = defaultCacheValue.route
     , zone = Time.utc
     , today = Date.fromRataDie 0
