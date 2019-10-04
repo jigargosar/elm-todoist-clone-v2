@@ -48,8 +48,19 @@ col =
 
 viewTodoItem =
     row [ class "items-center" ]
-        [ col [ class "flex pa1" ]
-            [ input
+        [ col [ class "relative flex pa1" ]
+            [ svg
+                [ SA.class "absolute top-0 left-0 w-100 h-100"
+                , SA.viewBox "0 0 24 24"
+                , SA.fill "none"
+                , SA.strokeWidth "1"
+                , SA.stroke "black"
+                ]
+                [ rect
+                    [ SA.width "12", SA.height "12", SA.transform "translate(6,6)" ]
+                    []
+                ]
+            , input
                 [ class "ma0 pa0 o-0"
                 , type_ "checkbox"
                 , style "width" "24px"
@@ -59,18 +70,6 @@ viewTodoItem =
                 , onCheck OnCheck
                 ]
                 []
-            , svg [ SA.viewBox "0 0 24 24" ]
-                [ g [ SA.transform "translate(6,6)" ]
-                    [ rect
-                        [ SA.width "50%"
-                        , SA.height "50%"
-                        , SA.fill "transparent"
-                        , SA.strokeWidth "1"
-                        , SA.stroke "black"
-                        ]
-                        []
-                    ]
-                ]
             ]
         , div [ class "pa1" ] [ text "Todo item title" ]
         ]
