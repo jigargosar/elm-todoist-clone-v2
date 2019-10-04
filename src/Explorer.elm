@@ -3,6 +3,8 @@ module Explorer exposing (main)
 import Browser
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
+import Html.Styled.Events exposing (onCheck)
+import UI
 
 
 type alias Model =
@@ -11,6 +13,7 @@ type alias Model =
 
 type Msg
     = NoOp
+    | OnCheck Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -19,21 +22,39 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
+        OnCheck bool ->
+            let
+                _ =
+                    Debug.log "onCheck" bool
+            in
+            ( model, Cmd.none )
+
 
 view : Model -> Html Msg
 view _ =
     div [ class "pa3 flex items-center bg-washed-red ba bw1 ma3", style "min-height" "100vh" ]
-        [ div [ class "ba bw1" ] [ viewTodoItem ] ]
+        [ div [ class "shadow-1" ] [ viewTodoItem ] ]
+
+
+row =
+    UI.row
+
+
+col =
+    UI.col
 
 
 viewTodoItem =
-    div [ class "flex" ]
-        [ div [ class "flex pa1" ]
+    row [ class "items-center" ]
+        [ col [ class "flex pa1" ]
             [ input
-                [ class "ma0 pa0 "
+                [ class "ma0 pa0 o-0"
                 , type_ "checkbox"
                 , style "width" "24px"
                 , style "height" "24px"
+
+                --, style "visibility" "hidden"
+                , onCheck OnCheck
                 ]
                 []
             ]
