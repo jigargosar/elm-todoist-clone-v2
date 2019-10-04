@@ -12,8 +12,11 @@ type Msg
     = NoOp
 
 
+update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
-    ( model, Cmd.none )
+    case message of
+        NoOp ->
+            ( model, Cmd.none )
 
 
 view _ =
