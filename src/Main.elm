@@ -8,7 +8,7 @@ import HasSeed
 import Html
 import Html.Attributes as HA
 import Html.Styled as H
-import Html.Styled.Attributes as A
+import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional)
@@ -275,6 +275,7 @@ setTodoForm form model =
 type Msg
     = NoOp
     | DnDListMsg DnDList.Msg
+    | OpenTodoContextMenu TodoId
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
@@ -297,6 +298,9 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        OpenTodoContextMenu todoId ->
+            ( { model | maybeTodoContextMenu = Just todoId }, Cmd.none )
 
         DnDListMsg dndMsg ->
             let
@@ -908,12 +912,33 @@ viewProjectTodoItem model todo =
                 , viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoDueDate today todo
-                , row
-                    ([ A.class "opacity-transition-none child absolute right-0 bg-white-90"
-                     ]
-                        ++ [ A.class actionsClass ]
-                    )
-                    actionsContent
+                , {- row
+                     ([ A.class "opacity-transition-none child absolute right-0 bg-white-90"
+                      ]
+                         ++ [ A.class actionsClass ]
+                     )
+                     actionsContent
+                  -}
+                  row [ A.class " relative" ]
+                    [ model.maybeTodoContextMenu
+                        |> MX.filter ((==) todo.id)
+                        |> MX.unwrap (H.text "")
+                            (\_ ->
+                                col
+                                    [ A.class "absolute right-0 bg-white shadow-1 z-999"
+                                    , style "min-width" "150px"
+                                    ]
+                                    [ col [ A.class "pa1" ] [ H.text "Edit" ]
+                                    , col [ A.class "pa1" ] [ H.text "Edit" ]
+                                    , col [ A.class "pa1" ] [ H.text "Edit" ]
+                                    ]
+                            )
+                    , col
+                        [ A.class "opacity-transition-none child pointer"
+                        , E.stopPropagationOn "click" (JD.succeed ( OpenTodoContextMenu todo.id, True ))
+                        ]
+                        [ H.text "..." ]
+                    ]
                 ]
 
         actionsContent =
