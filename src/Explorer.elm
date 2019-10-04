@@ -22,7 +22,7 @@ update message model =
 
 view : Model -> Html Msg
 view _ =
-    div [ class "pa3 flex vh-100" ]
+    div [ class "pa3 flex", style "min-height" "vh100" ]
         [ text "Hello" ]
 
 
