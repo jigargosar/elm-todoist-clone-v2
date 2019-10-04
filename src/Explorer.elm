@@ -48,9 +48,15 @@ col =
 
 viewTodoItem =
     row [ class "items-center" ]
-        [ col [ class "relative flex pa1" ]
+        [ col
+            [ class "relative flex f2"
+            , style "width" "1em"
+            , style "height" "1em"
+            ]
             [ svg
-                [ SA.class "absolute top-0 left-0 w-100 h-100"
+                [ SA.class "absolute"
+                , SA.width "100%"
+                , SA.height "100%"
                 , SA.viewBox "0 0 24 24"
                 , SA.fill "none"
                 , SA.strokeWidth "1"
@@ -63,8 +69,8 @@ viewTodoItem =
             , input
                 [ class "ma0 pa0 o-0"
                 , type_ "checkbox"
-                , style "width" "24px"
-                , style "height" "24px"
+                , style "width" "100%"
+                , style "height" "100%"
 
                 --, style "visibility" "hidden"
                 , onCheck OnCheck
