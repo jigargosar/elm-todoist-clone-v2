@@ -48,7 +48,7 @@ col =
 
 viewTodoItem model =
     row [ class "items-center" ]
-        [ viewCheckbox model.isChecked OnCheck "f2"
+        [ viewCheckbox model.isChecked OnCheck "f3"
         , div [ class "pa1" ] [ text "Todo item title" ]
         ]
 
@@ -67,18 +67,18 @@ viewCheckbox isChecked onCheck_ rootClass =
             , SA.height "100%"
             , SA.viewBox "0 0 24 24"
             , SA.fill "none"
-            , SA.strokeWidth "1"
+            , SA.strokeWidth "1.5"
             , SA.stroke "black"
             , SA.strokeLinecap "round"
             , SA.strokeLinejoin "round"
             ]
             [ rect
-                [ SA.width "12", SA.height "12", SA.transform "translate(6,6)" ]
+                [ SA.width "16", SA.height "16", SA.transform "translate(4,4)" ]
                 []
             , g []
                 (if isChecked then
-                    [ line [ x1 "0", x2 "8", SA.transform "translate(11,15), rotate(-50)" ] []
-                    , line [ x1 "0", x2 "4", SA.transform "translate(11,15), rotate(-140)" ] []
+                    [ line [ x1 "0", x2 "10", SA.transform "translate(11,16), rotate(-50)" ] []
+                    , line [ x1 "0", x2 "6", SA.transform "translate(11,16), rotate(-140)" ] []
                     ]
 
                  else
