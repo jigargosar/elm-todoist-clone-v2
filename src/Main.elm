@@ -156,16 +156,18 @@ stringOrValueDecoder decoder =
 -- DND SYSTEM
 
 
-dndConfig : DnDList.Config Msg
+dndConfig : DnDList.Config Todo
 dndConfig =
-    { message = DnDListMsg
+    { beforeUpdate = \_ _ list -> list
     , movement = DnDList.Vertical
+    , listen = DnDList.OnDrag
+    , operation = DnDList.Rotate
     }
 
 
-dndSystem : DnDList.System Msg Todo
+dndSystem : DnDList.System Todo Msg
 dndSystem =
-    DnDList.create dndConfig
+    DnDList.create dndConfig DnDListMsg
 
 
 
@@ -189,7 +191,7 @@ type alias SchedulePopup =
 
 
 type alias Model =
-    { draggable : DnDList.Draggable
+    { draggable : DnDList.Model
     , todoList : List Todo
     , projectList : List Project
     , maybeTodoForm : Maybe TodoForm
@@ -203,7 +205,7 @@ type alias Model =
 
 defaultModel : Model
 defaultModel =
-    { draggable = dndSystem.draggable
+    { draggable = dndSystem.model
     , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
     , maybeTodoForm = Nothing
@@ -1031,10 +1033,7 @@ viewProjectTodoItem model viewContextMenu todo =
             row
                 (A.class "hide-child relative"
                     :: A.id domId
-                    :: (dndSystem.dropEvents projectSortIdx
-                            |> List.map A.fromUnstyled
-                       )
-                    ++ rootAttrs
+                    :: rootAttrs
                 )
                 [ row
                     ([ A.class "opacity-transition-none bg-white-90 pointer b code"
@@ -1053,12 +1052,16 @@ viewProjectTodoItem model viewContextMenu todo =
 
         viewDropTarget rootClass =
             viewHelp
-                { rootAttrs = [ A.class rootClass ]
+                { rootAttrs =
+                    [ A.class rootClass ]
+                        ++ (dndSystem.dropEvents projectSortIdx domId
+                                |> List.map A.fromUnstyled
+                           )
                 , handleClass = "hidden"
                 , actionsClass = "hidden"
                 }
     in
-    case dndSystem.draggedIndex model.draggable of
+    case dndSystem.info model.draggable of
         Nothing ->
             -- viewDraggable
             viewHelp
@@ -1067,15 +1070,15 @@ viewProjectTodoItem model viewContextMenu todo =
                 , actionsClass = ""
                 }
 
-        Just idx ->
-            if idx == projectSortIdx then
+        Just { dragIndex } ->
+            if dragIndex == projectSortIdx then
                 col []
                     [ viewDropTarget "o-0"
                     , -- viewDragged
                       viewHelp
                         { rootAttrs =
                             HA.class "z-999"
-                                :: dndSystem.draggedStyles model.draggable
+                                :: dndSystem.ghostStyles model.draggable
                                 |> List.map A.fromUnstyled
                         , handleClass = ""
                         , actionsClass = "hidden"
