@@ -4,7 +4,7 @@ import Browser
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
 import Html.Styled.Events exposing (onCheck)
-import Svg.Styled exposing (rect, svg)
+import Svg.Styled exposing (g, rect, svg)
 import Svg.Styled.Attributes as SA
 import UI
 
@@ -60,14 +60,16 @@ viewTodoItem =
                 ]
                 []
             , svg [ SA.viewBox "0 0 24 24" ]
-                [ rect
-                    [ SA.width "100%"
-                    , SA.height "100%"
-                    , SA.fill "transparent"
-                    , SA.strokeWidth "5"
-                    , SA.stroke "white"
+                [ g [ SA.transform "translate(6,6)" ]
+                    [ rect
+                        [ SA.width "50%"
+                        , SA.height "50%"
+                        , SA.fill "transparent"
+                        , SA.strokeWidth "1"
+                        , SA.stroke "black"
+                        ]
+                        []
                     ]
-                    []
                 ]
             ]
         , div [ class "pa1" ] [ text "Todo item title" ]
