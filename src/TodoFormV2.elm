@@ -1,20 +1,11 @@
 module TodoFormV2 exposing
     ( Config
-    , Meta(..)
     , TodoForm
     , createConfig
-    , getMeta
-    , getProjectSortIdx
-    , initAdd
-    , initEdit
-    , isAddingForInitialDueDate
-    , isEditingFor
-    , setProjectSortIdxIfAdding
-    , toPatchesWithMeta
+    , getPatches
     , viewTodoForm
     )
 
-import Basics.More exposing (allPass, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -24,17 +15,11 @@ import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
 import Todo exposing (Todo)
-import TodoId exposing (TodoId)
 import UI exposing (btn2, col, ipt3, row, submit)
 
 
-type Meta
-    = Add
-    | Edit TodoId
-
-
 type TodoForm
-    = TodoForm Meta Fields Fields
+    = TodoForm Fields Fields
 
 
 type alias Fields =
@@ -45,9 +30,9 @@ type alias Fields =
     }
 
 
-toPatchesWithMeta : TodoForm -> ( Meta, List Todo.Patch )
-toPatchesWithMeta (TodoForm meta _ current) =
-    ( meta, toPatches current )
+getPatches : TodoForm -> List Todo.Patch
+getPatches (TodoForm _ current) =
+    toPatches current
 
 
 toPatches : Fields -> List Todo.Patch
@@ -59,57 +44,9 @@ toPatches m =
     ]
 
 
-unwrapMeta : TodoForm -> Meta
-unwrapMeta (TodoForm meta _ _) =
-    meta
-
-
-isEditingFor : TodoId -> TodoForm -> Bool
-isEditingFor todoId =
-    unwrapMeta >> (==) (Edit todoId)
-
-
-getMeta : TodoForm -> Meta
-getMeta =
-    unwrapMeta
-
-
-getProjectSortIdx : TodoForm -> Int
-getProjectSortIdx =
-    unwrap >> .projectSortIdx
-
-
-isAddingForInitialDueDate : Date -> TodoForm -> Bool
-isAddingForInitialDueDate dueDate =
-    allPass
-        [ unwrapMeta >> (==) Add
-        , unwrapInitial >> propEq .maybeDueDate (Just dueDate)
-        ]
-
-
 unwrap : TodoForm -> Fields
-unwrap (TodoForm _ _ internal) =
+unwrap (TodoForm _ internal) =
     internal
-
-
-unwrapInitial : TodoForm -> Fields
-unwrapInitial (TodoForm _ initial _) =
-    initial
-
-
-setProjectSortIdxIfAdding : Int -> TodoForm -> Maybe TodoForm
-setProjectSortIdxIfAdding projectSortIdx =
-    mapIfAdding (\f -> { f | projectSortIdx = projectSortIdx })
-
-
-mapIfAdding : (Fields -> Fields) -> TodoForm -> Maybe TodoForm
-mapIfAdding func (TodoForm meta initial current) =
-    case meta of
-        Add ->
-            Just <| TodoForm meta initial <| func current
-
-        _ ->
-            Nothing
 
 
 empty : Fields
@@ -117,19 +54,9 @@ empty =
     Fields "" Nothing Nothing Random.maxInt
 
 
-initAdd : (Fields -> Fields) -> TodoForm
-initAdd func =
-    init Add <| func empty
-
-
-init : Meta -> Fields -> TodoForm
-init meta internal =
-    TodoForm meta internal internal
-
-
-initEdit : Todo -> TodoForm
-initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
-    init (Edit id) <| Fields title maybeProjectId maybeDueDate projectSortIdx
+init : Fields -> TodoForm
+init internal =
+    TodoForm internal internal
 
 
 type Config msg
@@ -142,10 +69,10 @@ createConfig =
 
 
 viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
-viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta initial model) =
+viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm initial model) =
     let
         onChange =
-            toMsg << TodoForm meta initial
+            toMsg << TodoForm initial
 
         titleChanged title =
             onChange { model | title = title }
