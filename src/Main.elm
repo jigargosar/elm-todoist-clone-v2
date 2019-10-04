@@ -874,9 +874,24 @@ viewTodoListItem kind model =
                 ]
 
         viewCommonMoreMenu todo =
-            viewTodoMoreMenu todo.id
+            viewTodoContextMenuTrigger kind
+                todo
                 model
                 [ ( "Edit", EditTodoClicked todo )
+                , ( "Delete", DeleteTodo todo.id )
+                ]
+
+        viewProjectMoreMenu todo =
+            let
+                insertAt offset =
+                    InsertTodoInProjectAtClicked (todo.projectSortIdx + offset) todo.maybeProjectId
+            in
+            viewTodoContextMenuTrigger kind
+                todo
+                model
+                [ ( "Edit", EditTodoClicked todo )
+                , ( "Insert Above", insertAt 0 )
+                , ( "Insert Below", insertAt 1 )
                 , ( "Delete", DeleteTodo todo.id )
                 ]
     in
@@ -888,7 +903,7 @@ viewTodoListItem kind model =
             viewDueDateTodoItem model.projectList
 
         ProjectTodoList _ ->
-            viewProjectTodoItem model
+            viewProjectTodoItem model viewProjectMoreMenu
 
         SearchResultTodoList _ ->
             let
@@ -909,10 +924,10 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-viewTodoMoreMenu todoId model items =
+viewTodoContextMenuTrigger kind todo model items =
     row [ A.class " relative" ]
         [ model.maybeTodoContextMenu
-            |> MX.filter (.todoId >> (==) todoId)
+            |> MX.filter (.todoId >> (==) todo.id)
             |> MX.unwrap (H.text "")
                 (\_ ->
                     col
@@ -928,14 +943,13 @@ viewTodoMoreMenu todoId model items =
                 )
         , col
             [ A.class "opacity-transition-none child pointer"
-            , onClickStopPropagation (OpenTodoContextMenu todoId)
+            , onClickStopPropagation (OpenTodoContextMenu todo.id)
             ]
             [ H.text "..." ]
         ]
 
 
-viewProjectTodoItem : Model -> Todo -> H.Html Msg
-viewProjectTodoItem model todo =
+viewProjectTodoItem model viewContextMenu todo =
     let
         today =
             model.today
@@ -967,17 +981,8 @@ viewProjectTodoItem model todo =
                 , viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoDueDate today todo
-                , viewTodoMoreMenu todo.id
-                    model
-                    [ ( "Edit", EditTodoClicked todo )
-                    , ( "Insert Above", insertAt 0 )
-                    , ( "Insert Below", insertAt 1 )
-                    , ( "Delete", DeleteTodo todo.id )
-                    ]
+                , viewContextMenu todo
                 ]
-
-        insertAt offset =
-            InsertTodoInProjectAtClicked (projectSortIdx + offset) todo.maybeProjectId
 
         viewDropTarget rootClass =
             viewHelp
