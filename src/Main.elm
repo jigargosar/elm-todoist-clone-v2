@@ -890,6 +890,10 @@ viewTodoListItem kind model =
             viewSearchTodoItem model.today model.projectList
 
 
+onClickStopPropagation msg =
+    E.stopPropagationOn "click" (JD.succeed ( msg, True ))
+
+
 viewTodoMoreMenu todoId model items =
     row [ A.class " relative" ]
         [ model.maybeTodoContextMenu
@@ -909,7 +913,7 @@ viewTodoMoreMenu todoId model items =
                 )
         , col
             [ A.class "opacity-transition-none child pointer"
-            , E.onClick (OpenTodoContextMenu todoId)
+            , onClickStopPropagation (OpenTodoContextMenu todoId)
             ]
             [ H.text "..." ]
         ]
@@ -948,34 +952,17 @@ viewProjectTodoItem model todo =
                 , viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoDueDate today todo
-                , row [ A.class " relative" ]
-                    [ model.maybeTodoContextMenu
-                        |> MX.filter ((==) todo.id)
-                        |> MX.unwrap (H.text "")
-                            (\_ ->
-                                col
-                                    [ A.class "absolute right-0 bg-white shadow-1 z-999"
-                                    , style "min-width" "150px"
-                                    ]
-                                    [ col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
-                                    , col [ A.class "pa1", E.onClick <| insertAt 0 ] [ H.text "Insert Above" ]
-                                    , col [ A.class "pa1", E.onClick <| insertAt 1 ] [ H.text "Insert Below" ]
-                                    , col [ A.class "pa1", E.onClick <| DeleteTodo todo.id ] [ H.text "Delete" ]
-                                    ]
-                            )
-                    , col
-                        [ A.class "opacity-transition-none child pointer"
-                        , onClickStopPropagation (OpenTodoContextMenu todo.id)
-                        ]
-                        [ H.text "..." ]
+                , viewTodoMoreMenu todo.id
+                    model
+                    [ ( "Edit", EditTodoClicked todo )
+                    , ( "Insert Above", insertAt 0 )
+                    , ( "Insert Below", insertAt 1 )
+                    , ( "Delete", DeleteTodo todo.id )
                     ]
                 ]
 
         insertAt offset =
             InsertTodoInProjectAtClicked (projectSortIdx + offset) todo.maybeProjectId
-
-        onClickStopPropagation msg =
-            E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
         viewDropTarget rootClass =
             viewHelp
