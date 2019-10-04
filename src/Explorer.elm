@@ -23,7 +23,22 @@ update message model =
 view : Model -> Html Msg
 view _ =
     div [ class "pa3 flex items-center bg-washed-red ba bw1 ma3", style "min-height" "100vh" ]
-        [ div [] [ text "Hello" ] ]
+        [ div [ class "ba bw1" ] [ viewTodoItem ] ]
+
+
+viewTodoItem =
+    div [ class "flex" ]
+        [ div [ class "flex pa1" ]
+            [ input
+                [ class "ma0 pa0 "
+                , type_ "checkbox"
+                , style "width" "24px"
+                , style "height" "24px"
+                ]
+                []
+            ]
+        , div [ class "pa1" ] [ text "Todo item title" ]
+        ]
 
 
 main : Program {} Model Msg
