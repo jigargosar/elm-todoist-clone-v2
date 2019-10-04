@@ -935,11 +935,14 @@ viewProjectTodoItem model todo =
                             )
                     , col
                         [ A.class "opacity-transition-none child pointer"
-                        , E.stopPropagationOn "click" (JD.succeed ( OpenTodoContextMenu todo.id, True ))
+                        , onClickStopPropagation (OpenTodoContextMenu todo.id)
                         ]
                         [ H.text "..." ]
                     ]
                 ]
+
+        onClickStopPropagation msg =
+            E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
         actionsContent =
             [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
