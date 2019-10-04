@@ -2,6 +2,7 @@ module Explorer exposing (main)
 
 import Browser
 import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (..)
 
 
 type alias Model =
@@ -21,7 +22,8 @@ update message model =
 
 view : Model -> Html Msg
 view _ =
-    text "HH"
+    div [ class "pa3 flex vh-100" ]
+        [ text "Hello" ]
 
 
 main : Program {} Model Msg
