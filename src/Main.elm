@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Basics.More exposing (HasId, allPass, eqById, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
+import Browser.Events
 import Date exposing (Date)
 import DnDList
 import HasSeed
@@ -274,6 +275,7 @@ setTodoForm form model =
 
 type Msg
     = NoOp
+    | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
     | InsertTodoWithPatches (List Todo.Patch) Posix
@@ -301,6 +303,9 @@ update msg model =
 
         OpenTodoContextMenu todoId ->
             ( { model | maybeTodoContextMenu = Just todoId }, Cmd.none )
+
+        ClickOutsideDetected ->
+            ( { model | maybeTodoContextMenu = Nothing }, Cmd.none )
 
         DnDListMsg dndMsg ->
             let
@@ -504,6 +509,12 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ dndSystem.subscriptions model.draggable
+        , model.maybeTodoContextMenu
+            |> MX.unwrap Sub.none
+                (\_ ->
+                    Browser.Events.onClick <|
+                        JD.succeed ClickOutsideDetected
+                )
         ]
 
 
@@ -928,9 +939,9 @@ viewProjectTodoItem model todo =
                                     [ A.class "absolute right-0 bg-white shadow-1 z-999"
                                     , style "min-width" "150px"
                                     ]
-                                    [ col [ A.class "pa1" ] [ H.text "Edit" ]
-                                    , col [ A.class "pa1" ] [ H.text "Edit" ]
-                                    , col [ A.class "pa1" ] [ H.text "Edit" ]
+                                    [ col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
+                                    , col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
+                                    , col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
                                     ]
                             )
                     , col
