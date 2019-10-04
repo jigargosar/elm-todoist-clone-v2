@@ -1,4 +1,4 @@
-module SchedulePopup exposing (Model, Msg, Schedule, init, open, update, view)
+module SchedulePopup exposing (Model, Msg, Schedule, System, system)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -36,7 +36,22 @@ type Msg
     | NoOp
 
 
-update : { a | saved : Schedule -> msg } -> Msg -> Model -> ( Model, Cmd msg )
+type alias System msg =
+    { model : Model
+    , update : Msg -> Model -> ( Model, Cmd msg )
+    , view : ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html msg
+    }
+
+
+system : { toMsg : Msg -> msg, onSave : Schedule -> msg } -> System msg
+system { toMsg, onSave } =
+    { model = Model Nothing
+    , update = update { saved = onSave >> perform }
+    , view = \viewTrigger model -> view viewTrigger model |> H.map toMsg
+    }
+
+
+update : { saved : Schedule -> Cmd msg } -> Msg -> Model -> ( Model, Cmd msg )
 update config message (Model model) =
     case message of
         NoOp ->
@@ -46,7 +61,7 @@ update config message (Model model) =
             ( Just schedule |> Model, Cmd.none )
 
         Save ->
-            ( Model Nothing, model |> MX.unwrap Cmd.none (config.saved >> perform) )
+            ( Model Nothing, model |> MX.unwrap Cmd.none config.saved )
 
         Cancel ->
             ( Model Nothing, Cmd.none )
@@ -63,8 +78,8 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-view : (Msg -> msg) -> ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html msg
-view toMsg viewTrigger (Model maybeSchedule) =
+view : ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html Msg
+view viewTrigger (Model maybeSchedule) =
     col [ A.class " relative" ]
         [ maybeSchedule
             |> MX.unwrap (H.text "")
@@ -90,7 +105,5 @@ view toMsg viewTrigger (Model maybeSchedule) =
                             ]
                         ]
                 )
-            |> H.map toMsg
         , viewTrigger Open
-            |> H.map toMsg
         ]

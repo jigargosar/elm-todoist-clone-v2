@@ -288,7 +288,7 @@ type Msg
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
     | TodoContextMenuScheduleMsg SchedulePopup.Msg
-    | TodoContextMenuScheduleSaved TodoId (Maybe Date)
+    | TodoContextMenuScheduleSaved (Maybe Date)
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
@@ -306,6 +306,11 @@ type Msg
     | GotToday Date
 
 
+spSystem : SchedulePopup.System Msg
+spSystem =
+    SchedulePopup.system { toMsg = TodoContextMenuScheduleMsg, onSave = TodoContextMenuScheduleSaved }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -313,26 +318,24 @@ update msg model =
             ( model, Cmd.none )
 
         OpenTodoContextMenu todoId ->
-            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId SchedulePopup.init }, Cmd.none )
+            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId spSystem.model }, Cmd.none )
 
         TodoContextMenuScheduleMsg msg_ ->
             model.maybeTodoContextMenu
                 |> MX.unwrap ( model, Cmd.none )
                     (\{ todoId, schedulePopup } ->
                         let
-                            config =
-                                { saved = TodoContextMenuScheduleSaved todoId }
-
                             ( sp, spCmd ) =
-                                SchedulePopup.update config msg_ schedulePopup
+                                spSystem.update msg_ schedulePopup
                         in
                         ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId sp }
                         , spCmd
                         )
                     )
 
-        TodoContextMenuScheduleSaved todoId maybeDueDate ->
-            ( { model | maybeTodoContextMenu = Nothing }, patchTodo todoId (Todo.DueDate maybeDueDate) )
+        TodoContextMenuScheduleSaved maybeDueDate ->
+            model.maybeTodoContextMenu
+                |> MX.unwrap ( model, Cmd.none ) (\{ todoId } -> ( { model | maybeTodoContextMenu = Nothing }, patchTodo todoId (Todo.DueDate maybeDueDate) ))
 
         ClickOutsideDetected ->
             ( { model | maybeTodoContextMenu = Nothing }, Cmd.none )
@@ -956,8 +959,8 @@ viewTodoContextMenuTrigger kind todo model =
 
         viewScheduleMI =
             model.maybeTodoContextMenu
-                |> MX.unwrap SchedulePopup.init .schedulePopup
-                |> SchedulePopup.view TodoContextMenuScheduleMsg
+                |> MX.unwrap spSystem.model .schedulePopup
+                |> spSystem.view
                     (\open ->
                         col
                             [ A.class "pa1"
