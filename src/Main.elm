@@ -940,8 +940,9 @@ viewProjectTodoItem model todo =
                                     , style "min-width" "150px"
                                     ]
                                     [ col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
-                                    , col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
-                                    , col [ A.class "pa1", E.onClick <| EditTodoClicked todo ] [ H.text "Edit" ]
+                                    , col [ A.class "pa1", E.onClick <| insertAt 0 ] [ H.text "Insert Above" ]
+                                    , col [ A.class "pa1", E.onClick <| insertAt 1 ] [ H.text "Insert Below" ]
+                                    , col [ A.class "pa1", E.onClick <| DeleteTodo todo.id ] [ H.text "Delete" ]
                                     ]
                             )
                     , col
@@ -952,17 +953,11 @@ viewProjectTodoItem model todo =
                     ]
                 ]
 
+        insertAt offset =
+            InsertTodoInProjectAtClicked (projectSortIdx + offset) todo.maybeProjectId
+
         onClickStopPropagation msg =
             E.stopPropagationOn "click" (JD.succeed ( msg, True ))
-
-        actionsContent =
-            [ btn2 "Insert Above" (InsertTodoInProjectAtClicked projectSortIdx todo.maybeProjectId)
-            , btn2 "Insert Below" (InsertTodoInProjectAtClicked (projectSortIdx + 1) todo.maybeProjectId)
-
-            --            , btn2 "UP" (MoveUp todo.id)
-            --            , btn2 "DN" (MoveDown todo.id)
-            , btn2 "X" (DeleteTodo todo.id)
-            ]
 
         viewDropTarget rootClass =
             viewHelp
