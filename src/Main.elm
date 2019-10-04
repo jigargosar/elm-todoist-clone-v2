@@ -289,7 +289,6 @@ type Msg
     | OpenTodoContextMenu TodoId
     | TodoContextMenuScheduleMsg SchedulePopup.Msg
     | TodoContextMenuScheduleClicked Todo
-    | TodoContextMenuScheduleChanged (Maybe Date)
     | TodoContextMenuScheduleSaved TodoId (Maybe Date)
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
@@ -335,20 +334,6 @@ update msg model =
 
         TodoContextMenuScheduleClicked todo ->
             update (TodoContextMenuScheduleMsg (SchedulePopup.open todo.maybeDueDate)) model
-
-        TodoContextMenuScheduleChanged date ->
-            ( {- model.maybeTodoContextMenu
-                 |> MX.unwrap model
-                     (\tcm ->
-                         { model
-                             | maybeTodoContextMenu =
-                                 Just { tcm | schedulePopup = Just <| SchedulePopup date }
-                         }
-                     )
-              -}
-              model
-            , Cmd.none
-            )
 
         TodoContextMenuScheduleSaved todoId maybeDueDate ->
             ( { model | maybeTodoContextMenu = Nothing }, patchTodo todoId (Todo.DueDate maybeDueDate) )
