@@ -921,7 +921,7 @@ viewTodoContextMenuTrigger kind todo model =
             case kind of
                 ProjectTodoList _ ->
                     [ viewMI ( "Edit", EditTodoClicked todo )
-                    , viewMI ( "Schedule", EditTodoClicked todo )
+                    , viewScheduleMI
                     , viewMI ( "Insert Above", insertAt 0 )
                     , viewMI ( "Insert Below", insertAt 1 )
                     , viewMI ( "Delete", DeleteTodo todo.id )
@@ -929,9 +929,12 @@ viewTodoContextMenuTrigger kind todo model =
 
                 _ ->
                     [ viewMI ( "Edit", EditTodoClicked todo )
-                    , viewMI ( "Schedule", EditTodoClicked todo )
+                    , viewScheduleMI
                     , viewMI ( "Delete", DeleteTodo todo.id )
                     ]
+
+        viewScheduleMI =
+            col [ A.class "pa1", E.onClick <| TodoContextMenuScheduleClicked todo ] [ H.text "Schedule" ]
 
         viewMI ( title, msg ) =
             col [ A.class "pa1", E.onClick msg ] [ H.text title ]
