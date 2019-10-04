@@ -830,12 +830,6 @@ viewTodoListContent kind model maybeTodoForm todoList =
                     List.map viewTodoItem todoList ++ viewAddBtn
 
 
-
--- VIEW TODO_FORM
--- VIEW TODO_LIST_ITEM
---viewTodoListItem : TodoListKind -> { a | projectList : List Project, today : Date } -> Todo -> H.Html Msg
-
-
 viewTodoListItem :
     TodoListKind
     -> Model
