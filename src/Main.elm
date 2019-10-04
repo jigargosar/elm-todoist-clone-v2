@@ -284,6 +284,7 @@ type Msg
     | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
+    | TodoContextMenuScheduleClicked Todo
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
@@ -309,6 +310,9 @@ update msg model =
 
         OpenTodoContextMenu todoId ->
             ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId False }, Cmd.none )
+
+        TodoContextMenuScheduleClicked todo ->
+            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todo.id True }, Cmd.none )
 
         ClickOutsideDetected ->
             ( { model | maybeTodoContextMenu = Nothing }, Cmd.none )
