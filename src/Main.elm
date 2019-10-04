@@ -20,6 +20,7 @@ import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
 import Return
+import SchedulePopup
 import Task
 import Time exposing (Posix)
 import Todo exposing (Todo)
@@ -182,12 +183,8 @@ type alias Flags =
 
 type alias TodoContextMenu =
     { todoId : TodoId
-    , schedulePopup : Maybe SchedulePopup
+    , schedulePopup : SchedulePopup.Model
     }
-
-
-type alias SchedulePopup =
-    { maybeDueDate : Maybe Date }
 
 
 type alias Model =
@@ -290,6 +287,7 @@ type Msg
     | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
+    | TodoContextMenuScheduleMsg SchedulePopup.Msg
     | TodoContextMenuScheduleClicked Todo
     | TodoContextMenuScheduleChanged (Maybe Date)
     | TodoContextMenuScheduleSaved TodoId (Maybe Date)
@@ -317,25 +315,38 @@ update msg model =
             ( model, Cmd.none )
 
         OpenTodoContextMenu todoId ->
-            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId Nothing }, Cmd.none )
+            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId SchedulePopup.init }, Cmd.none )
+
+        TodoContextMenuScheduleMsg msg_ ->
+            model.maybeTodoContextMenu
+                |> MX.unwrap ( model, Cmd.none )
+                    (\{ todoId, schedulePopup } ->
+                        let
+                            config =
+                                { saved = TodoContextMenuScheduleSaved todoId }
+
+                            ( sp, spCmd ) =
+                                SchedulePopup.update config msg_ schedulePopup
+                        in
+                        ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId sp }
+                        , spCmd
+                        )
+                    )
 
         TodoContextMenuScheduleClicked todo ->
-            ( { model
-                | maybeTodoContextMenu =
-                    Just <| TodoContextMenu todo.id (Just <| SchedulePopup todo.maybeDueDate)
-              }
-            , Cmd.none
-            )
+            update (TodoContextMenuScheduleMsg (SchedulePopup.open todo.maybeDueDate)) model
 
         TodoContextMenuScheduleChanged date ->
-            ( model.maybeTodoContextMenu
-                |> MX.unwrap model
-                    (\tcm ->
-                        { model
-                            | maybeTodoContextMenu =
-                                Just { tcm | schedulePopup = Just <| SchedulePopup date }
-                        }
-                    )
+            ( {- model.maybeTodoContextMenu
+                 |> MX.unwrap model
+                     (\tcm ->
+                         { model
+                             | maybeTodoContextMenu =
+                                 Just { tcm | schedulePopup = Just <| SchedulePopup date }
+                         }
+                     )
+              -}
+              model
             , Cmd.none
             )
 
@@ -963,39 +974,16 @@ viewTodoContextMenuTrigger kind todo model =
                     ]
 
         viewScheduleMI =
-            col [ A.class " relative" ]
-                [ model.maybeTodoContextMenu
-                    |> Maybe.andThen .schedulePopup
-                    |> MX.unwrap (H.text "")
-                        (\{ maybeDueDate } ->
-                            col
-                                [ A.class "absolute right-1 bg-white shadow-1 z-999"
-                                , style "min-width" "150px"
-                                ]
-                                [ col [ onClickStopPropagation NoOp ]
-                                    [ H.text "Select Due Date"
-                                    , let
-                                        dateVal =
-                                            maybeDueDate
-                                                |> MX.unwrap "" Date.toIsoString
-                                      in
-                                      H.input
-                                        [ A.type_ "date"
-                                        , A.value dateVal
-                                        , E.onInput (Date.fromIsoString >> Result.toMaybe >> TodoContextMenuScheduleChanged)
-                                        ]
-                                        []
-                                    , btn2 "Save" (TodoContextMenuScheduleSaved todo.id maybeDueDate)
-                                    ]
-                                ]
-                        )
-                , col
-                    [ A.class "pa1"
-                    , onClickStopPropagation <|
-                        TodoContextMenuScheduleClicked todo
-                    ]
-                    [ H.text "Schedule" ]
-                ]
+            model.maybeTodoContextMenu
+                |> MX.unwrap SchedulePopup.init .schedulePopup
+                |> SchedulePopup.view TodoContextMenuScheduleMsg
+                    (col
+                        [ A.class "pa1"
+                        , onClickStopPropagation <|
+                            TodoContextMenuScheduleClicked todo
+                        ]
+                        [ H.text "Schedule" ]
+                    )
 
         viewMI ( title, msg ) =
             col [ A.class "pa1", E.onClick msg ] [ H.text title ]

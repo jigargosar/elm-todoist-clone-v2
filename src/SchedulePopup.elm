@@ -1,4 +1,4 @@
-module SchedulePopup exposing (Model, Msg, Schedule, update)
+module SchedulePopup exposing (Model, Msg, Schedule, init, open, update, view)
 
 import Date exposing (Date)
 import Html.Styled as H
@@ -6,6 +6,7 @@ import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD
 import Maybe.Extra as MX
+import Task
 import UI exposing (btn2, col)
 
 
@@ -22,6 +23,11 @@ init =
     Model Nothing
 
 
+open : Schedule -> Msg
+open =
+    Open
+
+
 type Msg
     = Open Schedule
     | Save
@@ -30,7 +36,7 @@ type Msg
     | NoOp
 
 
-update : { a | saved : Schedule -> Cmd msg } -> Msg -> Model -> ( Model, Cmd msg )
+update : { a | saved : Schedule -> msg } -> Msg -> Model -> ( Model, Cmd msg )
 update config message (Model model) =
     case message of
         NoOp ->
@@ -40,7 +46,7 @@ update config message (Model model) =
             ( Just schedule |> Model, Cmd.none )
 
         Save ->
-            ( Model Nothing, model |> MX.unwrap Cmd.none config.saved )
+            ( Model Nothing, model |> MX.unwrap Cmd.none (config.saved >> perform) )
 
         Cancel ->
             ( Model Nothing, Cmd.none )
@@ -49,12 +55,16 @@ update config message (Model model) =
             ( Just schedule |> Model, Cmd.none )
 
 
+perform =
+    Task.succeed >> Task.perform identity
+
+
 onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-view : ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html Msg
-view viewTrigger (Model maybeSchedule) =
+view : (Msg -> msg) -> H.Html msg -> Model -> H.Html msg
+view toMsg viewTrigger (Model maybeSchedule) =
     col [ A.class " relative" ]
         [ maybeSchedule
             |> MX.unwrap (H.text "")
@@ -80,5 +90,6 @@ view viewTrigger (Model maybeSchedule) =
                             ]
                         ]
                 )
-        , viewTrigger Open
+            |> H.map toMsg
+        , viewTrigger
         ]
