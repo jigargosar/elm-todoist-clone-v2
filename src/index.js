@@ -1,8 +1,9 @@
 import 'tachyons'
 import './index.css'
-import { Elm } from './Main.elm'
+// import { Elm } from './Main.elm'
+import { Elm } from './Explorer.elm'
 
-const app = Elm.Main.init({
+const app = Elm.Explorer.init({
   flags: {
     cache: localStorage.getItem('elm-todoist-clone-v2-cache'),
     now: Date.now(),
