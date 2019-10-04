@@ -318,7 +318,12 @@ update msg model =
             ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId Nothing }, Cmd.none )
 
         TodoContextMenuScheduleClicked todo ->
-            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todo.id (Just <| SchedulePopup todo.maybeDueDate) }, Cmd.none )
+            ( { model
+                | maybeTodoContextMenu =
+                    Just <| TodoContextMenu todo.id (Just <| SchedulePopup todo.maybeDueDate)
+              }
+            , Cmd.none
+            )
 
         TodoContextMenuScheduleChanged date ->
             ( model.maybeTodoContextMenu
