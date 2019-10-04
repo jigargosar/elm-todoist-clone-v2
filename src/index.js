@@ -2,6 +2,7 @@ import 'tachyons'
 import './index.css'
 // import { Elm } from './Main.elm'
 import { Elm } from './Explorer.elm'
+import { pathOr } from 'ramda'
 
 const app = Elm.Explorer.init({
   flags: {
@@ -11,14 +12,20 @@ const app = Elm.Explorer.init({
   node: document.getElementById('root'),
 })
 
-app.ports.setCache.subscribe(cacheString => {
-  localStorage.setItem('elm-todoist-clone-v2-cache', cacheString)
-})
+sub(
+  'setCache',
+  cacheString => {
+    localStorage.setItem('elm-todoist-clone-v2-cache', cacheString)
+  },
+  app,
+)
 
-document.addEventListener('click', e => {
-  const onclick = e.target.dataset['onclick']
-  if (onclick) {
-    console.log('click', onclick)
-    eval(onclick)
+function sub(name, fn, app) {
+
+  const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)
+  if (!subscribe) {
+    console.warn('Port not found : ', name)
+    return
   }
-})
+  subscribe(fn)
+}
