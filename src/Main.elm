@@ -890,6 +890,31 @@ viewTodoListItem kind model =
             viewSearchTodoItem model.today model.projectList
 
 
+viewTodoMoreMenu todoId model items =
+    row [ A.class " relative" ]
+        [ model.maybeTodoContextMenu
+            |> MX.filter ((==) todoId)
+            |> MX.unwrap (H.text "")
+                (\_ ->
+                    col
+                        [ A.class "absolute right-0 bg-white shadow-1 z-999"
+                        , style "min-width" "150px"
+                        ]
+                        (items
+                            |> List.map
+                                (\( title, msg ) ->
+                                    col [ A.class "pa1", E.onClick msg ] [ H.text title ]
+                                )
+                        )
+                )
+        , col
+            [ A.class "opacity-transition-none child pointer"
+            , E.onClick (OpenTodoContextMenu todoId)
+            ]
+            [ H.text "..." ]
+        ]
+
+
 viewProjectTodoItem : Model -> Todo -> H.Html Msg
 viewProjectTodoItem model todo =
     let
@@ -923,14 +948,7 @@ viewProjectTodoItem model todo =
                 , viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoDueDate today todo
-                , {- row
-                     ([ A.class "opacity-transition-none child absolute right-0 bg-white-90"
-                      ]
-                         ++ [ A.class actionsClass ]
-                     )
-                     actionsContent
-                  -}
-                  row [ A.class " relative" ]
+                , row [ A.class " relative" ]
                     [ model.maybeTodoContextMenu
                         |> MX.filter ((==) todo.id)
                         |> MX.unwrap (H.text "")
