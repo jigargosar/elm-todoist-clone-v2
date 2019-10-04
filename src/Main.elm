@@ -917,27 +917,24 @@ viewTodoContextMenuTrigger kind todo model =
         insertAt offset =
             InsertTodoInProjectAtClicked (todo.projectSortIdx + offset) todo.maybeProjectId
 
-        items =
+        viewItems =
             case kind of
                 ProjectTodoList _ ->
-                    [ ( "Edit", EditTodoClicked todo )
-                    , ( "Schedule", EditTodoClicked todo )
-                    , ( "Insert Above", insertAt 0 )
-                    , ( "Insert Below", insertAt 1 )
-                    , ( "Delete", DeleteTodo todo.id )
+                    [ viewMI ( "Edit", EditTodoClicked todo )
+                    , viewMI ( "Schedule", EditTodoClicked todo )
+                    , viewMI ( "Insert Above", insertAt 0 )
+                    , viewMI ( "Insert Below", insertAt 1 )
+                    , viewMI ( "Delete", DeleteTodo todo.id )
                     ]
 
                 _ ->
-                    [ ( "Edit", EditTodoClicked todo )
-                    , ( "Schedule", EditTodoClicked todo )
-                    , ( "Delete", DeleteTodo todo.id )
+                    [ viewMI ( "Edit", EditTodoClicked todo )
+                    , viewMI ( "Schedule", EditTodoClicked todo )
+                    , viewMI ( "Delete", DeleteTodo todo.id )
                     ]
 
         viewMI ( title, msg ) =
             col [ A.class "pa1", E.onClick msg ] [ H.text title ]
-
-        viewItems =
-            List.map viewMI items
     in
     row [ A.class " relative" ]
         [ model.maybeTodoContextMenu
