@@ -10,7 +10,7 @@ import UI
 
 
 type alias Model =
-    {}
+    { isChecked : Bool }
 
 
 type Msg
@@ -29,13 +29,13 @@ update message model =
                 _ =
                     Debug.log "onCheck" bool
             in
-            ( model, Cmd.none )
+            ( { model | isChecked = bool }, Cmd.none )
 
 
 view : Model -> Html Msg
-view _ =
+view model =
     div [ class "pa3 flex items-center bg-washed-red ba bw1 ma3", style "min-height" "100vh" ]
-        [ div [ class "shadow-1" ] [ viewTodoItem ] ]
+        [ div [ class "shadow-1" ] [ viewTodoItem model ] ]
 
 
 row =
@@ -46,49 +46,60 @@ col =
     UI.col
 
 
-viewTodoItem =
+viewTodoItem model =
     row [ class "items-center" ]
-        [ col
-            [ class "relative flex f2"
-            , style "width" "1em"
-            , style "height" "1em"
-            ]
-            [ svg
-                [ SA.class "absolute"
-                , SA.width "100%"
-                , SA.height "100%"
-                , SA.viewBox "0 0 24 24"
-                , SA.fill "none"
-                , SA.strokeWidth "1"
-                , SA.stroke "black"
-                , SA.strokeLinecap "round"
-                , SA.strokeLinejoin "round"
-                ]
-                [ rect
-                    [ SA.width "12", SA.height "12", SA.transform "translate(6,6)" ]
-                    []
-                , line [ x1 "0", x2 "8", SA.transform "translate(11,15), rotate(-50)" ] []
-                , line [ x1 "0", x2 "4", SA.transform "translate(11,15), rotate(-140)" ] []
-                ]
-            , input
-                [ class "ma0 pa0 o-0"
-                , type_ "checkbox"
-                , style "width" "100%"
-                , style "height" "100%"
-
-                --, style "visibility" "hidden"
-                , onCheck OnCheck
-                ]
-                []
-            ]
+        [ viewCheckbox model.isChecked
         , div [ class "pa1" ] [ text "Todo item title" ]
+        ]
+
+
+viewCheckbox isChecked =
+    col
+        [ class "relative flex f2"
+        , style "width" "1em"
+        , style "height" "1em"
+        ]
+        [ svg
+            [ SA.class "absolute"
+            , SA.width "100%"
+            , SA.height "100%"
+            , SA.viewBox "0 0 24 24"
+            , SA.fill "none"
+            , SA.strokeWidth "1"
+            , SA.stroke "black"
+            , SA.strokeLinecap "round"
+            , SA.strokeLinejoin "round"
+            ]
+            [ rect
+                [ SA.width "12", SA.height "12", SA.transform "translate(6,6)" ]
+                []
+            , g []
+                (if isChecked then
+                    [ line [ x1 "0", x2 "8", SA.transform "translate(11,15), rotate(-50)" ] []
+                    , line [ x1 "0", x2 "4", SA.transform "translate(11,15), rotate(-140)" ] []
+                    ]
+
+                 else
+                    []
+                )
+            ]
+        , input
+            [ class "ma0 pa0 o-0"
+            , type_ "checkbox"
+            , style "width" "100%"
+            , style "height" "100%"
+
+            --, style "visibility" "hidden"
+            , onCheck OnCheck
+            ]
+            []
         ]
 
 
 main : Program {} Model Msg
 main =
     Browser.element
-        { init = \_ -> ( Model, Cmd.none )
+        { init = \_ -> ( { isChecked = False }, Cmd.none )
         , view = toUnstyled << view
         , update = update
         , subscriptions = \_ -> Sub.none
