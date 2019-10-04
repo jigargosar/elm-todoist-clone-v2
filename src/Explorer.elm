@@ -48,12 +48,12 @@ col =
 
 viewTodoItem model =
     row [ class "items-center" ]
-        [ viewCheckbox model.isChecked
+        [ viewCheckbox model.isChecked onCheck
         , div [ class "pa1" ] [ text "Todo item title" ]
         ]
 
 
-viewCheckbox isChecked =
+viewCheckbox isChecked onCheck =
     col
         [ class "relative flex f2"
         , style "width" "1em"
