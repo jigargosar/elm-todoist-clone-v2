@@ -290,7 +290,7 @@ type Msg
     | OpenTodoContextMenu TodoId
     | TodoContextMenuScheduleClicked Todo
     | TodoContextMenuScheduleChanged (Maybe Date)
-    | TodoContextMenuScheduleSaved
+    | TodoContextMenuScheduleSaved TodoId (Maybe Date)
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
     | SetTodoCompleted TodoId Bool
@@ -327,8 +327,8 @@ update msg model =
             , Cmd.none
             )
 
-        TodoContextMenuScheduleSaved ->
-            ( model, Cmd.none )
+        TodoContextMenuScheduleSaved todoId maybeDueDate ->
+            ( { model | maybeTodoContextMenu = Nothing }, patchTodo todoId (Todo.DueDate maybeDueDate) )
 
         ClickOutsideDetected ->
             ( { model | maybeTodoContextMenu = Nothing }, Cmd.none )
@@ -972,7 +972,7 @@ viewTodoContextMenuTrigger kind todo model =
                                         , E.onInput (Date.fromIsoString >> Result.toMaybe >> TodoContextMenuScheduleChanged)
                                         ]
                                         []
-                                    , btn2 "Save" TodoContextMenuScheduleSaved
+                                    , btn2 "Save" (TodoContextMenuScheduleSaved todo.id maybeDueDate)
                                     ]
                                 ]
                         )
