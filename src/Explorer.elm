@@ -4,8 +4,8 @@ import Browser
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
 import Html.Styled.Events exposing (onCheck)
-import Svg.Styled exposing (g, rect, svg)
-import Svg.Styled.Attributes as SA
+import Svg.Styled exposing (g, line, rect, svg)
+import Svg.Styled.Attributes as SA exposing (x1, x2)
 import UI
 
 
@@ -61,10 +61,14 @@ viewTodoItem =
                 , SA.fill "none"
                 , SA.strokeWidth "1"
                 , SA.stroke "black"
+                , SA.strokeLinecap "round"
+                , SA.strokeLinejoin "round"
                 ]
                 [ rect
                     [ SA.width "12", SA.height "12", SA.transform "translate(6,6)" ]
                     []
+                , line [ x1 "0", x2 "8", SA.transform "translate(11,15), rotate(-50)" ] []
+                , line [ x1 "0", x2 "4", SA.transform "translate(11,15), rotate(-140)" ] []
                 ]
             , input
                 [ class "ma0 pa0 o-0"
