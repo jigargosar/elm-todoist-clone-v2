@@ -18,16 +18,6 @@ type Model
     = Model (Maybe Schedule)
 
 
-init : Model
-init =
-    Model Nothing
-
-
-open : Schedule -> Msg
-open =
-    Open
-
-
 type Msg
     = Open Schedule
     | Save

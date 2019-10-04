@@ -308,7 +308,10 @@ type Msg
 
 spSystem : SchedulePopup.System Msg
 spSystem =
-    SchedulePopup.system { toMsg = TodoContextMenuScheduleMsg, onSave = TodoContextMenuScheduleSaved }
+    SchedulePopup.system
+        { toMsg = TodoContextMenuScheduleMsg
+        , onSave = TodoContextMenuScheduleSaved
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
