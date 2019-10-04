@@ -877,23 +877,11 @@ viewTodoListItem kind model =
             viewTodoContextMenuTrigger kind
                 todo
                 model
-                [ ( "Edit", EditTodoClicked todo )
-                , ( "Delete", DeleteTodo todo.id )
-                ]
 
         viewProjectMoreMenu todo =
-            let
-                insertAt offset =
-                    InsertTodoInProjectAtClicked (todo.projectSortIdx + offset) todo.maybeProjectId
-            in
             viewTodoContextMenuTrigger kind
                 todo
                 model
-                [ ( "Edit", EditTodoClicked todo )
-                , ( "Insert Above", insertAt 0 )
-                , ( "Insert Below", insertAt 1 )
-                , ( "Delete", DeleteTodo todo.id )
-                ]
     in
     case kind of
         OverDueTodoList ->
@@ -924,7 +912,27 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-viewTodoContextMenuTrigger kind todo model items =
+viewTodoContextMenuTrigger kind todo model =
+    let
+        insertAt offset =
+            InsertTodoInProjectAtClicked (todo.projectSortIdx + offset) todo.maybeProjectId
+
+        items =
+            case kind of
+                ProjectTodoList _ ->
+                    [ ( "Edit", EditTodoClicked todo )
+                    , ( "Schedule", EditTodoClicked todo )
+                    , ( "Insert Above", insertAt 0 )
+                    , ( "Insert Below", insertAt 1 )
+                    , ( "Delete", DeleteTodo todo.id )
+                    ]
+
+                _ ->
+                    [ ( "Edit", EditTodoClicked todo )
+                    , ( "Schedule", EditTodoClicked todo )
+                    , ( "Delete", DeleteTodo todo.id )
+                    ]
+    in
     row [ A.class " relative" ]
         [ model.maybeTodoContextMenu
             |> MX.filter (.todoId >> (==) todo.id)
