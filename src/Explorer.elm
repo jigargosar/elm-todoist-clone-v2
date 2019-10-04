@@ -19,16 +19,16 @@ update message model =
             ( model, Cmd.none )
 
 
+view : Model -> Html Msg
 view _ =
-    toUnstyled <|
-        text "HH"
+    text "HH"
 
 
 main : Program {} Model Msg
 main =
     Browser.element
         { init = \_ -> ( Model, Cmd.none )
-        , view = view
+        , view = toUnstyled << view
         , update = update
         , subscriptions = \_ -> Sub.none
         }
