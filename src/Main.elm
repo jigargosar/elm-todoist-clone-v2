@@ -323,7 +323,12 @@ update msg model =
         TodoContextMenuScheduleChanged date ->
             ( model.maybeTodoContextMenu
                 |> MX.unwrap model
-                    (\tcm -> { model | maybeTodoContextMenu = Just { tcm | schedulePopup = Just <| SchedulePopup date } })
+                    (\tcm ->
+                        { model
+                            | maybeTodoContextMenu =
+                                Just { tcm | schedulePopup = Just <| SchedulePopup date }
+                        }
+                    )
             , Cmd.none
             )
 
