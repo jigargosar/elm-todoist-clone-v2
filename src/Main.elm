@@ -178,12 +178,18 @@ type alias Flags =
     }
 
 
+type alias TodoContextMenu =
+    { todoId : TodoId
+    , schedulePopup : Bool
+    }
+
+
 type alias Model =
     { draggable : DnDList.Draggable
     , todoList : List Todo
     , projectList : List Project
     , maybeTodoForm : Maybe TodoForm
-    , maybeTodoContextMenu : Maybe TodoId
+    , maybeTodoContextMenu : Maybe TodoContextMenu
     , route : Route
     , zone : Time.Zone
     , today : Date
@@ -302,7 +308,7 @@ update msg model =
             ( model, Cmd.none )
 
         OpenTodoContextMenu todoId ->
-            ( { model | maybeTodoContextMenu = Just todoId }, Cmd.none )
+            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId False }, Cmd.none )
 
         ClickOutsideDetected ->
             ( { model | maybeTodoContextMenu = Nothing }, Cmd.none )
@@ -902,7 +908,7 @@ onClickStopPropagation msg =
 viewTodoMoreMenu todoId model items =
     row [ A.class " relative" ]
         [ model.maybeTodoContextMenu
-            |> MX.filter ((==) todoId)
+            |> MX.filter (.todoId >> (==) todoId)
             |> MX.unwrap (H.text "")
                 (\_ ->
                     col
