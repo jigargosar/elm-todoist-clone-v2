@@ -288,7 +288,6 @@ type Msg
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
     | TodoContextMenuScheduleMsg SchedulePopup.Msg
-    | TodoContextMenuScheduleClicked Todo
     | TodoContextMenuScheduleSaved TodoId (Maybe Date)
     | InsertTodoWithPatches (List Todo.Patch) Posix
     | ApplyTodoPatches TodoId (List Todo.Patch) Posix
@@ -331,9 +330,6 @@ update msg model =
                         , spCmd
                         )
                     )
-
-        TodoContextMenuScheduleClicked todo ->
-            update (TodoContextMenuScheduleMsg (SchedulePopup.open todo.maybeDueDate)) model
 
         TodoContextMenuScheduleSaved todoId maybeDueDate ->
             ( { model | maybeTodoContextMenu = Nothing }, patchTodo todoId (Todo.DueDate maybeDueDate) )
@@ -962,12 +958,13 @@ viewTodoContextMenuTrigger kind todo model =
             model.maybeTodoContextMenu
                 |> MX.unwrap SchedulePopup.init .schedulePopup
                 |> SchedulePopup.view TodoContextMenuScheduleMsg
-                    (col
-                        [ A.class "pa1"
-                        , onClickStopPropagation <|
-                            TodoContextMenuScheduleClicked todo
-                        ]
-                        [ H.text "Schedule" ]
+                    (\open ->
+                        col
+                            [ A.class "pa1"
+                            , onClickStopPropagation <|
+                                open todo.maybeDueDate
+                            ]
+                            [ H.text "Schedule" ]
                     )
 
         viewMI ( title, msg ) =

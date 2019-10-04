@@ -63,7 +63,7 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-view : (Msg -> msg) -> H.Html msg -> Model -> H.Html msg
+view : (Msg -> msg) -> ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html msg
 view toMsg viewTrigger (Model maybeSchedule) =
     col [ A.class " relative" ]
         [ maybeSchedule
@@ -91,5 +91,6 @@ view toMsg viewTrigger (Model maybeSchedule) =
                         ]
                 )
             |> H.map toMsg
-        , viewTrigger
+        , viewTrigger Open
+            |> H.map toMsg
         ]
