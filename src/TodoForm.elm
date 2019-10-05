@@ -167,6 +167,18 @@ type alias System msg =
     { view : List Project -> TodoForm -> H.Html msg
     , update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
     , info : TodoForm -> Info
+    , initAddForProject : Maybe ProjectId -> Int -> TodoForm
+    , initAddForDueDate : Date -> TodoForm
+    }
+
+
+system : Config msg -> System msg
+system { onSave, onCancel, toMsg } =
+    { view = viewTodoForm toMsg
+    , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
+    , info = info
+    , initAddForProject = \maybeProjectId projectSortIdx -> initAdd (\d -> { d | maybeProjectId = maybeProjectId, projectSortIdx = projectSortIdx })
+    , initAddForDueDate = \dueDate -> initAdd (\d -> { d | maybeDueDate = Just dueDate })
     }
 
 
@@ -208,14 +220,6 @@ update { onSave, onCancel } message ((TodoForm meta _ current) as model) =
 
         Cancel ->
             ( model, onCancel )
-
-
-system : Config msg -> System msg
-system { onSave, onCancel, toMsg } =
-    { view = viewTodoForm toMsg
-    , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
-    , info = info
-    }
 
 
 type alias Info =

@@ -410,25 +410,12 @@ update message model =
             ( model, patchTodo todoId (Todo.Completed isDone) )
 
         AddTodoOnDueDateClicked dueDate ->
-            ( model
-                |> setTodoForm
-                    (TodoForm.initAdd
-                        (\d -> { d | maybeDueDate = Just dueDate })
-                    )
+            ( setTodoForm (todoFormSys.initAddForDueDate dueDate) model
             , Cmd.none
             )
 
         InsertTodoInProjectAtClicked idx maybeProjectId ->
-            ( model
-                |> setTodoForm
-                    (TodoForm.initAdd
-                        (\d ->
-                            { d
-                                | maybeProjectId = maybeProjectId
-                                , projectSortIdx = idx
-                            }
-                        )
-                    )
+            ( setTodoForm (todoFormSys.initAddForProject maybeProjectId idx) model
             , Cmd.none
             )
 
