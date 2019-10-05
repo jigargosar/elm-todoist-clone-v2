@@ -252,7 +252,8 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
 
 type alias Info =
     { edit : Maybe TodoId
-    , add : Maybe ( Maybe Date, Int )
+    , add : Maybe Int
+    , initialDueDate : Maybe Date
     }
 
 
@@ -275,10 +276,16 @@ info model =
                 (\( m, i, c ) ->
                     case m of
                         Add ->
-                            Just ( i.maybeDueDate, c.projectSortIdx )
+                            Just c.projectSortIdx
 
                         _ ->
                             Nothing
+                )
+    , initialDueDate =
+        unwrap model
+            |> Maybe.andThen
+                (\( _, i, _ ) ->
+                    i.maybeDueDate
                 )
     }
 

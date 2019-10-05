@@ -834,21 +834,21 @@ viewTodoListContent kind model form todoList =
             viewOnlyEditableTodoList info.edit
 
         DueAtTodoList dueDate ->
-            if TodoForm.initialDueDateEq dueDate form && TodoForm.isAdding form then
-                List.map viewTodoItem todoList ++ [ viewForm form ]
-
-            else if TodoForm.initialDueDateEq dueDate form && TodoForm.isEditing form then
-                viewOnlyEditableTodoList info.edit
-
-            else
-                List.map viewTodoItem todoList ++ viewAddBtn
+            info.initialDueDate
+                |> MX.filter ((==) dueDate)
+                |> Maybe.andThen
+                    (\_ ->
+                        info.add
+                            |> Maybe.map (\_ -> List.map viewTodoItem todoList ++ [ viewForm form ])
+                            |> MX.orElseLazy (\_ -> info.edit |> Maybe.map viewEditTodoListForTodoId)
+                    )
+                |> MX.unpack (\_ -> List.map viewTodoItem todoList ++ viewAddBtn) identity
 
         ProjectTodoList _ ->
             info.add
                 |> Maybe.map
-                    (\( _, projectSortIdx ) ->
-                        List.map viewTodoItem todoList
-                            |> insertAt projectSortIdx (viewForm form)
+                    (\projectSortIdx ->
+                        List.map viewTodoItem todoList |> insertAt projectSortIdx (viewForm form)
                     )
                 |> MX.orElseLazy (\_ -> info.edit |> Maybe.map viewEditTodoListForTodoId)
                 |> MX.unpack (\_ -> List.map viewTodoItem todoList ++ viewAddBtn) identity
