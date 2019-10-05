@@ -16,7 +16,7 @@ module TodoForm exposing
     , viewTodoForm
     )
 
-import Basics.More exposing (allPass, perform, propEq)
+import Basics.More exposing (allPass, flip, perform, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -166,6 +166,7 @@ type alias Config msg =
 type alias System msg =
     { view : List Project -> TodoForm -> H.Html msg
     , update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
+    , info : TodoForm -> Info
     }
 
 
@@ -213,6 +214,20 @@ system : Config msg -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm toMsg
     , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
+    , info = info
+    }
+
+
+type alias Info =
+    { isAdd : Bool, isEdit : Bool, isEditFor : TodoId -> Bool, isAddFor : Date -> Bool }
+
+
+info : TodoForm -> Info
+info model =
+    { isAdd = isAdding model
+    , isEdit = isEditing model
+    , isEditFor = flip isEditingFor model
+    , isAddFor = flip isAddingForInitialDueDate model
     }
 
 

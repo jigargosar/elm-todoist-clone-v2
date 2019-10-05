@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, idEq, ifElse, insertAt, perform, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, flip, idEq, ifElse, insertAt, perform, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 import Task
@@ -104,3 +104,8 @@ ifElse bool true false val =
 perform : a -> Cmd a
 perform =
     Task.succeed >> Task.perform identity
+
+
+flip : (c -> b -> a) -> b -> c -> a
+flip func b a =
+    func a b
