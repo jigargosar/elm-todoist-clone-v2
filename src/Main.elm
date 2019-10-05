@@ -810,7 +810,7 @@ viewTodoListContent kind model form todoList =
         defaultHtmlList =
             List.map viewTodoItem todoList
 
-        htmlWithAddBtn =
+        htmlListWithAddBtn =
             defaultHtmlList ++ viewAddTodoButtonFor kind
 
         maybeHtmlListForEdit =
@@ -837,7 +837,7 @@ viewTodoListContent kind model form todoList =
                         maybeHtmlListForAdd
                             |> MX.orElse maybeHtmlListForEdit
                     )
-                |> Maybe.withDefault htmlWithAddBtn
+                |> Maybe.withDefault htmlListWithAddBtn
 
         ProjectTodoList _ ->
             let
@@ -846,7 +846,7 @@ viewTodoListContent kind model form todoList =
             in
             maybeHtmlListForAdd
                 |> MX.orElse maybeHtmlListForEdit
-                |> Maybe.withDefault htmlWithAddBtn
+                |> Maybe.withDefault htmlListWithAddBtn
 
 
 viewTodoListItem :
