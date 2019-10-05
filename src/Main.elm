@@ -390,7 +390,7 @@ update message model =
         PushAll ->
             ( model, firePushTodoListCmd (TaggedDict.values model.todoDict) )
 
-        OnFireTodoList value ->
+        OnFireTodoList todoListValue ->
             let
                 upsertIfNewer new dict =
                     case TaggedDict.get new.id dict of
@@ -405,16 +405,16 @@ update message model =
                                 dict
             in
             case
-                JD.decodeValue (JD.list JD.value) value
+                JD.decodeValue (JD.list JD.value) todoListValue
                     |> Result.map
                         (List.foldr
-                            (\v ( l, el ) ->
-                                case JD.decodeValue Todo.decoder v of
-                                    Ok t ->
-                                        ( t :: l, el )
+                            (\todoValue ( todoList, errorList ) ->
+                                case JD.decodeValue Todo.decoder todoValue of
+                                    Ok todo ->
+                                        ( todo :: todoList, errorList )
 
                                     Err error ->
-                                        ( l, error :: el )
+                                        ( todoList, error :: errorList )
                             )
                             ( [], [] )
                         )
