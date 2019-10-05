@@ -795,18 +795,6 @@ viewTodoListContent kind model form todoList =
         info =
             todoFormSys.info form
 
-        viewEditTodoListForTodoId : TodoId -> List (H.Html Msg)
-        viewEditTodoListForTodoId editTodoId =
-            List.map
-                (\todo ->
-                    if editTodoId == todo.id then
-                        formHtml
-
-                    else
-                        viewTodoItem todo
-                )
-                todoList
-
         defaultHtmlList =
             List.map viewTodoItem todoList
 
@@ -814,7 +802,19 @@ viewTodoListContent kind model form todoList =
             defaultHtmlList ++ viewAddTodoButtonFor kind
 
         maybeHtmlListForEdit =
-            Maybe.map viewEditTodoListForTodoId info.edit
+            Maybe.map
+                (\editTodoId ->
+                    List.map
+                        (\todo ->
+                            if editTodoId == todo.id then
+                                formHtml
+
+                            else
+                                viewTodoItem todo
+                        )
+                        todoList
+                )
+                info.edit
     in
     case kind of
         OverDueTodoList ->
