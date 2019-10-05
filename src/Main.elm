@@ -52,6 +52,9 @@ port signOut : () -> Cmd msg
 port firePushTodoList : Value -> Cmd msg
 
 
+port onFireTodoList : (Value -> msg) -> Sub msg
+
+
 type alias AuthUser =
     { uid : String
     , displayName : String
@@ -326,6 +329,7 @@ setTodoForm form model =
 type Msg
     = NoOp
     | OnAuthStateChanged Value
+    | OnFireTodoList Value
     | SignInClicked
     | SignOutClicked
     | PushAll
@@ -373,6 +377,14 @@ update message model =
 
         PushAll ->
             ( model, firePushTodoList <| JE.list Todo.encoder model.todoList )
+
+        OnFireTodoList value ->
+            case JD.decodeValue (JD.list Todo.decoder) value of
+                Err err ->
+                    ( model, logError (JD.errorToString err) )
+
+                Ok todoList ->
+                    ( { model | todoList = todoList }, Cmd.none )
 
         OnAuthStateChanged value ->
             let
@@ -601,6 +613,7 @@ subscriptions model =
                         JD.succeed ClickOutsideDetected
                 )
         , onAuthStateChanged OnAuthStateChanged
+        , onFireTodoList OnFireTodoList
         ]
 
 
