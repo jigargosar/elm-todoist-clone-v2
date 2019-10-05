@@ -170,6 +170,7 @@ type alias System msg =
     , initAddForProject : Maybe ProjectId -> Int -> TodoForm
     , initAddForDueDate : Date -> TodoForm
     , initEdit : Todo -> TodoForm
+    , model : TodoForm
     }
 
 
@@ -181,6 +182,7 @@ system { onSave, onCancel, toMsg } =
     , initAddForProject = \maybeProjectId projectSortIdx -> initAdd (\d -> { d | maybeProjectId = maybeProjectId, projectSortIdx = projectSortIdx })
     , initAddForDueDate = \dueDate -> initAdd (\d -> { d | maybeDueDate = Just dueDate })
     , initEdit = initEdit
+    , model = TodoForm Nothing
     }
 
 
