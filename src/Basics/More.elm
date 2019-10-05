@@ -1,6 +1,7 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, idEq, ifElse, insertAt, perform, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
+import Task
 
 
 when : (a -> Bool) -> (a -> a) -> a -> a
@@ -98,3 +99,8 @@ ifElse bool true false val =
 
     else
         false val
+
+
+perform : a -> Cmd a
+perform =
+    Task.succeed >> Task.perform identity

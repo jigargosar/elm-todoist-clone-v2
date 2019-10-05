@@ -1,5 +1,6 @@
 module SchedulePopup exposing (Model, Msg, Schedule, System, system)
 
+import Basics.More exposing (perform)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A exposing (style)
@@ -58,10 +59,6 @@ update config message (Model model) =
 
         Changed schedule ->
             ( Just schedule |> Model, Cmd.none )
-
-
-perform =
-    Task.succeed >> Task.perform identity
 
 
 onClickStopPropagation msg =
