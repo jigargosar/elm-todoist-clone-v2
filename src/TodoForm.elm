@@ -200,8 +200,7 @@ map func (TodoForm mi) =
 
 
 type Msg
-    = Patch TodoForm
-    | TitleChanged String
+    = TitleChanged String
     | ProjectChanged (Maybe ProjectId)
     | DueDateChanged (Maybe Date)
     | Save
@@ -215,9 +214,6 @@ update :
     -> ( TodoForm, Cmd msg )
 update { onSave, onCancel } message ((TodoForm mi) as model) =
     case message of
-        Patch m ->
-            ( m, Cmd.none )
-
         TitleChanged title ->
             ( mapCurrent (\f -> { f | title = title }) model, Cmd.none )
 
