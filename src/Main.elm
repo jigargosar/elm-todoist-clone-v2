@@ -376,10 +376,6 @@ update message model =
 
                 authStateDecoder =
                     JD.oneOf [ JD.null SignedOut, userDecoder |> JD.map SignedIn ]
-
-                {- _ =
-                   Debug.log "user" (JE.encode 2 value)
-                -}
             in
             case JD.decodeValue authStateDecoder value of
                 Err err ->
