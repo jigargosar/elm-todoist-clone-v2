@@ -404,6 +404,7 @@ update message model =
 
         OnFireTodoList value ->
             let
+                upsertIfNewer : Todo -> TodoIdDict Todo -> TodoIdDict Todo
                 upsertIfNewer new dict =
                     case TaggedDict.get new.id dict of
                         Nothing ->
