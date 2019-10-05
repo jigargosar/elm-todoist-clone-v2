@@ -33,7 +33,11 @@ type Meta
 
 
 type TodoForm
-    = TodoForm ( Meta, Fields, Fields )
+    = TodoForm (Maybe Internal)
+
+
+type alias Internal =
+    ( Meta, Fields, Fields )
 
 
 type alias Fields =
@@ -53,24 +57,39 @@ toPatches m =
     ]
 
 
-unwrapMeta : TodoForm -> Meta
-unwrapMeta (TodoForm ( meta, _, _ )) =
+unwrapMeta_ : Internal -> Meta
+unwrapMeta_ ( meta, _, _ ) =
     meta
+
+
+unwrapCurrent_ : Internal -> Fields
+unwrapCurrent_ ( _, _, current ) =
+    current
+
+
+unwrapMeta : TodoForm -> Maybe Meta
+unwrapMeta =
+    unwrap >> Maybe.map unwrapMeta_
+
+
+unwrap : TodoForm -> Maybe Internal
+unwrap (TodoForm model) =
+    model
 
 
 isEditingFor : TodoId -> TodoForm -> Bool
 isEditingFor todoId =
-    unwrapMeta >> (==) (Edit todoId)
+    unwrap >> MX.unwrap False (unwrapMeta_ >> (==) (Edit todoId))
 
 
 isEditing : TodoForm -> Bool
 isEditing =
-    unwrapMeta >> isEdit
+    unwrap >> MX.unwrap False (unwrapMeta_ >> isEdit)
 
 
 isAdding : TodoForm -> Bool
 isAdding =
-    unwrapMeta >> isAdd
+    unwrap >> MX.unwrap False (unwrapMeta_ >> isAdd)
 
 
 isEdit : Meta -> Bool
@@ -93,32 +112,37 @@ isAdd meta =
             False
 
 
-getMeta : TodoForm -> Meta
+getMeta : TodoForm -> Maybe Meta
 getMeta =
     unwrapMeta
 
 
-getProjectSortIdx : TodoForm -> Int
+getProjectSortIdx : TodoForm -> Maybe Int
 getProjectSortIdx =
-    unwrap >> .projectSortIdx
+    unwrapCurrent >> Maybe.map .projectSortIdx
 
 
 isAddingForInitialDueDate : Date -> TodoForm -> Bool
 isAddingForInitialDueDate dueDate =
     allPass
-        [ unwrapMeta >> (==) Add
-        , unwrapInitial >> propEq .maybeDueDate (Just dueDate)
+        [ unwrapMeta >> (==) (Just Add)
+        , unwrapInitial >> MX.unwrap False (propEq .maybeDueDate (Just dueDate))
         ]
 
 
-unwrap : TodoForm -> Fields
-unwrap (TodoForm ( _, _, internal )) =
-    internal
+unwrapCurrent : TodoForm -> Maybe Fields
+unwrapCurrent =
+    unwrap >> Maybe.map unwrapCurrent_
 
 
-unwrapInitial : TodoForm -> Fields
-unwrapInitial (TodoForm ( _, initial, _ )) =
+unwrapInitial_ : Internal -> Fields
+unwrapInitial_ ( _, initial, _ ) =
     initial
+
+
+unwrapInitial : TodoForm -> Maybe Fields
+unwrapInitial =
+    unwrap >> Maybe.map unwrapInitial_
 
 
 empty : Fields
@@ -133,7 +157,7 @@ initAdd func =
 
 init : Meta -> Fields -> TodoForm
 init meta internal =
-    TodoForm ( meta, internal, internal )
+    TodoForm <| Just ( meta, internal, internal )
 
 
 initEdit : Todo -> TodoForm
@@ -166,9 +190,19 @@ system { onSave, onCancel, toMsg } =
     }
 
 
+mapCurrent_ : (Fields -> Fields) -> Internal -> Internal
+mapCurrent_ func ( m, i, c ) =
+    ( m, i, func c )
+
+
 mapCurrent : (Fields -> Fields) -> TodoForm -> TodoForm
-mapCurrent func (TodoForm ( meta, initial, current )) =
-    TodoForm ( meta, initial, func current )
+mapCurrent func =
+    map (mapCurrent_ func)
+
+
+map : (Internal -> Internal) -> TodoForm -> TodoForm
+map func (TodoForm mi) =
+    Maybe.map func mi |> TodoForm
 
 
 type Msg
@@ -185,7 +219,7 @@ update :
     -> Msg
     -> TodoForm
     -> ( TodoForm, Cmd msg )
-update { onSave, onCancel } message ((TodoForm ( meta, _, current )) as model) =
+update { onSave, onCancel } message ((TodoForm mi) as model) =
     case message of
         Patch m ->
             ( m, Cmd.none )
@@ -200,7 +234,7 @@ update { onSave, onCancel } message ((TodoForm ( meta, _, current )) as model) =
             ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
 
         Save ->
-            ( model, onSave meta (toPatches current) )
+            ( model, mi |> MX.unwrap Cmd.none (\( m, _, c ) -> onSave m (toPatches c)) )
 
         Cancel ->
             ( model, onCancel )
@@ -220,16 +254,21 @@ info model =
 
 
 viewTodoForm : (Msg -> msg) -> List Project -> TodoForm -> H.Html msg
-viewTodoForm toMsg projectList (TodoForm ( _, _, { title, maybeProjectId, maybeDueDate } )) =
-    H.form [ A.class "flex flex-column pa1", E.onSubmit Save ]
-        [ col [ A.class "pv1" ]
-            [ ipt3 title TitleChanged [ A.autofocus True ]
-            ]
-        , Project.viewSelectOne maybeProjectId ProjectChanged projectList
-        , viewDueDateInput maybeDueDate DueDateChanged
-        , row [ A.class "pv1" ] [ submit "Save" [], btn2 "Cancel" Cancel ]
-        ]
-        |> H.map toMsg
+viewTodoForm toMsg projectList (TodoForm mi) =
+    case mi of
+        Just ( _, _, { title, maybeProjectId, maybeDueDate } ) ->
+            H.form [ A.class "flex flex-column pa1", E.onSubmit Save ]
+                [ col [ A.class "pv1" ]
+                    [ ipt3 title TitleChanged [ A.autofocus True ]
+                    ]
+                , Project.viewSelectOne maybeProjectId ProjectChanged projectList
+                , viewDueDateInput maybeDueDate DueDateChanged
+                , row [ A.class "pv1" ] [ submit "Save" [], btn2 "Cancel" Cancel ]
+                ]
+                |> H.map toMsg
+
+        Nothing ->
+            H.text ""
 
 
 viewDueDateInput maybeDueDate dueDateChanged =
