@@ -251,22 +251,14 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
 
 
 type alias Info =
-    { isAdd : Bool
-    , isEdit : Bool
-    , isEditFor : TodoId -> Bool
-    , isAddFor : Date -> Bool
-    , edit : Maybe TodoId
+    { edit : Maybe TodoId
     , add : Maybe ( Maybe Date, Int )
     }
 
 
 info : TodoForm -> Info
 info model =
-    { isAdd = isAdding model
-    , isEdit = isEditing model
-    , isEditFor = flip isEditingFor model
-    , isAddFor = flip initialDueDateEq model
-    , edit =
+    { edit =
         unwrapMeta model
             |> Maybe.andThen
                 (\m ->
