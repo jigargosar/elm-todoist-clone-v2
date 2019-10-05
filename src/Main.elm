@@ -1,18 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More
-    exposing
-        ( HasId
-        , allPass
-        , eqById
-        , findById
-        , idEq
-        , insertAt
-        , propEq
-        , uncurry
-        , updateWhenIdEq
-        , upsertById
-        )
+import Basics.More exposing (HasId, allPass, appendOne, eqById, findById, idEq, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
 import Browser
 import Browser.Events
 import Date exposing (Date)
@@ -842,7 +830,7 @@ viewTodoListContent kind model form todoList =
                 |> MX.filter ((==) dueDate)
                 |> Maybe.andThen
                     (\_ ->
-                        Maybe.map (\_ -> todoListHtml ++ [ formHtml ]) info.add
+                        Maybe.map (\_ -> todoListHtml |> appendOne formHtml) info.add
                             |> MX.orElse maybeEditTodoListHtml
                     )
                 |> Maybe.withDefault (todoListHtml ++ viewAddBtn)

@@ -1,4 +1,4 @@
-module Basics.More exposing (HasId, allPass, anyPass, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, flip, idEq, ifElse, insertAt, perform, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing (HasId, allPass, anyPass, appendOne, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, flip, idEq, ifElse, insertAt, perform, propEq, uncurry, updateWhenIdEq, upsertById, when)
 
 import List.Extra
 import Task
@@ -90,6 +90,11 @@ insertAt : Int -> a -> List a -> List a
 insertAt i c =
     List.Extra.splitAt i
         >> (\( l, r ) -> l ++ [ c ] ++ r)
+
+
+appendOne : a -> List a -> List a
+appendOne i l =
+    l ++ [ i ]
 
 
 ifElse : (a -> Bool) -> (a -> b) -> (a -> b) -> a -> b
