@@ -830,7 +830,7 @@ viewTodoListContent kind model form todoList =
                 |> MX.filter ((==) dueDate)
                 |> Maybe.andThen
                     (\_ ->
-                        Maybe.map (\_ -> todoListHtml |> appendOne formHtml) info.add
+                        Maybe.map (\_ -> appendOne formHtml todoListHtml) info.add
                             |> MX.orElse maybeEditTodoListHtml
                     )
                 |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
@@ -839,7 +839,7 @@ viewTodoListContent kind model form todoList =
             info.add
                 |> Maybe.map
                     (\projectSortIdx ->
-                        todoListHtml |> insertAt projectSortIdx formHtml
+                        insertAt projectSortIdx formHtml todoListHtml
                     )
                 |> MX.orElse maybeEditTodoListHtml
                 |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
