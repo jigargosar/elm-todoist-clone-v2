@@ -26,7 +26,7 @@ import Time exposing (Posix)
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId)
-import UI exposing (btn2, btn3, checkbox3, col, ipt3, row)
+import UI exposing (btn2, btn3, btnDisabled, checkbox3, col, ipt3, row)
 
 
 
@@ -617,7 +617,7 @@ view model =
                 , row [ A.class "flex-grow-1" ] []
                 , case model.auth of
                     Unknown ->
-                        row [] [ btn3 "SignIn" SignInClicked [ A.disabled True ] ]
+                        row [] [ btnDisabled "SignIn" ]
 
                     SignedOut ->
                         row [] [ btn2 "SignIn" SignInClicked ]

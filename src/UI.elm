@@ -44,6 +44,11 @@ btn3 title msg attrs =
     H.button ([ E.onClick msg, A.class "ph2 pv1 color-primary" ] ++ attrs) [ H.text title ]
 
 
+btnDisabled : String -> H.Html msg
+btnDisabled title =
+    H.button [ A.class "ph2 pv1 gray", A.disabled True ] [ H.text title ]
+
+
 btn2 : String -> msg -> H.Html msg
 btn2 title msg =
     btn3 title msg []
