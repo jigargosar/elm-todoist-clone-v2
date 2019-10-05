@@ -440,8 +440,7 @@ update message model =
                 |> Tuple.mapBoth
                     (\todoList ->
                         { model
-                            | todoDict =
-                                List.foldl upsertIfNewer model.todoDict todoList
+                            | todoDict = List.foldl upsertIfNewer model.todoDict todoList
                         }
                     )
                     (List.map logError >> Cmd.batch)
