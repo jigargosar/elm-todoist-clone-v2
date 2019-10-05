@@ -299,6 +299,7 @@ type Msg
     | InsertTodoInProjectAtClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | PatchTodoForm TodoForm
+    | TodoFormMsg TodoForm.Msg
     | Save
     | Cancel
     | ChangeRouteTo Route
@@ -315,8 +316,8 @@ spSystem =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
+update message model =
+    case message of
         NoOp ->
             ( model, Cmd.none )
 
@@ -438,6 +439,18 @@ update msg model =
 
         EditTodoClicked todo ->
             ( model |> setTodoForm (TodoForm.initEdit todo), Cmd.none )
+
+        TodoFormMsg msg ->
+            case model.maybeTodoForm of
+                Just todoForm ->
+                    let
+                        ( tf, c ) =
+                            todoFormSys.update msg todoForm
+                    in
+                    ( model |> setTodoForm tf, c )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         PatchTodoForm todoForm ->
             ( model |> setTodoForm todoForm, Cmd.none )

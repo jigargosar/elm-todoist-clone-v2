@@ -1,5 +1,6 @@
 module TodoForm exposing
     ( Meta(..)
+    , Msg
     , System
     , TodoForm
     , getMeta
