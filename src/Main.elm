@@ -191,7 +191,7 @@ type alias Model =
     { dnd : DnDList.Model
     , todoList : List Todo
     , projectList : List Project
-    , maybeTodoForm : Maybe TodoForm
+    , todoForm : Maybe TodoForm
     , maybeTodoContextMenu : Maybe TodoContextMenu
     , route : Route
     , zone : Time.Zone
@@ -205,7 +205,7 @@ defaultModel =
     { dnd = dndSystem.model
     , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
-    , maybeTodoForm = Nothing
+    , todoForm = Nothing
     , maybeTodoContextMenu = Nothing
     , route = defaultCacheValue.route
     , zone = Time.utc
@@ -275,7 +275,7 @@ mapTodoList func model =
 
 
 setTodoForm form model =
-    { model | maybeTodoForm = Just form }
+    { model | todoForm = Just form }
 
 
 
@@ -385,7 +385,7 @@ update message model =
             ( { model | today = today }, Cmd.none )
 
         ChangeRouteTo route ->
-            refreshModel { model | route = route, maybeTodoForm = Nothing }
+            refreshModel { model | route = route, todoForm = Nothing }
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
@@ -423,7 +423,7 @@ update message model =
             ( model |> setTodoForm (todoFormSys.initEdit todo), Cmd.none )
 
         TodoFormMsg msg ->
-            case model.maybeTodoForm of
+            case model.todoForm of
                 Just todoForm ->
                     let
                         ( tf, c ) =
@@ -435,7 +435,7 @@ update message model =
                     ( model, Cmd.none )
 
         Save meta patches ->
-            ( { model | maybeTodoForm = Nothing }
+            ( { model | todoForm = Nothing }
             , case meta of
                 TodoForm.Add ->
                     Time.now |> Task.perform (InsertTodoWithPatches patches)
@@ -445,7 +445,7 @@ update message model =
             )
 
         Cancel ->
-            ( { model | maybeTodoForm = Nothing }, Cmd.none )
+            ( { model | todoForm = Nothing }, Cmd.none )
 
 
 patchTodoProjectSortIdxBy : Int -> TodoId -> Model -> Cmd Msg
@@ -697,7 +697,7 @@ viewTodoListSection kind model =
 
     else
         viewTodoListTitle kind model
-            :: viewTodoListContent kind model model.maybeTodoForm todoList
+            :: viewTodoListContent kind model model.todoForm todoList
 
 
 todoListFor : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
@@ -789,7 +789,7 @@ viewTodoListContent :
     -> Maybe TodoForm
     -> List Todo
     -> List (H.Html Msg)
-viewTodoListContent kind model maybeTodoForm todoList =
+viewTodoListContent kind model todoForm todoList =
     let
         viewTodoItem =
             viewTodoListItem kind model
@@ -802,7 +802,7 @@ viewTodoListContent kind model maybeTodoForm todoList =
             todoFormSys.view model.projectList
 
         editFormForTodoId todoId =
-            maybeTodoForm
+            todoForm
                 |> MX.filter (TodoForm.isEditingFor todoId)
     in
     case kind of
@@ -823,7 +823,7 @@ viewTodoListContent kind model maybeTodoForm todoList =
                 todoList
 
         DueAtTodoList dueDate ->
-            case maybeTodoForm of
+            case todoForm of
                 Just form ->
                     if TodoForm.isAdding form then
                         List.map viewTodoItem todoList
@@ -849,7 +849,7 @@ viewTodoListContent kind model maybeTodoForm todoList =
                     List.map viewTodoItem todoList ++ viewAddBtn
 
         ProjectTodoList _ ->
-            case maybeTodoForm of
+            case todoForm of
                 Just form ->
                     if TodoForm.isAdding form then
                         List.map viewTodoItem todoList
