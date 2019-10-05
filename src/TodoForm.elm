@@ -116,12 +116,7 @@ info model =
         unwrap model
             |> Maybe.andThen
                 (\( m, _, _ ) ->
-                    case m of
-                        Edit ti ->
-                            Just ti
-
-                        _ ->
-                            Nothing
+                    todoIdFromMeta m
                 )
     , add =
         unwrap model
