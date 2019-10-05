@@ -51,16 +51,6 @@ toPatches m =
     ]
 
 
-unwrapMeta_ : Internal -> Meta
-unwrapMeta_ ( meta, _, _ ) =
-    meta
-
-
-unwrapMeta : TodoForm -> Maybe Meta
-unwrapMeta =
-    unwrap >> Maybe.map unwrapMeta_
-
-
 unwrap : TodoForm -> Maybe Internal
 unwrap (TodoForm model) =
     model
