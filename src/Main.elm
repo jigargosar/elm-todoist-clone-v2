@@ -796,11 +796,6 @@ viewAddTodoButtonFor kind =
             []
 
 
-todoFormConfig : TodoForm.Config Msg
-todoFormConfig =
-    TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
-
-
 todoFormSys : TodoForm.System Msg
 todoFormSys =
     TodoForm.system { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
@@ -822,7 +817,7 @@ viewTodoListContent kind model maybeTodoForm todoList =
 
         viewForm : TodoForm -> H.Html Msg
         viewForm =
-            TodoForm.viewTodoForm todoFormConfig model.projectList
+            todoFormSys.view model.projectList
 
         editFormForTodoId todoId =
             maybeTodoForm
