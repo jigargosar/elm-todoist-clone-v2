@@ -27,6 +27,7 @@
     "webpack-dev-server": "^3.8.1"
   },
   "dependencies": {
+    "firebase": "^7.1.0",
     "meow": "^5.0.0",
     "ramda": "^0.26.1",
     "tachyons": "^4.11.1"
