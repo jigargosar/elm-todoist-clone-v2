@@ -49,6 +49,9 @@ port signIn : () -> Cmd msg
 port signOut : () -> Cmd msg
 
 
+port firePushTodoList : Value -> Cmd msg
+
+
 type alias AuthUser =
     { uid : String
     , displayName : String
@@ -325,6 +328,7 @@ type Msg
     | OnAuthStateChanged Value
     | SignInClicked
     | SignOutClicked
+    | PushAll
     | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
@@ -366,6 +370,9 @@ update message model =
 
         SignOutClicked ->
             ( model, signOut () )
+
+        PushAll ->
+            ( model, firePushTodoList <| JE.list Todo.encoder model.todoList )
 
         OnAuthStateChanged value ->
             let
