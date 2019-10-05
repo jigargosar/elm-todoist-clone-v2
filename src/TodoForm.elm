@@ -141,6 +141,11 @@ createConfig =
     Config
 
 
+system { onSave, onCancel, toMsg } =
+    { view = viewTodoForm <| createConfig { onSave = onSave, onCancel = onCancel, toMsg = toMsg }
+    }
+
+
 viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
 viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta initial model) =
     let
