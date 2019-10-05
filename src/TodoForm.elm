@@ -87,7 +87,7 @@ initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
 
 
 type alias Config msg =
-    { onSave : Meta -> List Todo.Patch -> msg, onCancel : msg, toMsg : Msg -> msg }
+    { onSave : Maybe TodoId -> List Todo.Patch -> msg, onCancel : msg, toMsg : Msg -> msg }
 
 
 type alias System msg =
@@ -104,7 +104,7 @@ type alias System msg =
 system : Config msg -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm toMsg
-    , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
+    , update = update { onSave = \a b -> perform <| onSave a b, onCancel = perform onCancel }
     , info = info
     , initAddForProject = \maybeProjectId projectSortIdx -> initAdd (\d -> { d | maybeProjectId = maybeProjectId, projectSortIdx = projectSortIdx })
     , initAddForDueDate = \dueDate -> initAdd (\d -> { d | maybeDueDate = Just dueDate })
@@ -177,7 +177,7 @@ type Msg
 
 
 update :
-    { onSave : Meta -> List Todo.Patch -> Cmd msg, onCancel : Cmd msg }
+    { onSave : Maybe TodoId -> List Todo.Patch -> Cmd msg, onCancel : Cmd msg }
     -> Msg
     -> TodoForm
     -> ( TodoForm, Cmd msg )
@@ -193,10 +193,26 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
             ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
 
         Save ->
-            mi |> MX.unwrap ( model, Cmd.none ) (\( m, _, c ) -> ( TodoForm Nothing, onSave m (toPatches c) ))
+            mi
+                |> MX.unwrap ( model, Cmd.none )
+                    (\( m, _, c ) ->
+                        ( TodoForm Nothing, onSave (todoIdFromMeta m) (toPatches c) )
+                    )
 
         Cancel ->
-            mi |> MX.unwrap ( model, Cmd.none ) (always ( TodoForm Nothing, onCancel ))
+            mi
+                |> MX.unwrap ( model, Cmd.none )
+                    (always ( TodoForm Nothing, onCancel ))
+
+
+todoIdFromMeta : Meta -> Maybe TodoId
+todoIdFromMeta meta =
+    case meta of
+        Edit todoId ->
+            Just todoId
+
+        Add ->
+            Nothing
 
 
 viewTodoForm : (Msg -> msg) -> List Project -> TodoForm -> H.Html msg

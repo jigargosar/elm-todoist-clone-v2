@@ -311,7 +311,7 @@ type Msg
     | InsertTodoInProjectAtClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | TodoFormMsg TodoForm.Msg
-    | Save TodoForm.Meta (List Todo.Patch)
+    | Save (Maybe TodoId) (List Todo.Patch)
     | Cancel
     | ChangeRouteTo Route
     | ResetModel
@@ -441,13 +441,13 @@ update message model =
             in
             ( model |> setTodoForm tf, c )
 
-        Save meta patches ->
+        Save maybeTodoId patches ->
             ( model
-            , case meta of
-                TodoForm.Add ->
+            , case maybeTodoId of
+                Nothing ->
                     Time.now |> Task.perform (InsertTodoWithPatches patches)
 
-                TodoForm.Edit todoId ->
+                Just todoId ->
                     applyTodoPatches todoId patches
             )
 
