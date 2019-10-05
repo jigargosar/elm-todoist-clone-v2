@@ -421,17 +421,13 @@ update message model =
         InsertTodoInProjectAtClicked idx maybeProjectId ->
             ( model
                 |> setTodoForm
-                    (model.maybeTodoForm
-                        |> Maybe.andThen (TodoForm.setProjectSortIdxIfAdding idx)
-                        |> Maybe.withDefault
-                            (TodoForm.initAdd
-                                (\d ->
-                                    { d
-                                        | maybeProjectId = maybeProjectId
-                                        , projectSortIdx = idx
-                                    }
-                                )
-                            )
+                    (TodoForm.initAdd
+                        (\d ->
+                            { d
+                                | maybeProjectId = maybeProjectId
+                                , projectSortIdx = idx
+                            }
+                        )
                     )
             , Cmd.none
             )
