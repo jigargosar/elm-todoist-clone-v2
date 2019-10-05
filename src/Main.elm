@@ -808,6 +808,29 @@ viewTodoListContent kind model form todoList =
         viewForm =
             todoFormSys.view model.projectList
 
+        info =
+            todoFormSys.info form
+
+        viewEditTodoListForTodoId : TodoId -> List (H.Html Msg)
+        viewEditTodoListForTodoId editTodoId =
+            List.map
+                (\todo ->
+                    if editTodoId == todo.id then
+                        viewForm form
+
+                    else
+                        viewTodoItem todo
+                )
+                todoList
+
+        maybeEditTodoList : Maybe (List (H.Html Msg))
+        maybeEditTodoList =
+            info.edit
+                |> Maybe.map viewEditTodoListForTodoId
+
+        viewOnlyEditableTodoList =
+            MX.unpack (\_ -> List.map viewTodoItem todoList) viewEditTodoListForTodoId
+
         editFormForTodoId : TodoId -> Maybe (H.Html Msg)
         editFormForTodoId todoId =
             todoFormSys.viewEdit model.projectList form
@@ -815,20 +838,10 @@ viewTodoListContent kind model form todoList =
     in
     case kind of
         OverDueTodoList ->
-            List.map
-                (\todo ->
-                    editFormForTodoId todo.id
-                        |> Maybe.withDefault (viewTodoItem todo)
-                )
-                todoList
+            viewOnlyEditableTodoList info.edit
 
         SearchResultTodoList _ ->
-            List.map
-                (\todo ->
-                    editFormForTodoId todo.id
-                        |> Maybe.withDefault (viewTodoItem todo)
-                )
-                todoList
+            viewOnlyEditableTodoList info.edit
 
         DueAtTodoList dueDate ->
             if TodoForm.isAdding form then
