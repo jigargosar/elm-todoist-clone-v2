@@ -481,7 +481,7 @@ update message model =
             )
 
         ApplyTodoPatches todoId patches now ->
-            ( applyTodoPatchesWithNow todoId now patches model, Cmd.none )
+            applyTodoPatchesWithNow todoId now patches model
 
         MoveUp todoId ->
             ( model, patchTodoProjectSortIdxBy -1 todoId model )
@@ -553,15 +553,15 @@ sortedTodoListForMaybeProjectId maybeProjectId =
         >> List.sortBy .projectSortIdx
 
 
-applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> Model
+applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> ( Model, Cmd Msg )
 applyTodoPatchesWithNow todoId now patches model =
     findById todoId model.todoList
         |> Maybe.map
             (applyTodoPatchesWithNowHelp now patches model)
-        |> Maybe.withDefault model
+        |> Maybe.withDefault ( model, Cmd.none )
 
 
-applyTodoPatchesWithNowHelp : Posix -> List Todo.Patch -> Model -> Todo -> Model
+applyTodoPatchesWithNowHelp : Posix -> List Todo.Patch -> Model -> Todo -> ( Model, Cmd Msg )
 applyTodoPatchesWithNowHelp now patches model oldTodo =
     let
         newTodo =
@@ -584,9 +584,11 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
         todoListWithoutOldTodo =
             List.filter (idEq oldTodo.id >> not) model.todoList
     in
-    { model
+    ( { model
         | todoList = List.foldl upsertById todoListWithoutOldTodo projectTodoList
-    }
+      }
+    , Cmd.none
+    )
 
 
 insertTodo todo model =
