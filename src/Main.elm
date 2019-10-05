@@ -844,16 +844,14 @@ viewTodoListContent kind model form todoList =
                 List.map viewTodoItem todoList ++ viewAddBtn
 
         ProjectTodoList _ ->
-            if TodoForm.isAdding form then
-                List.map viewTodoItem todoList
-                    ++ List.map viewTodoItem todoList
-                    |> insertAt (TodoForm.getProjectSortIdx form |> Maybe.withDefault 0) (viewForm form)
-
-            else if TodoForm.isEditing form then
-                viewOnlyEditableTodoList info.edit
-
-            else
-                List.map viewTodoItem todoList ++ viewAddBtn
+            info.add
+                |> Maybe.map
+                    (\( _, projectSortIdx ) ->
+                        List.map viewTodoItem todoList
+                            |> insertAt projectSortIdx (viewForm form)
+                    )
+                |> MX.orElseLazy (\_ -> info.edit |> Maybe.map viewEditTodoListForTodoId)
+                |> MX.unpack (\_ -> List.map viewTodoItem todoList ++ viewAddBtn) identity
 
 
 viewTodoListItem :
