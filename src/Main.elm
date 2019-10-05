@@ -1016,11 +1016,7 @@ viewTodoListContent kind model todoList =
                 |> Maybe.withDefault htmlListWithAddBtn
 
 
-viewTodoListItem :
-    TodoListKind
-    -> Model
-    -> Todo
-    -> H.Html Msg
+viewTodoListItem : TodoListKind -> Model -> Todo -> H.Html Msg
 viewTodoListItem kind model todo =
     let
         viewDueDateTodoItem =
