@@ -24,6 +24,10 @@ fire.onAuthStateChanged(data =>
   sleep(2000, () => pubOnAuthStateChanged(data)),
 )
 
+fire.onUserCollection('todos', s=>
+  console.log('snap',s)
+)
+
 sub(
   'setCache',
   cacheString => {
