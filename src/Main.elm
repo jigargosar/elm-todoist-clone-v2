@@ -857,7 +857,7 @@ viewTodoListSection kind model =
 
     else
         viewTodoListTitle kind model
-            :: viewTodoListContent kind model model.todoForm todoList
+            :: viewTodoListContent kind model todoList
 
 
 todoListFor : TodoListKind -> { a | today : Date } -> List Todo -> List Todo
@@ -946,11 +946,13 @@ todoFormSys =
 viewTodoListContent :
     TodoListKind
     -> Model
-    -> TodoForm
     -> List Todo
     -> List (H.Html Msg)
-viewTodoListContent kind model form todoList =
+viewTodoListContent kind model todoList =
     let
+        form =
+            model.todoForm
+
         viewTodoItem =
             viewTodoListItem kind model
 
