@@ -404,17 +404,31 @@ update message model =
                             else
                                 dict
             in
-            case JD.decodeValue (JD.list Todo.decoder) value of
+            case
+                JD.decodeValue (JD.list JD.value) value
+                    |> Result.map
+                        (List.foldr
+                            (\v ( l, el ) ->
+                                case JD.decodeValue Todo.decoder v of
+                                    Ok t ->
+                                        ( t :: l, el )
+
+                                    Err error ->
+                                        ( l, error :: el )
+                            )
+                            ( [], [] )
+                        )
+            of
                 Err err ->
                     ( model, logError (JD.errorToString err) )
 
-                Ok todoList ->
+                Ok ( tl, el ) ->
                     ( { model
                         | todoDict =
-                            todoList
-                                |> List.foldl upsertIfNewer model.todoDict
+                            List.foldl upsertIfNewer model.todoDict tl
                       }
-                    , Cmd.none
+                    , List.map (JD.errorToString >> logError) el
+                        |> Cmd.batch
                     )
 
         OnAuthStateChanged value ->
