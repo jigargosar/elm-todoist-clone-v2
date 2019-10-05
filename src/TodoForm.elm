@@ -4,8 +4,8 @@ module TodoForm exposing
     , System
     , TodoForm
     , getProjectSortIdx
+    , initialDueDateEq
     , isAdding
-    , isAddingForInitialDueDate
     , isEditing
     , isEditingFor
     , system
@@ -116,12 +116,9 @@ getProjectSortIdx =
     unwrapCurrent >> Maybe.map .projectSortIdx
 
 
-isAddingForInitialDueDate : Date -> TodoForm -> Bool
-isAddingForInitialDueDate dueDate =
-    allPass
-        [ unwrapMeta >> (==) (Just Add)
-        , unwrapInitial >> MX.unwrap False (propEq .maybeDueDate (Just dueDate))
-        ]
+initialDueDateEq : Date -> TodoForm -> Bool
+initialDueDateEq dueDate =
+    unwrapInitial >> MX.unwrap False (propEq .maybeDueDate (Just dueDate))
 
 
 unwrapCurrent : TodoForm -> Maybe Fields
@@ -268,7 +265,7 @@ info model =
     { isAdd = isAdding model
     , isEdit = isEditing model
     , isEditFor = flip isEditingFor model
-    , isAddFor = flip isAddingForInitialDueDate model
+    , isAddFor = flip initialDueDateEq model
     , edit =
         unwrapMeta model
             |> Maybe.andThen

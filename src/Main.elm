@@ -839,16 +839,10 @@ viewTodoListContent kind model form todoList =
             viewOnlyEditableTodoList info.edit
 
         DueAtTodoList dueDate ->
-            if TodoForm.isAdding form then
-                List.map viewTodoItem todoList
-                    ++ (if TodoForm.isAddingForInitialDueDate dueDate form then
-                            [ viewForm form ]
+            if TodoForm.initialDueDateEq dueDate form && TodoForm.isAdding form then
+                List.map viewTodoItem todoList ++ [ viewForm form ]
 
-                        else
-                            viewAddBtn
-                       )
-
-            else if TodoForm.isEditing form then
+            else if TodoForm.initialDueDateEq dueDate form && TodoForm.isEditing form then
                 List.map
                     (\todo ->
                         editFormForTodoId todo.id
