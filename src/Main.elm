@@ -487,7 +487,7 @@ update message model =
                 |> MX.unwrap ( model, Cmd.none )
                     (\{ todoId } ->
                         ( { model | maybeTodoContextMenu = Nothing }
-                        , patchTodo todoId (Todo.DueDate maybeDueDate)
+                        , patchTodo todoId [ Todo.DueDate maybeDueDate ]
                         )
                     )
 
@@ -556,7 +556,7 @@ update message model =
             ( model, patchTodoProjectSortIdxBy 1 todoId model )
 
         SetTodoCompleted todoId isDone ->
-            ( model, patchTodo todoId (Todo.Completed isDone) )
+            ( model, patchTodo todoId [ Todo.Completed isDone ] )
 
         AddTodoOnDueDateClicked dueDate ->
             ( setTodoForm (todoFormSys.initAddForDueDate dueDate) model
@@ -585,7 +585,7 @@ update message model =
                     Time.now |> Task.perform (InsertTodoWithPatches patches)
 
                 Just todoId ->
-                    applyTodoPatches todoId patches
+                    patchTodo todoId patches
             )
 
         Cancel ->
@@ -595,18 +595,13 @@ update message model =
 patchTodoProjectSortIdxBy : Int -> TodoId -> Model -> Cmd Msg
 patchTodoProjectSortIdxBy offset todoId model =
     TaggedDict.get todoId model.todoDict
-        |> Maybe.map (.projectSortIdx >> (+) offset >> Todo.ProjectSortIdx >> patchTodo todoId)
+        |> Maybe.map (.projectSortIdx >> (+) offset >> Todo.ProjectSortIdx >> List.singleton >> patchTodo todoId)
         |> Maybe.withDefault Cmd.none
 
 
-patchTodo : TodoId -> Todo.Patch -> Cmd Msg
-patchTodo todoId patch =
-    applyTodoPatches todoId [ patch ]
-
-
-applyTodoPatches : TodoId -> List Todo.Patch -> Cmd Msg
-applyTodoPatches todoId todoPatches =
-    Time.now |> Task.perform (ApplyTodoPatches todoId todoPatches)
+patchTodo : TodoId -> List Todo.Patch -> Cmd Msg
+patchTodo todoId patches =
+    Time.now |> Task.perform (ApplyTodoPatches todoId patches)
 
 
 
