@@ -12,7 +12,7 @@ import Html.Styled as H
 import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Pipeline exposing (optional)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
@@ -40,6 +40,18 @@ port signIn : () -> Cmd msg
 
 
 port signOut : () -> Cmd msg
+
+
+type alias AuthUser =
+    { uid : String
+    , displayName : String
+    }
+
+
+type AuthState
+    = Unknown
+    | SignedIn AuthUser
+    | SignedOut
 
 
 
@@ -206,6 +218,7 @@ type alias TodoContextMenu =
 
 type alias Model =
     { dnd : DnDList.Model
+    , auth : AuthState
     , todoList : List Todo
     , projectList : List Project
     , todoForm : TodoForm
@@ -220,6 +233,7 @@ type alias Model =
 defaultModel : Model
 defaultModel =
     { dnd = dndSystem.model
+    , auth = Unknown
     , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
     , todoForm = todoFormSys.model
@@ -302,6 +316,7 @@ setTodoForm form model =
 type Msg
     = NoOp
     | OnAuthStateChanged Value
+    | SignInClicked
     | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
@@ -338,12 +353,28 @@ update message model =
         NoOp ->
             ( model, Cmd.none )
 
+        SignInClicked ->
+            ( model, signIn () )
+
         OnAuthStateChanged value ->
             let
+                userDecoder =
+                    JD.succeed AuthUser
+                        |> required "uid" JD.string
+                        |> required "displayName" JD.string
+
+                authStateDecoder =
+                    JD.oneOf [ JD.null SignedOut, userDecoder |> JD.map SignedIn ]
+
+                auth =
+                    JD.decodeValue authStateDecoder value
+                        |> Result.mapError (Debug.log "decode err")
+                        |> Result.withDefault SignedOut
+
                 _ =
                     Debug.log "user" (JE.encode 2 value)
             in
-            ( model, Cmd.none )
+            ( { model | auth = auth }, Cmd.none )
 
         OpenTodoContextMenu todoId ->
             ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId spSystem.model }, Cmd.none )
@@ -579,6 +610,7 @@ view model =
                         (ChangeRouteTo << RouteSearch)
                         [ A.placeholder "Search" ]
                     ]
+                , btn2 "SignIn" SignInClicked
                 ]
             , row []
                 [ col [ A.class "pa2" ] (viewNav model)
