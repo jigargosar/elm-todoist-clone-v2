@@ -4,6 +4,8 @@ import { Elm } from './Main.elm'
 // import { Elm } from './Explorer.elm'
 import { pathOr } from 'ramda'
 
+global._fire = fire
+
 const app = Elm.Main.init({
   flags: {
     cache: localStorage.getItem('elm-todoist-clone-v2-cache'),
