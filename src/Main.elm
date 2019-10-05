@@ -54,6 +54,9 @@ port signOut : () -> Cmd msg
 port firePushTodoList : Value -> Cmd msg
 
 
+port fireDeleteTodoId : Value -> Cmd msg
+
+
 port onFireTodoList : (Value -> msg) -> Sub msg
 
 
@@ -507,7 +510,7 @@ update message model =
 
         DeleteTodo todoId ->
             ( model |> mapTodoDict (TaggedDict.filter (\_ -> idEq todoId >> not))
-            , Cmd.none
+            , fireDeleteTodoId (TodoId.encoder todoId)
             )
 
         InsertTodoWithPatches patches now ->
