@@ -412,7 +412,7 @@ update message model =
                         Err v ->
                             v
             in
-            JD.decodeValue (JD.keyValuePairs JD.value) todoListValue
+            JD.decodeValue (JD.list (JD.map2 Tuple.pair (JD.index 0 JD.string) (JD.index 1 JD.value))) todoListValue
                 |> Result.map
                     (List.foldr
                         (\( todoIdStr, todoValue ) ( todoList, errorList ) ->
@@ -422,7 +422,7 @@ update message model =
 
                                 Err error ->
                                     ( todoList
-                                    , ("Error Decoding TodoId:"
+                                    , ("Error Decoding Todo: "
                                         ++ todoIdStr
                                         ++ JD.errorToString error
                                       )
