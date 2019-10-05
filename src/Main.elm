@@ -470,7 +470,7 @@ update message model =
 
         TodoContextMenuScheduleMsg msg_ ->
             model.maybeTodoContextMenu
-                |> MX.unwrap ( model, Cmd.none )
+                |> Maybe.map
                     (\{ todoId, schedulePopup } ->
                         let
                             ( sp, spCmd ) =
@@ -480,6 +480,7 @@ update message model =
                         , spCmd
                         )
                     )
+                |> Maybe.withDefault ( model, Cmd.none )
 
         TodoContextMenuScheduleSaved maybeDueDate ->
             model.maybeTodoContextMenu
