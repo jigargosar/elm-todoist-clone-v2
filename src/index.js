@@ -14,7 +14,7 @@ const app = Elm.Main.init({
 
 import fire from './fire'
 
-const pubOnAuthStateChanged = data => pub('onAuthStateChanged', data, app)
+const pubOnAuthStateChanged = pub('onAuthStateChanged', app)
 
 fire.onAuthStateChanged(pubOnAuthStateChanged)
 
@@ -27,6 +27,7 @@ sub(
 )
 
 function sub(name, fn, app) {
+
   const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)
   if (!subscribe) {
     console.warn('Port not found : ', name)
@@ -35,11 +36,14 @@ function sub(name, fn, app) {
   subscribe(fn)
 }
 
-function pub(name, data, app) {
+
+function pub(name, app) {
   const send = pathOr(null, ['ports', name, 'send'])(app)
   if (!send) {
     console.warn('Port not found : ', name)
-    return
+    return function(data) {
+      console.warn('Send Error: Port not found : ', name, data)
+    }
   }
-  send(data)
+  return send
 }
