@@ -421,7 +421,12 @@ update message model =
 
         TodoContextMenuScheduleSaved maybeDueDate ->
             model.maybeTodoContextMenu
-                |> MX.unwrap ( model, Cmd.none ) (\{ todoId } -> ( { model | maybeTodoContextMenu = Nothing }, patchTodo todoId (Todo.DueDate maybeDueDate) ))
+                |> MX.unwrap ( model, Cmd.none )
+                    (\{ todoId } ->
+                        ( { model | maybeTodoContextMenu = Nothing }
+                        , patchTodo todoId (Todo.DueDate maybeDueDate)
+                        )
+                    )
 
         ClickOutsideDetected ->
             ( { model | maybeTodoContextMenu = Nothing }, Cmd.none )
