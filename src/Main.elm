@@ -419,15 +419,15 @@ update message model =
                             ( [], [] )
                         )
             of
-                Err err ->
-                    ( model, logError (JD.errorToString err) )
+                Err error ->
+                    ( model, logError (JD.errorToString error) )
 
-                Ok ( tl, el ) ->
+                Ok ( todoList, errorList ) ->
                     ( { model
                         | todoDict =
-                            List.foldl upsertIfNewer model.todoDict tl
+                            List.foldl upsertIfNewer model.todoDict todoList
                       }
-                    , List.map (JD.errorToString >> logError) el
+                    , List.map (JD.errorToString >> logError) errorList
                         |> Cmd.batch
                     )
 
