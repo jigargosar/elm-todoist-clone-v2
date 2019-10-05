@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
-import { identity, isEmpty } from 'ramda'
+import { identity, is, isEmpty } from 'ramda'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBVS1Tx23pScQz9w4ZDTGh307mqkCRy2Bw',
@@ -21,7 +21,7 @@ const db = firebase.firestore()
 function userCollectionRef(name) {
   invariant(!isEmpty(name.trim()))
   const uid = auth.currentUser.uid
-  invariant(uid instanceof String)
+  invariant(is(String, uid))
   return db.collection(`/users/${uid}/elm-todoist-clone-v2/db/${name}`)
 }
 
@@ -36,7 +36,7 @@ export default {
     return auth.signOut()
   },
   setAll(name, docs) {
-    invariant(docs instanceof Array)
+    invariant(is(Array, docs))
     const cr = userCollectionRef(name)
     const b = db.batch()
 

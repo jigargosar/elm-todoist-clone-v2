@@ -15,6 +15,7 @@ const app = Elm.Main.init({
 import fire from './fire'
 
 const pubOnAuthStateChanged = pub('onAuthStateChanged', app)
+const pubOnFireTodoList = pub('onFireTodoList', app)
 
 function sleep(ms, andThen) {
   return setTimeout(andThen, ms)
@@ -24,9 +25,10 @@ fire.onAuthStateChanged(data =>
   sleep(2000, () => pubOnAuthStateChanged(data)),
 )
 
-fire.onUserCollection('todos', s=>
-  console.log('snap',s)
-)
+fire.onUserCollection('todos', s => {
+  console.debug('snap', s)
+  pubOnFireTodoList(s.docs.map(ds => ds.data()))
+})
 
 sub(
   'setCache',
@@ -39,7 +41,7 @@ sub(
 sub('signIn', fire.signIn, app)
 sub('signOut', fire.signOut, app)
 sub('logError', err => console.error('Elm:', err), app)
-sub('firePushTodoList', todoList => fire.setAll('todos',todoList), app)
+sub('firePushTodoList', todoList => fire.setAll('todos', todoList), app)
 
 function sub(name, fn, app) {
   const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)
