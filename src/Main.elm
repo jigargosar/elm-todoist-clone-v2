@@ -497,11 +497,11 @@ applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> Model
 applyTodoPatchesWithNow todoId now patches model =
     findById todoId model.todoList
         |> Maybe.map
-            (patchTodoWithNowHelp now patches model)
+            (applyTodoPatchesWithNowHelp now patches model)
         |> Maybe.withDefault model
 
 
-patchTodoWithNowHelp now patches model oldTodo =
+applyTodoPatchesWithNowHelp now patches model oldTodo =
     let
         newTodo =
             Todo.applyPatches now patches oldTodo
