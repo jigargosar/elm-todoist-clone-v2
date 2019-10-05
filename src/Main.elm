@@ -804,9 +804,8 @@ viewTodoListContent kind model form todoList =
         viewAddBtn =
             viewAddTodoButtonFor kind
 
-        viewForm : TodoForm -> H.Html Msg
-        viewForm =
-            todoFormSys.view model.projectList
+        formHtml =
+            todoFormSys.view model.projectList form
 
         info =
             todoFormSys.info form
@@ -816,7 +815,7 @@ viewTodoListContent kind model form todoList =
             List.map
                 (\todo ->
                     if editTodoId == todo.id then
-                        viewForm form
+                        formHtml
 
                     else
                         viewTodoItem todo
@@ -843,7 +842,7 @@ viewTodoListContent kind model form todoList =
                 |> MX.filter ((==) dueDate)
                 |> Maybe.andThen
                     (\_ ->
-                        Maybe.map (\_ -> todoListHtml ++ [ viewForm form ]) info.add
+                        Maybe.map (\_ -> todoListHtml ++ [ formHtml ]) info.add
                             |> MX.orElse maybeEditTodoListHtml
                     )
                 |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
@@ -852,7 +851,7 @@ viewTodoListContent kind model form todoList =
             info.add
                 |> Maybe.map
                     (\projectSortIdx ->
-                        todoListHtml |> insertAt projectSortIdx (viewForm form)
+                        todoListHtml |> insertAt projectSortIdx formHtml
                     )
                 |> MX.orElse maybeEditTodoListHtml
                 |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
