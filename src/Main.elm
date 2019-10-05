@@ -501,6 +501,7 @@ applyTodoPatchesWithNow todoId now patches model =
         |> Maybe.withDefault model
 
 
+applyTodoPatchesWithNowHelp : Posix -> List Todo.Patch -> Model -> Todo -> Model
 applyTodoPatchesWithNowHelp now patches model oldTodo =
     let
         newTodo =
