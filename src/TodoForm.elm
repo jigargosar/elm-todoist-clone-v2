@@ -228,10 +228,10 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
             ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
 
         Save ->
-            ( TodoForm Nothing, mi |> MX.unwrap Cmd.none (\( m, _, c ) -> onSave m (toPatches c)) )
+            mi |> MX.unwrap ( model, Cmd.none ) (\( m, _, c ) -> ( TodoForm Nothing, onSave m (toPatches c) ))
 
         Cancel ->
-            ( TodoForm Nothing, onCancel )
+            mi |> MX.unwrap ( model, Cmd.none ) (always ( TodoForm Nothing, onCancel ))
 
 
 type alias Info =
