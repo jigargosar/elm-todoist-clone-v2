@@ -148,15 +148,32 @@ type alias System msg =
     }
 
 
+mapCurrent : (Fields -> Fields) -> TodoForm -> TodoForm
+mapCurrent func (TodoForm meta initial current) =
+    TodoForm meta initial (func current)
+
+
 type Msg
     = Patch TodoForm
+    | TitleChanged String
+    | ProjectChanged (Maybe ProjectId)
+    | DueDateChanged (Maybe Date)
 
 
 update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
-update message model =
+update message ((TodoForm meta initial current) as model) =
     case message of
         Patch m ->
             ( m, Cmd.none )
+
+        TitleChanged title ->
+            ( mapCurrent (\f -> { f | title = title }) model, Cmd.none )
+
+        ProjectChanged maybeProjectId ->
+            ( mapCurrent (\f -> { f | maybeProjectId = maybeProjectId }) model, Cmd.none )
+
+        DueDateChanged maybeDueDate ->
+            ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
 
 
 system : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> System msg
