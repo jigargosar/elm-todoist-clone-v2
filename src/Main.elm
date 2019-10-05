@@ -842,24 +842,25 @@ viewTodoListContent kind model maybeTodoForm todoList =
         DueAtTodoList dueDate ->
             case maybeTodoForm of
                 Just form ->
-                    let
-                        showAddForm =
-                            TodoForm.isAddingForInitialDueDate dueDate form
-                    in
-                    case TodoForm.getMeta form of
-                        TodoForm.Add ->
-                            List.map viewTodoItem todoList
-                                ++ (if showAddForm then
-                                        [ viewForm form ]
+                    if TodoForm.isAdding form then
+                        List.map viewTodoItem todoList
+                            ++ (if TodoForm.isAddingForInitialDueDate dueDate form then
+                                    [ viewForm form ]
 
-                                    else
-                                        viewAddBtn
-                                   )
+                                else
+                                    viewAddBtn
+                               )
 
-                        TodoForm.Edit todoId ->
-                            List.map
-                                (ifElse (idEq todoId) (\_ -> viewForm form) viewTodoItem)
-                                todoList
+                    else if TodoForm.isEditing form then
+                        List.map
+                            (\todo ->
+                                editFormForTodoId todo.id
+                                    |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                            )
+                            todoList
+
+                    else
+                        List.map viewTodoItem todoList ++ viewAddBtn
 
                 Nothing ->
                     List.map viewTodoItem todoList ++ viewAddBtn

@@ -7,7 +7,9 @@ module TodoForm exposing
     , getProjectSortIdx
     , initAdd
     , initEdit
+    , isAdding
     , isAddingForInitialDueDate
+    , isEditing
     , isEditingFor
     , setProjectSortIdxIfAdding
     , system
@@ -62,6 +64,36 @@ unwrapMeta (TodoForm meta _ _) =
 isEditingFor : TodoId -> TodoForm -> Bool
 isEditingFor todoId =
     unwrapMeta >> (==) (Edit todoId)
+
+
+isEditing : TodoForm -> Bool
+isEditing =
+    unwrapMeta >> isEdit
+
+
+isAdding : TodoForm -> Bool
+isAdding =
+    unwrapMeta >> isAdd
+
+
+isEdit : Meta -> Bool
+isEdit meta =
+    case meta of
+        Edit _ ->
+            True
+
+        _ ->
+            False
+
+
+isAdd : Meta -> Bool
+isAdd meta =
+    case meta of
+        Add ->
+            True
+
+        _ ->
+            False
 
 
 getMeta : TodoForm -> Meta
