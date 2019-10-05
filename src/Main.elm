@@ -420,7 +420,7 @@ update message model =
             )
 
         EditTodoClicked todo ->
-            ( model |> setTodoForm (TodoForm.initEdit todo), Cmd.none )
+            ( model |> setTodoForm (todoFormSys.initEdit todo), Cmd.none )
 
         TodoFormMsg msg ->
             case model.maybeTodoForm of

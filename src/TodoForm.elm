@@ -5,7 +5,6 @@ module TodoForm exposing
     , TodoForm
     , getMeta
     , getProjectSortIdx
-    , initEdit
     , isAdding
     , isAddingForInitialDueDate
     , isEditing
@@ -122,16 +121,6 @@ unwrapInitial (TodoForm _ initial _) =
     initial
 
 
-mapIfAdding : (Fields -> Fields) -> TodoForm -> Maybe TodoForm
-mapIfAdding func (TodoForm meta initial current) =
-    case meta of
-        Add ->
-            Just <| TodoForm meta initial <| func current
-
-        _ ->
-            Nothing
-
-
 empty : Fields
 empty =
     Fields "" Nothing Nothing Random.maxInt
@@ -162,6 +151,7 @@ type alias System msg =
     , info : TodoForm -> Info
     , initAddForProject : Maybe ProjectId -> Int -> TodoForm
     , initAddForDueDate : Date -> TodoForm
+    , initEdit : Todo -> TodoForm
     }
 
 
@@ -172,6 +162,7 @@ system { onSave, onCancel, toMsg } =
     , info = info
     , initAddForProject = \maybeProjectId projectSortIdx -> initAdd (\d -> { d | maybeProjectId = maybeProjectId, projectSortIdx = projectSortIdx })
     , initAddForDueDate = \dueDate -> initAdd (\d -> { d | maybeDueDate = Just dueDate })
+    , initEdit = initEdit
     }
 
 
