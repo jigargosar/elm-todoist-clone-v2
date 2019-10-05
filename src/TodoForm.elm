@@ -142,12 +142,26 @@ createConfig =
 
 
 type alias System msg =
-    { view : List Project -> TodoForm -> H.Html msg }
+    { view : List Project -> TodoForm -> H.Html msg
+    , update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
+    }
+
+
+type Msg
+    = Patch TodoForm
+
+
+update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
+update message model =
+    case message of
+        Patch m ->
+            ( m, Cmd.none )
 
 
 system : { onSave : msg, onCancel : msg, toMsg : TodoForm -> msg } -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm <| createConfig { onSave = onSave, onCancel = onCancel, toMsg = toMsg }
+    , update = update
     }
 
 
