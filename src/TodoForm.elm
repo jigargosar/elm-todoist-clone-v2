@@ -150,11 +150,11 @@ mapCurrent_ func ( m, i, c ) =
 
 mapCurrent : (Fields -> Fields) -> TodoForm -> TodoForm
 mapCurrent func =
-    map (mapCurrent_ func)
+    mapInternal (mapCurrent_ func)
 
 
-map : (Internal -> Internal) -> TodoForm -> TodoForm
-map func (TodoForm mi) =
+mapInternal : (Internal -> Internal) -> TodoForm -> TodoForm
+mapInternal func (TodoForm mi) =
     Maybe.map func mi |> TodoForm
 
 
