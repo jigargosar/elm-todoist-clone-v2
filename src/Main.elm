@@ -851,15 +851,21 @@ viewTodoListContent kind model maybeTodoForm todoList =
         ProjectTodoList _ ->
             case maybeTodoForm of
                 Just form ->
-                    case TodoForm.getMeta form of
-                        TodoForm.Add ->
-                            List.map viewTodoItem todoList
-                                |> insertAt (TodoForm.getProjectSortIdx form) (viewForm form)
+                    if TodoForm.isAdding form then
+                        List.map viewTodoItem todoList
+                            ++ List.map viewTodoItem todoList
+                            |> insertAt (TodoForm.getProjectSortIdx form |> Maybe.withDefault 0) (viewForm form)
 
-                        TodoForm.Edit todoId ->
-                            List.map
-                                (ifElse (idEq todoId) (\_ -> viewForm form) viewTodoItem)
-                                todoList
+                    else if TodoForm.isEditing form then
+                        List.map
+                            (\todo ->
+                                editFormForTodoId todo.id
+                                    |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                            )
+                            todoList
+
+                    else
+                        List.map viewTodoItem todoList ++ viewAddBtn
 
                 Nothing ->
                     List.map viewTodoItem todoList ++ viewAddBtn
