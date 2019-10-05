@@ -254,7 +254,13 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
 
 
 type alias Info =
-    { isAdd : Bool, isEdit : Bool, isEditFor : TodoId -> Bool, isAddFor : Date -> Bool }
+    { isAdd : Bool
+    , isEdit : Bool
+    , isEditFor : TodoId -> Bool
+    , isAddFor : Date -> Bool
+    , edit : Maybe TodoId
+    , add : Maybe ( Maybe Date, Int )
+    }
 
 
 info : TodoForm -> Info
@@ -263,6 +269,28 @@ info model =
     , isEdit = isEditing model
     , isEditFor = flip isEditingFor model
     , isAddFor = flip isAddingForInitialDueDate model
+    , edit =
+        unwrapMeta model
+            |> Maybe.andThen
+                (\m ->
+                    case m of
+                        Edit ti ->
+                            Just ti
+
+                        _ ->
+                            Nothing
+                )
+    , add =
+        unwrap model
+            |> Maybe.andThen
+                (\( m, i, c ) ->
+                    case m of
+                        Add ->
+                            Just ( i.maybeDueDate, c.projectSortIdx )
+
+                        _ ->
+                            Nothing
+                )
     }
 
 
