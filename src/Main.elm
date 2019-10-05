@@ -738,12 +738,10 @@ todoListFor kind model =
     in
     case kind of
         OverDueTodoList ->
-            List.filter (overDuePred model.today)
-                >> sortByCreatedAt
+            List.filter (overDuePred model.today) >> sortByCreatedAt
 
         DueAtTodoList dueDate ->
-            List.filter (dueOnPred dueDate)
-                >> sortByCreatedAt
+            List.filter (dueOnPred dueDate) >> sortByCreatedAt
 
         ProjectTodoList maybeProjectId ->
             sortedTodoListForMaybeProjectId maybeProjectId
