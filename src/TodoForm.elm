@@ -123,9 +123,9 @@ type alias Info =
 info : TodoForm -> Info
 info model =
     { edit =
-        unwrapMeta model
+        unwrap model
             |> Maybe.andThen
-                (\m ->
+                (\( m, _, _ ) ->
                     case m of
                         Edit ti ->
                             Just ti
