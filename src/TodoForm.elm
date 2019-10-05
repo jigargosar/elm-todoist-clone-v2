@@ -1,9 +1,7 @@
 module TodoForm exposing
-    ( Config
-    , Meta(..)
+    ( Meta(..)
     , System
     , TodoForm
-    , createConfig
     , getMeta
     , getProjectSortIdx
     , initAdd
