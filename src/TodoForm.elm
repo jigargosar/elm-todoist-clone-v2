@@ -5,13 +5,11 @@ module TodoForm exposing
     , TodoForm
     , getMeta
     , getProjectSortIdx
-    , initAdd
     , initEdit
     , isAdding
     , isAddingForInitialDueDate
     , isEditing
     , isEditingFor
-    , setProjectSortIdxIfAdding
     , system
     , viewTodoForm
     )
@@ -122,11 +120,6 @@ unwrap (TodoForm _ _ internal) =
 unwrapInitial : TodoForm -> Fields
 unwrapInitial (TodoForm _ initial _) =
     initial
-
-
-setProjectSortIdxIfAdding : Int -> TodoForm -> Maybe TodoForm
-setProjectSortIdxIfAdding projectSortIdx =
-    mapIfAdding (\f -> { f | projectSortIdx = projectSortIdx })
 
 
 mapIfAdding : (Fields -> Fields) -> TodoForm -> Maybe TodoForm
