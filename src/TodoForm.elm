@@ -33,7 +33,7 @@ type Meta
 
 
 type TodoForm
-    = TodoForm Meta Fields Fields
+    = TodoForm ( Meta, Fields, Fields )
 
 
 type alias Fields =
@@ -54,7 +54,7 @@ toPatches m =
 
 
 unwrapMeta : TodoForm -> Meta
-unwrapMeta (TodoForm meta _ _) =
+unwrapMeta (TodoForm ( meta, _, _ )) =
     meta
 
 
@@ -112,12 +112,12 @@ isAddingForInitialDueDate dueDate =
 
 
 unwrap : TodoForm -> Fields
-unwrap (TodoForm _ _ internal) =
+unwrap (TodoForm ( _, _, internal )) =
     internal
 
 
 unwrapInitial : TodoForm -> Fields
-unwrapInitial (TodoForm _ initial _) =
+unwrapInitial (TodoForm ( _, initial, _ )) =
     initial
 
 
@@ -133,7 +133,7 @@ initAdd func =
 
 init : Meta -> Fields -> TodoForm
 init meta internal =
-    TodoForm meta internal internal
+    TodoForm ( meta, internal, internal )
 
 
 initEdit : Todo -> TodoForm
@@ -167,8 +167,8 @@ system { onSave, onCancel, toMsg } =
 
 
 mapCurrent : (Fields -> Fields) -> TodoForm -> TodoForm
-mapCurrent func (TodoForm meta initial current) =
-    TodoForm meta initial (func current)
+mapCurrent func (TodoForm ( meta, initial, current )) =
+    TodoForm ( meta, initial, func current )
 
 
 type Msg
@@ -185,7 +185,7 @@ update :
     -> Msg
     -> TodoForm
     -> ( TodoForm, Cmd msg )
-update { onSave, onCancel } message ((TodoForm meta _ current) as model) =
+update { onSave, onCancel } message ((TodoForm ( meta, _, current )) as model) =
     case message of
         Patch m ->
             ( m, Cmd.none )
@@ -220,7 +220,7 @@ info model =
 
 
 viewTodoForm : (Msg -> msg) -> List Project -> TodoForm -> H.Html msg
-viewTodoForm toMsg projectList (TodoForm _ _ { title, maybeProjectId, maybeDueDate }) =
+viewTodoForm toMsg projectList (TodoForm ( _, _, { title, maybeProjectId, maybeDueDate } )) =
     H.form [ A.class "flex flex-column pa1", E.onSubmit Save ]
         [ col [ A.class "pv1" ]
             [ ipt3 title TitleChanged [ A.autofocus True ]
