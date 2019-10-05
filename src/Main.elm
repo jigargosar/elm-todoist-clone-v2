@@ -379,12 +379,31 @@ update message model =
             ( model, pushTodoListCmd model.todoList )
 
         OnFireTodoList value ->
+            let
+                upsertIfNewer new l =
+                    case findById new.id l of
+                        Nothing ->
+                            new :: l
+
+                        Just old ->
+                            if Todo.isNewerThan old new then
+                                new :: List.filter (eqById old) l
+
+                            else
+                                new :: l
+            in
             case JD.decodeValue (JD.list Todo.decoder) value of
                 Err err ->
                     ( model, logError (JD.errorToString err) )
 
                 Ok todoList ->
-                    ( { model | todoList = todoList }, Cmd.none )
+                    ( { model
+                        | todoList =
+                            todoList
+                                |> List.foldl upsertIfNewer model.todoList
+                      }
+                    , Cmd.none
+                    )
 
         OnAuthStateChanged value ->
             let

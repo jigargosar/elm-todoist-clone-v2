@@ -5,6 +5,7 @@ module Todo exposing
     , decoder
     , encoder
     , generator
+    , isNewerThan
     , mockListGenerator
     )
 
@@ -147,6 +148,15 @@ type Patch
     | ProjectSortIdx Int
     | DueDate (Maybe Date)
     | Completed Bool
+
+
+isNewerThan : Todo -> Todo -> Bool
+isNewerThan t2 t1 =
+    let
+        updatedAtMillis =
+            Time.posixToMillis << .updatedAt
+    in
+    updatedAtMillis t1 > updatedAtMillis t2
 
 
 applyPatches : Posix -> List Patch -> Todo -> Todo
