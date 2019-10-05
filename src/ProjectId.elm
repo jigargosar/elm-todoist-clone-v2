@@ -1,33 +1,47 @@
-module ProjectId exposing (ProjectId, encoder, decoder, toString ,fromString, generator)
+module ProjectId exposing (ProjectId, decoder, encoder, fromString, generator, toString)
 
-import Json.Encode as JE exposing(Value)
-import Json.Decode as JD exposing(Decoder)
+import Json.Decode as JD exposing (Decoder)
+import Json.Encode as JE exposing (Value)
 import Random
+import Tagged exposing (Tagged)
 
-type ProjectId =
-    ProjectId String
-    
 
-encoder: ProjectId -> Value
-encoder (ProjectId v) = 
-    JE.string v
+type ProjectIdTag
+    = ProjectIdTag
 
-decoder: Decoder ProjectId
-decoder = 
-  JD.map ProjectId JD.string
-  
-toString: ProjectId -> String
-toString (ProjectId s) = 
-  s
-  
-fromString: String -> Maybe ProjectId
+
+type alias ProjectId =
+    Tagged ProjectIdTag String
+
+
+encoder : ProjectId -> Value
+encoder =
+    Tagged.untag >> JE.string
+
+
+decoder : Decoder ProjectId
+decoder =
+    JD.map Tagged.tag JD.string
+
+
+toString : ProjectId -> String
+toString =
+    Tagged.untag
+
+
+fromString : String -> Maybe ProjectId
 fromString =
-  String.trim
-  >> \s -> if String.isEmpty s then Nothing else Just (ProjectId s)
+    String.trim
+        >> (\s ->
+                if String.isEmpty s then
+                    Nothing
 
-generator: Random.Generator ProjectId
-generator = 
-  Random.int (10 ^ 3) (10 ^ 5)
-  |> Random.map (String.fromInt >> (++) "ProjectId-" >> ProjectId)
+                else
+                    Just <| Tagged.tag s
+           )
 
-  
+
+generator : Random.Generator ProjectId
+generator =
+    Random.int (10 ^ 3) (10 ^ 5)
+        |> Random.map (String.fromInt >> (++) "ProjectId-" >> Tagged.tag)
