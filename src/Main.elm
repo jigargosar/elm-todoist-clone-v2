@@ -298,7 +298,6 @@ type Msg
     | AddTodoOnDueDateClicked Date
     | InsertTodoInProjectAtClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
-    | PatchTodoForm TodoForm
     | TodoFormMsg TodoForm.Msg
     | Save
     | Cancel
@@ -451,9 +450,6 @@ update message model =
 
                 Nothing ->
                     ( model, Cmd.none )
-
-        PatchTodoForm todoForm ->
-            ( model |> setTodoForm todoForm, Cmd.none )
 
         Save ->
             case model.maybeTodoForm of
@@ -811,7 +807,7 @@ viewAddTodoButtonFor kind =
 
 todoFormSys : TodoForm.System Msg
 todoFormSys =
-    TodoForm.system { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
+    TodoForm.system { onSave = Save, onCancel = Cancel, toMsg = TodoFormMsg }
 
 
 viewTodoListContent :

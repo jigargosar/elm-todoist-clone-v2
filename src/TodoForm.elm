@@ -134,10 +134,10 @@ initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
 
 
 type Config msg
-    = Config { onSave : msg, onCancel : msg, toMsg : TodoForm -> msg }
+    = Config { onSave : msg, onCancel : msg, toMsg : Msg -> msg }
 
 
-createConfig : { onSave : msg, onCancel : msg, toMsg : TodoForm -> msg } -> Config msg
+createConfig : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> Config msg
 createConfig =
     Config
 
@@ -159,7 +159,7 @@ update message model =
             ( m, Cmd.none )
 
 
-system : { onSave : msg, onCancel : msg, toMsg : TodoForm -> msg } -> System msg
+system : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm <| createConfig { onSave = onSave, onCancel = onCancel, toMsg = toMsg }
     , update = update
@@ -170,7 +170,7 @@ viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
 viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta initial model) =
     let
         onChange =
-            toMsg << TodoForm meta initial
+            toMsg << Patch << TodoForm meta initial
 
         titleChanged title =
             onChange { model | title = title }
