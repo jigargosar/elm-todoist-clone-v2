@@ -299,7 +299,7 @@ type Msg
     | InsertTodoInProjectAtClicked Int (Maybe ProjectId)
     | EditTodoClicked Todo
     | TodoFormMsg TodoForm.Msg
-    | Save
+    | Save TodoForm.Meta (List Todo.Patch)
     | Cancel
     | ChangeRouteTo Route
     | ResetModel
@@ -451,13 +451,8 @@ update message model =
                 Nothing ->
                     ( model, Cmd.none )
 
-        Save ->
-            case model.maybeTodoForm of
-                Just form ->
-                    saveTodoForm form model
-
-                Nothing ->
-                    ( model, Cmd.none )
+        Save meta patches ->
+            saveTodoForm meta patches model
 
         Cancel ->
             ( { model | maybeTodoForm = Nothing }, Cmd.none )
@@ -480,12 +475,11 @@ applyTodoPatches todoId todoPatches =
     Time.now |> Task.perform (ApplyTodoPatches todoId todoPatches)
 
 
-saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
-saveTodoForm form model =
-    let
-        ( meta, patches ) =
-            TodoForm.toPatchesWithMeta form
-    in
+
+--saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
+
+
+saveTodoForm meta patches model =
     ( { model | maybeTodoForm = Nothing }
     , case meta of
         TodoForm.Add ->

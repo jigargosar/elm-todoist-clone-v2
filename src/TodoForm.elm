@@ -11,7 +11,6 @@ module TodoForm exposing
     , isEditingFor
     , setProjectSortIdxIfAdding
     , system
-    , toPatchesWithMeta
     , viewTodoForm
     )
 
@@ -44,11 +43,6 @@ type alias Fields =
     , maybeDueDate : Maybe Date
     , projectSortIdx : Int
     }
-
-
-toPatchesWithMeta : TodoForm -> ( Meta, List Todo.Patch )
-toPatchesWithMeta (TodoForm meta _ current) =
-    ( meta, toPatches current )
 
 
 toPatches : Fields -> List Todo.Patch
@@ -133,13 +127,8 @@ initEdit { id, title, maybeProjectId, maybeDueDate, projectSortIdx } =
     init (Edit id) <| Fields title maybeProjectId maybeDueDate projectSortIdx
 
 
-type Config msg
-    = Config { onSave : msg, onCancel : msg, toMsg : Msg -> msg }
-
-
-createConfig : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> Config msg
-createConfig =
-    Config
+type alias Config msg =
+    { onSave : Meta -> List Todo.Patch -> msg, onCancel : msg, toMsg : Msg -> msg }
 
 
 type alias System msg =
@@ -162,8 +151,12 @@ type Msg
     | Cancel
 
 
-update : { onSave : Cmd msg, onCancel : Cmd msg } -> Msg -> TodoForm -> ( TodoForm, Cmd msg )
-update { onSave, onCancel } message ((TodoForm meta initial current) as model) =
+update :
+    { onSave : Meta -> List Todo.Patch -> Cmd msg, onCancel : Cmd msg }
+    -> Msg
+    -> TodoForm
+    -> ( TodoForm, Cmd msg )
+update { onSave, onCancel } message ((TodoForm meta _ current) as model) =
     case message of
         Patch m ->
             ( m, Cmd.none )
@@ -178,21 +171,21 @@ update { onSave, onCancel } message ((TodoForm meta initial current) as model) =
             ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
 
         Save ->
-            ( model, onSave )
+            ( model, onSave meta (toPatches current) )
 
         Cancel ->
             ( model, onCancel )
 
 
-system : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> System msg
+system : Config msg -> System msg
 system { onSave, onCancel, toMsg } =
-    { view = viewTodoForm <| createConfig { onSave = onSave, onCancel = onCancel, toMsg = toMsg }
-    , update = update { onSave = perform onSave, onCancel = perform onCancel }
+    { view = viewTodoForm toMsg
+    , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
     }
 
 
-viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
-viewTodoForm (Config { toMsg }) projectList (TodoForm _ _ { title, maybeProjectId, maybeDueDate }) =
+viewTodoForm : (Msg -> msg) -> List Project -> TodoForm -> H.Html msg
+viewTodoForm toMsg projectList (TodoForm _ _ { title, maybeProjectId, maybeDueDate }) =
     H.form [ A.class "flex flex-column pa1", E.onSubmit Save ]
         [ col [ A.class "pv1" ]
             [ ipt3 title TitleChanged [ A.autofocus True ]
