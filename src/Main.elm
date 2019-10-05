@@ -1,6 +1,18 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, eqById, findById, idEq, ifElse, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More
+    exposing
+        ( HasId
+        , allPass
+        , eqById
+        , findById
+        , idEq
+        , insertAt
+        , propEq
+        , uncurry
+        , updateWhenIdEq
+        , upsertById
+        )
 import Browser
 import Browser.Events
 import Date exposing (Date)
@@ -191,7 +203,7 @@ type alias Model =
     { dnd : DnDList.Model
     , todoList : List Todo
     , projectList : List Project
-    , todoForm : Maybe TodoForm
+    , todoForm : TodoForm
     , maybeTodoContextMenu : Maybe TodoContextMenu
     , route : Route
     , zone : Time.Zone
@@ -205,7 +217,7 @@ defaultModel =
     { dnd = dndSystem.model
     , todoList = defaultCacheValue.todoList
     , projectList = defaultCacheValue.projectList
-    , todoForm = Nothing
+    , todoForm = todoFormSys.model
     , maybeTodoContextMenu = Nothing
     , route = defaultCacheValue.route
     , zone = Time.utc
@@ -275,7 +287,7 @@ mapTodoList func model =
 
 
 setTodoForm form model =
-    { model | todoForm = Just form }
+    { model | todoForm = form }
 
 
 
@@ -385,7 +397,7 @@ update message model =
             ( { model | today = today }, Cmd.none )
 
         ChangeRouteTo route ->
-            refreshModel { model | route = route, todoForm = Nothing }
+            refreshModel { model | route = route, todoForm = todoFormSys.model }
 
         DeleteTodo todoId ->
             ( model |> mapTodoList (List.filter (idEq todoId >> not))
@@ -423,19 +435,14 @@ update message model =
             ( model |> setTodoForm (todoFormSys.initEdit todo), Cmd.none )
 
         TodoFormMsg msg ->
-            case model.todoForm of
-                Just todoForm ->
-                    let
-                        ( tf, c ) =
-                            todoFormSys.update msg todoForm
-                    in
-                    ( model |> setTodoForm tf, c )
-
-                Nothing ->
-                    ( model, Cmd.none )
+            let
+                ( tf, c ) =
+                    todoFormSys.update msg model.todoForm
+            in
+            ( model |> setTodoForm tf, c )
 
         Save meta patches ->
-            ( { model | todoForm = Nothing }
+            ( model
             , case meta of
                 TodoForm.Add ->
                     Time.now |> Task.perform (InsertTodoWithPatches patches)
@@ -445,7 +452,7 @@ update message model =
             )
 
         Cancel ->
-            ( { model | todoForm = Nothing }, Cmd.none )
+            ( model, Cmd.none )
 
 
 patchTodoProjectSortIdxBy : Int -> TodoId -> Model -> Cmd Msg
@@ -786,10 +793,10 @@ todoFormSys =
 viewTodoListContent :
     TodoListKind
     -> Model
-    -> Maybe TodoForm
+    -> TodoForm
     -> List Todo
     -> List (H.Html Msg)
-viewTodoListContent kind model todoForm todoList =
+viewTodoListContent kind model form todoList =
     let
         viewTodoItem =
             viewTodoListItem kind model
@@ -802,15 +809,14 @@ viewTodoListContent kind model todoForm todoList =
             todoFormSys.view model.projectList
 
         editFormForTodoId todoId =
-            todoForm
-                |> MX.filter (TodoForm.isEditingFor todoId)
+            todoFormSys.viewEditFor todoId model.projectList form
     in
     case kind of
         OverDueTodoList ->
             List.map
                 (\todo ->
                     editFormForTodoId todo.id
-                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                        |> MX.unpack (\_ -> viewTodoItem todo) identity
                 )
                 todoList
 
@@ -818,57 +824,47 @@ viewTodoListContent kind model todoForm todoList =
             List.map
                 (\todo ->
                     editFormForTodoId todo.id
-                        |> MX.unpack (\_ -> viewTodoItem todo) viewForm
+                        |> MX.unpack (\_ -> viewTodoItem todo) identity
                 )
                 todoList
 
         DueAtTodoList dueDate ->
-            case todoForm of
-                Just form ->
-                    if TodoForm.isAdding form then
-                        List.map viewTodoItem todoList
-                            ++ (if TodoForm.isAddingForInitialDueDate dueDate form then
-                                    [ viewForm form ]
+            if TodoForm.isAdding form then
+                List.map viewTodoItem todoList
+                    ++ (if TodoForm.isAddingForInitialDueDate dueDate form then
+                            [ viewForm form ]
 
-                                else
-                                    viewAddBtn
-                               )
+                        else
+                            viewAddBtn
+                       )
 
-                    else if TodoForm.isEditing form then
-                        List.map
-                            (\todo ->
-                                editFormForTodoId todo.id
-                                    |> MX.unpack (\_ -> viewTodoItem todo) viewForm
-                            )
-                            todoList
+            else if TodoForm.isEditing form then
+                List.map
+                    (\todo ->
+                        editFormForTodoId todo.id
+                            |> MX.unpack (\_ -> viewTodoItem todo) identity
+                    )
+                    todoList
 
-                    else
-                        List.map viewTodoItem todoList ++ viewAddBtn
-
-                Nothing ->
-                    List.map viewTodoItem todoList ++ viewAddBtn
+            else
+                List.map viewTodoItem todoList ++ viewAddBtn
 
         ProjectTodoList _ ->
-            case todoForm of
-                Just form ->
-                    if TodoForm.isAdding form then
-                        List.map viewTodoItem todoList
-                            ++ List.map viewTodoItem todoList
-                            |> insertAt (TodoForm.getProjectSortIdx form |> Maybe.withDefault 0) (viewForm form)
+            if TodoForm.isAdding form then
+                List.map viewTodoItem todoList
+                    ++ List.map viewTodoItem todoList
+                    |> insertAt (TodoForm.getProjectSortIdx form |> Maybe.withDefault 0) (viewForm form)
 
-                    else if TodoForm.isEditing form then
-                        List.map
-                            (\todo ->
-                                editFormForTodoId todo.id
-                                    |> MX.unpack (\_ -> viewTodoItem todo) viewForm
-                            )
-                            todoList
+            else if TodoForm.isEditing form then
+                List.map
+                    (\todo ->
+                        editFormForTodoId todo.id
+                            |> MX.unpack (\_ -> viewTodoItem todo) identity
+                    )
+                    todoList
 
-                    else
-                        List.map viewTodoItem todoList ++ viewAddBtn
-
-                Nothing ->
-                    List.map viewTodoItem todoList ++ viewAddBtn
+            else
+                List.map viewTodoItem todoList ++ viewAddBtn
 
 
 viewTodoListItem :

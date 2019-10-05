@@ -12,7 +12,7 @@ module TodoForm exposing
     , viewTodoForm
     )
 
-import Basics.More exposing (allPass, flip, perform, propEq)
+import Basics.More exposing (allPass, flip, ifElse, perform, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -165,6 +165,7 @@ type alias Config msg =
 
 type alias System msg =
     { view : List Project -> TodoForm -> H.Html msg
+    , viewEditFor : TodoId -> List Project -> TodoForm -> Maybe (H.Html msg)
     , update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
     , info : TodoForm -> Info
     , initAddForProject : Maybe ProjectId -> Int -> TodoForm
@@ -177,6 +178,7 @@ type alias System msg =
 system : Config msg -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm toMsg
+    , viewEditFor = \todoId lp -> ifElse (isEditingFor todoId) (viewTodoForm toMsg lp >> Just) (always Nothing)
     , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
     , info = info
     , initAddForProject = \maybeProjectId projectSortIdx -> initAdd (\d -> { d | maybeProjectId = maybeProjectId, projectSortIdx = projectSortIdx })
