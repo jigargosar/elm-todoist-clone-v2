@@ -16,7 +16,13 @@ import fire from './fire'
 
 const pubOnAuthStateChanged = pub('onAuthStateChanged', app)
 
-fire.onAuthStateChanged(pubOnAuthStateChanged)
+function sleep(ms, andThen) {
+  return setTimeout(andThen, ms)
+}
+
+fire.onAuthStateChanged(data =>
+  sleep(2000, () => pubOnAuthStateChanged(data)),
+)
 
 sub(
   'setCache',
@@ -30,7 +36,6 @@ sub('signIn', fire.signIn, app)
 sub('signOut', fire.signOut, app)
 
 function sub(name, fn, app) {
-
   const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)
   if (!subscribe) {
     console.warn('Port not found : ', name)
@@ -38,7 +43,6 @@ function sub(name, fn, app) {
   }
   subscribe(fn)
 }
-
 
 function pub(name, app) {
   const send = pathOr(null, ['ports', name, 'send'])(app)
