@@ -825,11 +825,6 @@ viewTodoListContent kind model form todoList =
 
         viewOnlyEditableTodoList =
             MX.unpack (\_ -> List.map viewTodoItem todoList) viewEditTodoListForTodoId
-
-        editFormForTodoId : TodoId -> Maybe (H.Html Msg)
-        editFormForTodoId todoId =
-            todoFormSys.viewEdit model.projectList form
-                |> Maybe.andThen (\fn -> fn todoId)
     in
     case kind of
         OverDueTodoList ->
@@ -843,12 +838,7 @@ viewTodoListContent kind model form todoList =
                 List.map viewTodoItem todoList ++ [ viewForm form ]
 
             else if TodoForm.initialDueDateEq dueDate form && TodoForm.isEditing form then
-                List.map
-                    (\todo ->
-                        editFormForTodoId todo.id
-                            |> MX.unpack (\_ -> viewTodoItem todo) identity
-                    )
-                    todoList
+                viewOnlyEditableTodoList info.edit
 
             else
                 List.map viewTodoItem todoList ++ viewAddBtn
