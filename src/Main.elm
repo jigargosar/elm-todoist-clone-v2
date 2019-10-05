@@ -854,45 +854,43 @@ viewTodoListItem :
     -> Model
     -> Todo
     -> H.Html Msg
-viewTodoListItem kind model =
+viewTodoListItem kind model todo =
     let
-        viewDueDateTodoItem : List Project -> Todo -> H.Html Msg
-        viewDueDateTodoItem projectList todo =
+        viewDueDateTodoItem =
             row [ A.class "hide-child relative" ]
                 [ viewTodoCheckbox todo
                 , viewTodoTitle todo
-                , viewTodoProjectPill projectList todo
-                , viewMoreMenuTriggerWithPopup todo
+                , viewTodoProjectPill model.projectList todo
+                , viewMoreMenuTriggerWithPopup
                 ]
 
-        viewMoreMenuTriggerWithPopup todo =
+        viewMoreMenuTriggerWithPopup =
             viewTodoMoreMenuTriggerWithPopup kind
                 todo
                 model
     in
     case kind of
         OverDueTodoList ->
-            viewDueDateTodoItem model.projectList
+            viewDueDateTodoItem
 
         DueAtTodoList _ ->
-            viewDueDateTodoItem model.projectList
+            viewDueDateTodoItem
 
         ProjectTodoList _ ->
-            viewProjectTodoItem model viewMoreMenuTriggerWithPopup
+            viewProjectTodoItem model viewMoreMenuTriggerWithPopup todo
 
         SearchResultTodoList _ ->
             let
-                viewSearchTodoItem : Date -> List Project -> Todo -> H.Html Msg
-                viewSearchTodoItem today projectList todo =
+                viewSearchTodoItem =
                     row [ A.class "hide-child relative" ]
                         [ viewTodoCheckbox todo
                         , viewTodoTitle todo
-                        , viewTodoDueDate today todo
-                        , viewTodoProjectPill projectList todo
-                        , viewMoreMenuTriggerWithPopup todo
+                        , viewTodoDueDate model.today todo
+                        , viewTodoProjectPill model.projectList todo
+                        , viewMoreMenuTriggerWithPopup
                         ]
             in
-            viewSearchTodoItem model.today model.projectList
+            viewSearchTodoItem
 
 
 onClickStopPropagation msg =
@@ -985,7 +983,7 @@ viewProjectTodoItem model viewContextMenu todo =
                 , viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoDueDate today todo
-                , viewContextMenu todo
+                , viewContextMenu
                 ]
 
         viewDropTarget rootClass =
