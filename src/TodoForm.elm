@@ -192,13 +192,13 @@ system { onSave, onCancel, toMsg } =
 
 
 viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
-viewTodoForm (Config { toMsg }) projectList (TodoForm meta initial model) =
+viewTodoForm (Config { toMsg }) projectList (TodoForm _ _ { title, maybeProjectId, maybeDueDate }) =
     H.form [ A.class "flex flex-column pa1", E.onSubmit Save ]
         [ col [ A.class "pv1" ]
-            [ ipt3 model.title TitleChanged [ A.autofocus True ]
+            [ ipt3 title TitleChanged [ A.autofocus True ]
             ]
-        , Project.viewSelectOne model.maybeProjectId ProjectChanged projectList
-        , viewDueDateInput model.maybeDueDate DueDateChanged
+        , Project.viewSelectOne maybeProjectId ProjectChanged projectList
+        , viewDueDateInput maybeDueDate DueDateChanged
         , row [ A.class "pv1" ] [ submit "Save" [], btn2 "Cancel" Cancel ]
         ]
         |> H.map toMsg
