@@ -404,7 +404,9 @@ update message model =
                     ( { model | auth = auth }, Cmd.none )
 
         OpenTodoContextMenu todoId ->
-            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId spSystem.model }, Cmd.none )
+            ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId spSystem.model }
+            , Cmd.none
+            )
 
         TodoContextMenuScheduleMsg msg_ ->
             model.maybeTodoContextMenu
