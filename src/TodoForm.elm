@@ -3,7 +3,6 @@ module TodoForm exposing
     , Msg
     , System
     , TodoForm
-    , getMeta
     , getProjectSortIdx
     , isAdding
     , isAddingForInitialDueDate
@@ -110,11 +109,6 @@ isAdd meta =
 
         _ ->
             False
-
-
-getMeta : TodoForm -> Maybe Meta
-getMeta =
-    unwrapMeta
 
 
 getProjectSortIdx : TodoForm -> Maybe Int
