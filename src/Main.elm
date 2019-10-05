@@ -12,7 +12,6 @@ import Html.Styled as H
 import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.Extra
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
@@ -20,6 +19,7 @@ import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
+import Result.Extra as RX
 import Return
 import SchedulePopup
 import Tagged exposing (Tagged)
@@ -405,14 +405,6 @@ update message model =
                             else
                                 dict
 
-                combineResult result =
-                    case result of
-                        Ok v ->
-                            v
-
-                        Err v ->
-                            v
-
                 tupleDecoder da db =
                     JD.map2 Tuple.pair (JD.index 0 da) (JD.index 1 db)
             in
@@ -435,8 +427,7 @@ update message model =
                         )
                         ( [], [] )
                     )
-                |> Result.mapError (\error -> ( [], [ JD.errorToString error ] ))
-                |> combineResult
+                |> RX.extract (\error -> ( [], [ JD.errorToString error ] ))
                 |> Tuple.mapBoth
                     (\todoList ->
                         { model

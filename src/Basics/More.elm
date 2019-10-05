@@ -1,4 +1,25 @@
-module Basics.More exposing (HasId, allPass, anyPass, appendOne, callWith, clampListIndex, clampListLength, eqBy, eqById, findById, flip, idEq, ifElse, insertAt, perform, propEq, uncurry, updateWhenIdEq, upsertById, when)
+module Basics.More exposing
+    ( HasId
+    , allPass
+    , anyPass
+    , appendOne
+    , callWith
+    , clampListIndex
+    , clampListLength
+    , eqBy
+    , eqById
+    , findById
+    , flip
+    , idEq
+    , ifElse
+    , insertAt
+    , perform
+    , propEq
+    , uncurry
+    , updateWhenIdEq
+    , upsertById
+    , when
+    )
 
 import List.Extra
 import Task

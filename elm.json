@@ -19,6 +19,7 @@
             "elm-community/json-extra": "4.1.0",
             "elm-community/list-extra": "8.2.2",
             "elm-community/maybe-extra": "5.0.0",
+            "elm-community/result-extra": "2.2.1",
             "joneshf/elm-tagged": "2.1.1",
             "justinmimbs/date": "3.2.0",
             "kalutheo/elm-ui-explorer": "3.0.2",
