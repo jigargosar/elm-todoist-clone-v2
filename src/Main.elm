@@ -285,7 +285,9 @@ init flags =
         model : Model
         model =
             { defaultModel
-                | todoList = cache.todoList
+                | todoList =
+                    cache.todoList
+                        |> LX.uniqueBy (.id >> TodoId.toString)
                 , projectList = cache.projectList
                 , route = cache.route
                 , seed = Random.initialSeed flags.now
@@ -380,17 +382,17 @@ update message model =
 
         OnFireTodoList value ->
             let
-                upsertIfNewer new l =
-                    case findById new.id l of
+                upsertIfNewer new list =
+                    case findById new.id list of
                         Nothing ->
-                            new :: l
+                            new :: list
 
                         Just old ->
                             if Todo.isNewerThan old new then
-                                new :: List.filter (eqById old) l
+                                new :: List.filter (eqById old) list
 
                             else
-                                new :: l
+                                list
             in
             case JD.decodeValue (JD.list Todo.decoder) value of
                 Err err ->
