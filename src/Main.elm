@@ -862,11 +862,11 @@ viewTodoListItem kind model =
                 [ viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoProjectPill projectList todo
-                , viewMoreTriggerWithMenu todo
+                , viewMoreMenuTriggerWithPopup todo
                 ]
 
-        viewMoreTriggerWithMenu todo =
-            viewTodoContextMenuWithTrigger kind
+        viewMoreMenuTriggerWithPopup todo =
+            viewTodoMoreMenuTriggerWithPopup kind
                 todo
                 model
     in
@@ -878,7 +878,7 @@ viewTodoListItem kind model =
             viewDueDateTodoItem model.projectList
 
         ProjectTodoList _ ->
-            viewProjectTodoItem model viewMoreTriggerWithMenu
+            viewProjectTodoItem model viewMoreMenuTriggerWithPopup
 
         SearchResultTodoList _ ->
             let
@@ -889,7 +889,7 @@ viewTodoListItem kind model =
                         , viewTodoTitle todo
                         , viewTodoDueDate today todo
                         , viewTodoProjectPill projectList todo
-                        , viewMoreTriggerWithMenu todo
+                        , viewMoreMenuTriggerWithPopup todo
                         ]
             in
             viewSearchTodoItem model.today model.projectList
@@ -899,8 +899,8 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-viewTodoContextMenuWithTrigger : TodoListKind -> Todo -> Model -> H.Html Msg
-viewTodoContextMenuWithTrigger kind todo model =
+viewTodoMoreMenuTriggerWithPopup : TodoListKind -> Todo -> Model -> H.Html Msg
+viewTodoMoreMenuTriggerWithPopup kind todo model =
     let
         insertAt offset =
             InsertTodoInProjectAtClicked (todo.projectSortIdx + offset) todo.maybeProjectId
