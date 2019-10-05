@@ -30,6 +30,13 @@ import UI exposing (btn2, btn3, btnDisabled, checkbox3, col, ipt3, row)
 
 
 
+-- ERROR
+
+
+port logError : String -> Cmd msg
+
+
+
 -- FIRE
 
 
@@ -370,16 +377,16 @@ update message model =
                 authStateDecoder =
                     JD.oneOf [ JD.null SignedOut, userDecoder |> JD.map SignedIn ]
 
-                auth =
-                    JD.decodeValue authStateDecoder value
-                        |> Result.mapError (Debug.log "decode err")
-                        |> Result.withDefault SignedOut
-
                 {- _ =
                    Debug.log "user" (JE.encode 2 value)
                 -}
             in
-            ( { model | auth = auth }, Cmd.none )
+            case JD.decodeValue authStateDecoder value of
+                Err err ->
+                    ( model, logError (JD.errorToString err) )
+
+                Ok auth ->
+                    ( { model | auth = auth }, Cmd.none )
 
         OpenTodoContextMenu todoId ->
             ( { model | maybeTodoContextMenu = Just <| TodoContextMenu todoId spSystem.model }, Cmd.none )
