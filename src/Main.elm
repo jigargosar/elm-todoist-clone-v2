@@ -822,16 +822,17 @@ viewTodoListContent kind model form todoList =
                         viewTodoItem todo
                 )
                 todoList
-
-        viewOnlyEditableTodoList =
-            MX.unpack (\_ -> List.map viewTodoItem todoList) viewEditTodoListForTodoId
     in
     case kind of
         OverDueTodoList ->
-            viewOnlyEditableTodoList info.edit
+            info.edit
+                |> Maybe.map viewEditTodoListForTodoId
+                |> Maybe.withDefault (List.map viewTodoItem todoList)
 
         SearchResultTodoList _ ->
-            viewOnlyEditableTodoList info.edit
+            info.edit
+                |> Maybe.map viewEditTodoListForTodoId
+                |> Maybe.withDefault (List.map viewTodoItem todoList)
 
         DueAtTodoList dueDate ->
             info.initialDueDate
