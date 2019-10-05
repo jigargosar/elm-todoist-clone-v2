@@ -823,11 +823,6 @@ viewTodoListContent kind model form todoList =
                 )
                 todoList
 
-        maybeEditTodoList : Maybe (List (H.Html Msg))
-        maybeEditTodoList =
-            info.edit
-                |> Maybe.map viewEditTodoListForTodoId
-
         viewOnlyEditableTodoList =
             MX.unpack (\_ -> List.map viewTodoItem todoList) viewEditTodoListForTodoId
 
@@ -865,30 +860,13 @@ viewTodoListContent kind model form todoList =
                 List.map viewTodoItem todoList ++ viewAddBtn
 
         ProjectTodoList _ ->
-            let
-                viewEditableTodo maybeViewFormFor todo =
-                    maybeViewFormFor todo.id
-                        |> MX.unpack (\_ -> viewTodoItem todo) identity
-
-                viewEditableTodoList maybeViewFormFor =
-                    List.map (viewEditableTodo maybeViewFormFor) todoList
-
-                _ =
-                    todoFormSys.viewEdit model.projectList form
-                        |> Maybe.map viewEditableTodoList
-            in
             if TodoForm.isAdding form then
                 List.map viewTodoItem todoList
                     ++ List.map viewTodoItem todoList
                     |> insertAt (TodoForm.getProjectSortIdx form |> Maybe.withDefault 0) (viewForm form)
 
             else if TodoForm.isEditing form then
-                List.map
-                    (\todo ->
-                        editFormForTodoId todo.id
-                            |> MX.unpack (\_ -> viewTodoItem todo) identity
-                    )
-                    todoList
+                viewOnlyEditableTodoList info.edit
 
             else
                 List.map viewTodoItem todoList ++ viewAddBtn
