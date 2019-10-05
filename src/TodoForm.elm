@@ -165,6 +165,7 @@ type alias Config msg =
 
 type alias System msg =
     { view : List Project -> TodoForm -> H.Html msg
+    , viewEdit : List Project -> TodoForm -> Maybe (TodoId -> Maybe (H.Html msg))
     , viewEditFor : TodoId -> List Project -> TodoForm -> Maybe (H.Html msg)
     , update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
     , info : TodoForm -> Info
@@ -178,6 +179,7 @@ type alias System msg =
 system : Config msg -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm toMsg
+    , viewEdit = viewEdit toMsg
     , viewEditFor = \todoId lp -> ifElse (isEditingFor todoId) (viewTodoForm toMsg lp >> Just) (always Nothing)
     , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
     , info = info
@@ -186,6 +188,23 @@ system { onSave, onCancel, toMsg } =
     , initEdit = initEdit
     , model = TodoForm Nothing
     }
+
+
+viewEdit : (Msg -> msg) -> List Project -> TodoForm -> Maybe (TodoId -> Maybe (H.Html msg))
+viewEdit toMsg pl ((TodoForm mi) as model) =
+    case mi of
+        Just ( Edit todoId, _, _ ) ->
+            Just
+                (\forTodoId ->
+                    if todoId == forTodoId then
+                        Just <| viewTodoForm toMsg pl model
+
+                    else
+                        Nothing
+                )
+
+        _ ->
+            Nothing
 
 
 mapCurrent_ : (Fields -> Fields) -> Internal -> Internal
