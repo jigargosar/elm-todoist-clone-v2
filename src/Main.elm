@@ -382,7 +382,7 @@ update message model =
             ( model, signIn () )
 
         SignOutClicked ->
-            ( model, signOut () )
+            ( { model | todoDict = TaggedDict.empty }, signOut () )
 
         PushAll ->
             ( model, pushTodoListCmd (TaggedDict.values model.todoDict) )
