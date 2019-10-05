@@ -158,6 +158,8 @@ type Msg
     | TitleChanged String
     | ProjectChanged (Maybe ProjectId)
     | DueDateChanged (Maybe Date)
+    | Save
+    | Cancel
 
 
 update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
@@ -174,6 +176,12 @@ update message ((TodoForm meta initial current) as model) =
 
         DueDateChanged maybeDueDate ->
             ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
+
+        Save ->
+            ( model, Cmd.none )
+
+        Cancel ->
+            ( model, Cmd.none )
 
 
 system : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> System msg
