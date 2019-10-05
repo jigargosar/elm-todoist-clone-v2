@@ -7,7 +7,6 @@ import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD
 import Maybe.Extra as MX
-import Task
 import UI exposing (btn2, col)
 
 
