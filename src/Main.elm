@@ -840,9 +840,9 @@ viewTodoListContent kind model form todoList =
                     (\_ ->
                         info.add
                             |> Maybe.map (\_ -> List.map viewTodoItem todoList ++ [ viewForm form ])
-                            |> MX.orElseLazy (\_ -> info.edit |> Maybe.map viewEditTodoListForTodoId)
+                            |> MX.orElse (info.edit |> Maybe.map viewEditTodoListForTodoId)
                     )
-                |> MX.unpack (\_ -> List.map viewTodoItem todoList ++ viewAddBtn) identity
+                |> Maybe.withDefault (List.map viewTodoItem todoList ++ viewAddBtn)
 
         ProjectTodoList _ ->
             info.add
@@ -850,8 +850,8 @@ viewTodoListContent kind model form todoList =
                     (\projectSortIdx ->
                         List.map viewTodoItem todoList |> insertAt projectSortIdx (viewForm form)
                     )
-                |> MX.orElseLazy (\_ -> info.edit |> Maybe.map viewEditTodoListForTodoId)
-                |> MX.unpack (\_ -> List.map viewTodoItem todoList ++ viewAddBtn) identity
+                |> MX.orElse (info.edit |> Maybe.map viewEditTodoListForTodoId)
+                |> Maybe.withDefault (List.map viewTodoItem todoList ++ viewAddBtn)
 
 
 viewTodoListItem :
