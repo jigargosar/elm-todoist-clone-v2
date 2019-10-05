@@ -28,7 +28,7 @@ export default {
     return auth.signOut()
   },
   setAll(name, docs) {
-    invariant(isEmpty(name.trim()))
+    invariant(!isEmpty(name.trim()))
     invariant(docs instanceof Array)
     const uid = auth.currentUser.uid
     const cr = db.collection(
