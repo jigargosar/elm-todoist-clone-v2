@@ -604,10 +604,6 @@ patchTodo todoId patches =
     Time.now |> Task.perform (ApplyTodoPatches todoId patches)
 
 
-
---saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
-
-
 sortedTodoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
 sortedTodoListForMaybeProjectId maybeProjectId =
     List.filter (propEq .maybeProjectId maybeProjectId)
