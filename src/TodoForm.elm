@@ -186,17 +186,14 @@ system { onSave, onCancel, toMsg } =
 viewTodoForm : Config msg -> List Project -> TodoForm -> H.Html msg
 viewTodoForm (Config { onSave, onCancel, toMsg }) projectList (TodoForm meta initial model) =
     let
-        onChange =
-            toMsg << Patch << TodoForm meta initial
+        titleChanged =
+            toMsg << TitleChanged
 
-        titleChanged title =
-            onChange { model | title = title }
+        projectChanged =
+            toMsg << ProjectChanged
 
-        projectChanged maybeProjectId =
-            onChange { model | maybeProjectId = maybeProjectId }
-
-        dueDateChanged maybeDueDate =
-            onChange { model | maybeDueDate = maybeDueDate }
+        dueDateChanged =
+            toMsg << DueDateChanged
     in
     H.form [ A.class "flex flex-column pa1", E.onSubmit onSave ]
         [ col [ A.class "pv1" ]
