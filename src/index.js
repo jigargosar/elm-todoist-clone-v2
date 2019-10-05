@@ -27,7 +27,7 @@ fire.onAuthStateChanged(data =>
 
 fire.onUserCollection('todos', s => {
   console.debug('snap', s)
-  pubOnFireTodoList(s.docs.map(ds => ds.data()))
+  pubOnFireTodoList(s.docs.map(ds => [ds.id, ds.data()]))
 })
 
 sub(
