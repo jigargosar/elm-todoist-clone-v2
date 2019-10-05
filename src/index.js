@@ -42,6 +42,7 @@ sub('signIn', fire.signIn, app)
 sub('signOut', fire.signOut, app)
 sub('logError', err => console.error('Elm:', err), app)
 sub('firePushTodoList', todoList => fire.setAll('todos', todoList), app)
+sub('fireDeleteTodoId', todoId => fire.delete('todos', todoId), app)
 
 function sub(name, fn, app) {
   const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)

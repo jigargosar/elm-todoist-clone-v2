@@ -35,6 +35,10 @@ export default {
   signOut() {
     return auth.signOut()
   },
+  delete(name, docId) {
+    const cr = userCollectionRef(name)
+    return cr.doc(docId).delete()
+  },
   setAll(name, docs) {
     invariant(is(Array, docs))
     const cr = userCollectionRef(name)
