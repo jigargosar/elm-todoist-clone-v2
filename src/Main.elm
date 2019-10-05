@@ -385,7 +385,7 @@ update message model =
             ( { model | todoDict = TaggedDict.empty }, signOut () )
 
         PushAll ->
-            ( model, pushTodoListCmd (TaggedDict.values model.todoDict) )
+            ( model, firePushTodoListCmd (TaggedDict.values model.todoDict) )
 
         OnFireTodoList value ->
             let
@@ -511,9 +511,7 @@ update message model =
             )
 
         InsertTodoWithPatches patches now ->
-            ( HasSeed.step (Todo.generator now patches) model |> uncurry insertTodo
-            , Cmd.none
-            )
+            HasSeed.step (Todo.generator now patches) model |> uncurry insertTodo
 
         ApplyTodoPatches todoId patches now ->
             applyTodoPatchesWithNow todoId now patches model
@@ -622,12 +620,12 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
     ( { model
         | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
       }
-    , pushTodoListCmd projectTodoList
+    , firePushTodoListCmd projectTodoList
     )
 
 
-pushTodoListCmd : List Todo -> Cmd msg
-pushTodoListCmd =
+firePushTodoListCmd : List Todo -> Cmd msg
+firePushTodoListCmd =
     firePushTodoList << JE.list Todo.encoder
 
 
@@ -639,9 +637,11 @@ insertTodo todo model =
                 |> (\( l, r ) -> l ++ [ todo ] ++ r)
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
-    { model
+    ( { model
         | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) model.todoDict projectTodoList
-    }
+      }
+    , firePushTodoListCmd projectTodoList
+    )
 
 
 subscriptions : Model -> Sub Msg
