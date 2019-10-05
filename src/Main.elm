@@ -807,46 +807,46 @@ viewTodoListContent kind model form todoList =
                 )
                 todoList
 
-        todoListHtml =
+        defaultHtmlList =
             List.map viewTodoItem todoList
 
-        todoListHtmlWithAddButton =
-            todoListHtml ++ viewAddTodoButtonFor kind
+        htmlWithAddBtn =
+            defaultHtmlList ++ viewAddTodoButtonFor kind
 
-        maybeTodoListHtmlWithEditForm =
+        maybeHtmlListForEdit =
             Maybe.map viewEditTodoListForTodoId info.edit
     in
     case kind of
         OverDueTodoList ->
-            maybeTodoListHtmlWithEditForm
-                |> Maybe.withDefault todoListHtml
+            maybeHtmlListForEdit
+                |> Maybe.withDefault defaultHtmlList
 
         SearchResultTodoList _ ->
-            maybeTodoListHtmlWithEditForm
-                |> Maybe.withDefault todoListHtml
+            maybeHtmlListForEdit
+                |> Maybe.withDefault defaultHtmlList
 
         DueAtTodoList dueDate ->
             let
-                maybeHtmlForAdd =
-                    Maybe.map (\_ -> appendOne formHtml todoListHtml) info.add
+                maybeHtmlListForAdd =
+                    Maybe.map (\_ -> appendOne formHtml defaultHtmlList) info.add
             in
             info.initialDueDate
                 |> MX.filter ((==) dueDate)
                 |> Maybe.andThen
                     (\_ ->
-                        maybeHtmlForAdd
-                            |> MX.orElse maybeTodoListHtmlWithEditForm
+                        maybeHtmlListForAdd
+                            |> MX.orElse maybeHtmlListForEdit
                     )
-                |> Maybe.withDefault todoListHtmlWithAddButton
+                |> Maybe.withDefault htmlWithAddBtn
 
         ProjectTodoList _ ->
             let
-                maybeHtmlForAdd =
-                    Maybe.map (\projectSortIdx -> insertAt projectSortIdx formHtml todoListHtml) info.add
+                maybeHtmlListForAdd =
+                    Maybe.map (\projectSortIdx -> insertAt projectSortIdx formHtml defaultHtmlList) info.add
             in
-            maybeHtmlForAdd
-                |> MX.orElse maybeTodoListHtmlWithEditForm
-                |> Maybe.withDefault todoListHtmlWithAddButton
+            maybeHtmlListForAdd
+                |> MX.orElse maybeHtmlListForEdit
+                |> Maybe.withDefault htmlWithAddBtn
 
 
 viewTodoListItem :
