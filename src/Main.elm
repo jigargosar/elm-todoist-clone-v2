@@ -22,6 +22,7 @@ import Html.Styled as H
 import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
+import Json.Decode.More as JDM
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
@@ -414,11 +415,8 @@ update message model =
 
                             else
                                 dict
-
-                tupleDecoder da db =
-                    JD.map2 Tuple.pair (JD.index 0 da) (JD.index 1 db)
             in
-            JD.decodeValue (JD.list (tupleDecoder JD.string JD.value)) value
+            JD.decodeValue (JD.list (JDM.tuple JD.string JD.value)) value
                 |> Result.map
                     (List.foldr
                         (\( todoIdStr, todoValue ) ( todoList, errorList ) ->
