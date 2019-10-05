@@ -452,7 +452,14 @@ update message model =
                     ( model, Cmd.none )
 
         Save meta patches ->
-            saveTodoForm meta patches model
+            ( { model | maybeTodoForm = Nothing }
+            , case meta of
+                TodoForm.Add ->
+                    Time.now |> Task.perform (InsertTodoWithPatches patches)
+
+                TodoForm.Edit todoId ->
+                    applyTodoPatches todoId patches
+            )
 
         Cancel ->
             ( { model | maybeTodoForm = Nothing }, Cmd.none )
@@ -477,17 +484,6 @@ applyTodoPatches todoId todoPatches =
 
 
 --saveTodoForm : TodoForm -> Model -> ( Model, Cmd Msg )
-
-
-saveTodoForm meta patches model =
-    ( { model | maybeTodoForm = Nothing }
-    , case meta of
-        TodoForm.Add ->
-            Time.now |> Task.perform (InsertTodoWithPatches patches)
-
-        TodoForm.Edit todoId ->
-            applyTodoPatches todoId patches
-    )
 
 
 sortedTodoListForMaybeProjectId : Maybe ProjectId -> List Todo -> List Todo
