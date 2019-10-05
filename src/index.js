@@ -12,6 +12,12 @@ const app = Elm.Main.init({
   node: document.getElementById('root'),
 })
 
+import fire from './fire'
+
+const pubOnAuthStateChanged = data => pub('onAuthStateChanged', data, app)
+
+fire.onAuthStateChanged(pubOnAuthStateChanged)
+
 sub(
   'setCache',
   cacheString => {
@@ -21,11 +27,19 @@ sub(
 )
 
 function sub(name, fn, app) {
-
   const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)
   if (!subscribe) {
     console.warn('Port not found : ', name)
     return
   }
   subscribe(fn)
+}
+
+function pub(name, data, app) {
+  const send = pathOr(null, ['ports', name, 'send'])(app)
+  if (!send) {
+    console.warn('Port not found : ', name)
+    return
+  }
+  send(data)
 }
