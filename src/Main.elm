@@ -412,20 +412,26 @@ update message model =
                         Err v ->
                             v
             in
-            JD.decodeValue (JD.list JD.value) todoListValue
+            JD.decodeValue (JD.keyValuePairs JD.value) todoListValue
                 |> Result.map
                     (List.foldr
-                        (\todoValue ( todoList, errorList ) ->
+                        (\( todoIdStr, todoValue ) ( todoList, errorList ) ->
                             case JD.decodeValue Todo.decoder todoValue of
                                 Ok todo ->
                                     ( todo :: todoList, errorList )
 
                                 Err error ->
-                                    ( todoList, error :: errorList )
+                                    ( todoList
+                                    , ("Error Decoding TodoId:"
+                                        ++ todoIdStr
+                                        ++ JD.errorToString error
+                                      )
+                                        :: errorList
+                                    )
                         )
                         ( [], [] )
                     )
-                |> Result.mapError (\error -> ( [], [ error ] ))
+                |> Result.mapError (\error -> ( [], [ JD.errorToString error ] ))
                 |> combineResult
                 |> Tuple.mapBoth
                     (\todoList ->
@@ -434,10 +440,7 @@ update message model =
                                 List.foldl upsertIfNewer model.todoDict todoList
                         }
                     )
-                    (\errorList ->
-                        List.map (JD.errorToString >> logError) errorList
-                            |> Cmd.batch
-                    )
+                    (List.map logError >> Cmd.batch)
 
         OnAuthStateChanged value ->
             let
