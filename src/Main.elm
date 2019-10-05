@@ -1,11 +1,9 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, appendOne, eqById, findById, idEq, insertAt, propEq, uncurry, updateWhenIdEq, upsertById)
+import Basics.More exposing (HasId, allPass, appendOne, idEq, insertAt, propEq, uncurry, updateWhenIdEq)
 import Browser
 import Browser.Events
 import Date exposing (Date)
-import Dict
-import Dict.Extra
 import DnDList
 import HasSeed
 import Html
@@ -23,12 +21,14 @@ import ProjectId exposing (ProjectId)
 import Random
 import Return
 import SchedulePopup
+import Tagged exposing (Tagged)
+import Tagged.Dict as TaggedDict exposing (TaggedDict)
 import Task
 import Time exposing (Posix)
 import Todo exposing (Todo)
 import TodoForm exposing (TodoForm)
-import TodoId exposing (TodoId)
-import UI exposing (btn2, btn3, btnDisabled, checkbox3, col, ipt3, row)
+import TodoId exposing (TodoId, TodoIdDict)
+import UI exposing (btn2, btnDisabled, checkbox3, col, ipt3, row)
 
 
 
@@ -169,7 +169,7 @@ cacheModel_ model =
         modelEncoder : Model -> Value
         modelEncoder m =
             object
-                [ ( "todoList", JE.list Todo.encoder m.todoList )
+                [ ( "todoList", JE.list Todo.encoder (TaggedDict.values m.todoDict) )
                 , ( "projectList", JE.list Project.encoder m.projectList )
                 , ( "route", routeEncoder m.route )
                 ]
@@ -234,7 +234,7 @@ type alias TodoContextMenu =
 type alias Model =
     { dnd : DnDList.Model
     , auth : AuthState
-    , todoList : List Todo
+    , todoDict : TodoIdDict Todo
     , projectList : List Project
     , todoForm : TodoForm
     , maybeTodoContextMenu : Maybe TodoContextMenu
@@ -245,11 +245,18 @@ type alias Model =
     }
 
 
+taggedDictFromListBy : (v -> Tagged tag comparable) -> List v -> TaggedDict tag comparable v
+taggedDictFromListBy func list =
+    List.map (\a -> ( func a, a )) list
+        |> TaggedDict.fromList
+
+
 defaultModel : Model
 defaultModel =
     { dnd = dndSystem.model
     , auth = Unknown
-    , todoList = defaultCacheValue.todoList
+    , todoDict =
+        defaultCacheValue.todoList |> taggedDictFromListBy .id
     , projectList = defaultCacheValue.projectList
     , todoForm = todoFormSys.model
     , maybeTodoContextMenu = Nothing
@@ -267,7 +274,7 @@ generateMockModel =
         gen =
             Random.map2
                 (\todoList projectList ->
-                    { defaultModel | todoList = todoList, projectList = projectList }
+                    { defaultModel | todoDict = taggedDictFromListBy .id todoList, projectList = projectList }
                 )
                 Todo.mockListGenerator
                 Project.mockListGenerator
@@ -287,9 +294,8 @@ init flags =
         model : Model
         model =
             { defaultModel
-                | todoList =
-                    cache.todoList
-                        |> LX.uniqueBy (.id >> TodoId.toString)
+                | todoDict =
+                    taggedDictFromListBy .id cache.todoList
                 , projectList = cache.projectList
                 , route = cache.route
                 , seed = Random.initialSeed flags.now
@@ -317,9 +323,8 @@ getToday =
     Date.today |> Task.perform GotToday
 
 
-mapTodoList : (small -> small) -> { big | todoList : small } -> { big | todoList : small }
-mapTodoList func model =
-    { model | todoList = func model.todoList }
+mapTodoDict func model =
+    { model | todoDict = func model.todoDict }
 
 
 setTodoForm form model =
@@ -380,21 +385,21 @@ update message model =
             ( model, signOut () )
 
         PushAll ->
-            ( model, pushTodoListCmd model.todoList )
+            ( model, pushTodoListCmd (TaggedDict.values model.todoDict) )
 
         OnFireTodoList value ->
             let
-                upsertIfNewer new list =
-                    case findById new.id list of
+                upsertIfNewer new dict =
+                    case TaggedDict.get new.id dict of
                         Nothing ->
-                            new :: list
+                            TaggedDict.insert new.id new dict
 
                         Just old ->
                             if Todo.isNewerThan old new then
-                                new :: List.filter (eqById old) list
+                                TaggedDict.insert new.id new dict
 
                             else
-                                list
+                                dict
             in
             case JD.decodeValue (JD.list Todo.decoder) value of
                 Err err ->
@@ -402,9 +407,9 @@ update message model =
 
                 Ok todoList ->
                     ( { model
-                        | todoList =
+                        | todoDict =
                             todoList
-                                |> List.foldl upsertIfNewer model.todoList
+                                |> List.foldl upsertIfNewer model.todoDict
                       }
                     , Cmd.none
                     )
@@ -473,7 +478,7 @@ update message model =
                 Just maybeProjectId ->
                     let
                         projectTodoList =
-                            sortedTodoListForMaybeProjectId maybeProjectId model.todoList
+                            sortedTodoListForMaybeProjectId maybeProjectId (TaggedDict.values model.todoDict)
 
                         ( draggable, newProjectTodoList ) =
                             dndSystem.update dndMsg model.dnd projectTodoList
@@ -483,7 +488,7 @@ update message model =
                     in
                     ( { model
                         | dnd = draggable
-                        , todoList = List.foldr (\t -> LX.setIf (eqById t) t) model.todoList updatedTodoList
+                        , todoDict = List.foldr (\t -> TaggedDict.insert t.id t) model.todoDict updatedTodoList
                       }
                     , dndSystem.commands model.dnd
                     )
@@ -501,7 +506,7 @@ update message model =
             refreshModel { model | route = route, todoForm = todoFormSys.model }
 
         DeleteTodo todoId ->
-            ( model |> mapTodoList (List.filter (idEq todoId >> not))
+            ( model |> mapTodoDict (TaggedDict.filter (\_ -> idEq todoId >> not))
             , Cmd.none
             )
 
@@ -558,7 +563,7 @@ update message model =
 
 patchTodoProjectSortIdxBy : Int -> TodoId -> Model -> Cmd Msg
 patchTodoProjectSortIdxBy offset todoId model =
-    findById todoId model.todoList
+    TaggedDict.get todoId model.todoDict
         |> Maybe.map (.projectSortIdx >> (+) offset >> Todo.ProjectSortIdx >> patchTodo todoId)
         |> Maybe.withDefault Cmd.none
 
@@ -585,7 +590,7 @@ sortedTodoListForMaybeProjectId maybeProjectId =
 
 applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> ( Model, Cmd Msg )
 applyTodoPatchesWithNow todoId now patches model =
-    findById todoId model.todoList
+    TaggedDict.get todoId model.todoDict
         |> Maybe.map
             (applyTodoPatchesWithNowHelp now patches model)
         |> Maybe.withDefault ( model, Cmd.none )
@@ -600,22 +605,22 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
         projectTodoList =
             if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
                 (newTodo
-                    :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId model.todoList
+                    :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId (TaggedDict.values model.todoDict)
                 )
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
             else
-                model.todoList
+                TaggedDict.values model.todoDict
                     |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
                     |> updateWhenIdEq newTodo.id (always newTodo)
                     |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
                     |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
         todoListWithoutOldTodo =
-            List.filter (idEq oldTodo.id >> not) model.todoList
+            TaggedDict.remove oldTodo.id model.todoDict
     in
     ( { model
-        | todoList = List.foldl upsertById todoListWithoutOldTodo projectTodoList
+        | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
       }
     , pushTodoListCmd projectTodoList
     )
@@ -629,13 +634,13 @@ pushTodoListCmd =
 insertTodo todo model =
     let
         projectTodoList =
-            sortedTodoListForMaybeProjectId todo.maybeProjectId model.todoList
+            sortedTodoListForMaybeProjectId todo.maybeProjectId (TaggedDict.values model.todoDict)
                 |> LX.splitAt todo.projectSortIdx
                 |> (\( l, r ) -> l ++ [ todo ] ++ r)
                 |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
     in
     { model
-        | todoList = List.foldl upsertById model.todoList projectTodoList
+        | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) model.todoDict projectTodoList
     }
 
 
@@ -807,7 +812,7 @@ viewTodoListSection kind model =
     let
         todoList : List Todo
         todoList =
-            todoListFor kind model model.todoList
+            todoListFor kind model (TaggedDict.values model.todoDict)
 
         hideWhenEmpty =
             case kind of

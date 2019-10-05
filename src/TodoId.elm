@@ -1,33 +1,52 @@
-module TodoId exposing (TodoId, encoder, decoder, toString ,fromString, generator)
+module TodoId exposing (TodoId, TodoIdDict, decoder, encoder, fromString, generator, toString)
 
-import Json.Encode as JE exposing(Value)
-import Json.Decode as JD exposing(Decoder)
+import Json.Decode as JD exposing (Decoder)
+import Json.Encode as JE exposing (Value)
 import Random
+import Tagged exposing (Tagged, tag, untag)
+import Tagged.Dict exposing (TaggedDict)
 
-type TodoId =
-    TodoId String
-    
 
-encoder: TodoId -> Value
-encoder (TodoId v) = 
-    JE.string v
+type TodoIdTag
+    = TodoIdTag
 
-decoder: Decoder TodoId
-decoder = 
-  JD.map TodoId JD.string
-  
-toString: TodoId -> String
-toString (TodoId s) = 
-  s
-  
-fromString: String -> Maybe TodoId
+
+type alias TodoId =
+    Tagged TodoIdTag String
+
+
+type alias TodoIdDict q =
+    TaggedDict TodoIdTag String q
+
+
+encoder : TodoId -> Value
+encoder =
+    untag >> JE.string
+
+
+decoder : Decoder TodoId
+decoder =
+    JD.map tag JD.string
+
+
+toString : TodoId -> String
+toString =
+    untag
+
+
+fromString : String -> Maybe TodoId
 fromString =
-  String.trim
-  >> \s -> if String.isEmpty s then Nothing else Just (TodoId s)
+    String.trim
+        >> (\s ->
+                if String.isEmpty s then
+                    Nothing
 
-generator: Random.Generator TodoId
-generator = 
-  Random.int (10 ^ 3) (10 ^ 5)
-  |> Random.map (String.fromInt >> (++) "TodoId-" >> TodoId)
+                else
+                    Just (tag s)
+           )
 
-  
+
+generator : Random.Generator TodoId
+generator =
+    Random.int (10 ^ 3) (10 ^ 5)
+        |> Random.map (String.fromInt >> (++) "TodoId-" >> tag)
