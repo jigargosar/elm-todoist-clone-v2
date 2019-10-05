@@ -56,11 +56,6 @@ unwrapMeta_ ( meta, _, _ ) =
     meta
 
 
-unwrapCurrent_ : Internal -> Fields
-unwrapCurrent_ ( _, _, current ) =
-    current
-
-
 unwrapMeta : TodoForm -> Maybe Meta
 unwrapMeta =
     unwrap >> Maybe.map unwrapMeta_
