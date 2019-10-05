@@ -801,6 +801,11 @@ todoFormConfig =
     TodoForm.createConfig { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
 
 
+todoFormSys : TodoForm.System Msg
+todoFormSys =
+    TodoForm.system { onSave = Save, onCancel = Cancel, toMsg = PatchTodoForm }
+
+
 viewTodoListContent :
     TodoListKind
     -> Model

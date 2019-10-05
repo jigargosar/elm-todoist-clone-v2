@@ -1,6 +1,7 @@
 module TodoForm exposing
     ( Config
     , Meta(..)
+    , System
     , TodoForm
     , createConfig
     , getMeta
@@ -10,6 +11,7 @@ module TodoForm exposing
     , isAddingForInitialDueDate
     , isEditingFor
     , setProjectSortIdxIfAdding
+    , system
     , toPatchesWithMeta
     , viewTodoForm
     )
@@ -141,6 +143,11 @@ createConfig =
     Config
 
 
+type alias System msg =
+    { view : List Project -> TodoForm -> H.Html msg }
+
+
+system : { onSave : msg, onCancel : msg, toMsg : TodoForm -> msg } -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm <| createConfig { onSave = onSave, onCancel = onCancel, toMsg = toMsg }
     }
