@@ -375,8 +375,9 @@ update message model =
                         |> Result.mapError (Debug.log "decode err")
                         |> Result.withDefault SignedOut
 
-                _ =
-                    Debug.log "user" (JE.encode 2 value)
+                {- _ =
+                   Debug.log "user" (JE.encode 2 value)
+                -}
             in
             ( { model | auth = auth }, Cmd.none )
 
