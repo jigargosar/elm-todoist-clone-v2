@@ -15,7 +15,7 @@ module TodoForm exposing
     , viewTodoForm
     )
 
-import Basics.More exposing (allPass, propEq)
+import Basics.More exposing (allPass, perform, propEq)
 import Date exposing (Date)
 import Html.Styled as H
 import Html.Styled.Attributes as A
@@ -162,8 +162,8 @@ type Msg
     | Cancel
 
 
-update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
-update message ((TodoForm meta initial current) as model) =
+update : { onSave : Cmd msg, onCancel : Cmd msg } -> Msg -> TodoForm -> ( TodoForm, Cmd msg )
+update { onSave, onCancel } message ((TodoForm meta initial current) as model) =
     case message of
         Patch m ->
             ( m, Cmd.none )
@@ -178,16 +178,16 @@ update message ((TodoForm meta initial current) as model) =
             ( mapCurrent (\f -> { f | maybeDueDate = maybeDueDate }) model, Cmd.none )
 
         Save ->
-            ( model, Cmd.none )
+            ( model, onSave )
 
         Cancel ->
-            ( model, Cmd.none )
+            ( model, onCancel )
 
 
 system : { onSave : msg, onCancel : msg, toMsg : Msg -> msg } -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm <| createConfig { onSave = onSave, onCancel = onCancel, toMsg = toMsg }
-    , update = update
+    , update = update { onSave = perform onSave, onCancel = perform onCancel }
     }
 
 
