@@ -808,15 +808,17 @@ viewTodoListContent kind model form todoList =
         viewForm =
             todoFormSys.view model.projectList
 
+        editFormForTodoId : TodoId -> Maybe (H.Html Msg)
         editFormForTodoId todoId =
-            todoFormSys.viewEditFor todoId model.projectList form
+            todoFormSys.viewEdit model.projectList form
+                |> Maybe.andThen (\fn -> fn todoId)
     in
     case kind of
         OverDueTodoList ->
             List.map
                 (\todo ->
                     editFormForTodoId todo.id
-                        |> MX.unpack (\_ -> viewTodoItem todo) identity
+                        |> Maybe.withDefault (viewTodoItem todo)
                 )
                 todoList
 
@@ -824,7 +826,7 @@ viewTodoListContent kind model form todoList =
             List.map
                 (\todo ->
                     editFormForTodoId todo.id
-                        |> MX.unpack (\_ -> viewTodoItem todo) identity
+                        |> Maybe.withDefault (viewTodoItem todo)
                 )
                 todoList
 
