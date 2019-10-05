@@ -789,9 +789,6 @@ viewTodoListContent kind model form todoList =
         viewTodoItem =
             viewTodoListItem kind model
 
-        viewAddBtn =
-            viewAddTodoButtonFor kind
-
         formHtml =
             todoFormSys.view model.projectList form
 
@@ -813,6 +810,9 @@ viewTodoListContent kind model form todoList =
         todoListHtml =
             List.map viewTodoItem todoList
 
+        todoListHtmlWithAddBtn =
+            todoListHtml ++ viewAddTodoButtonFor kind
+
         maybeEditTodoListHtml =
             Maybe.map viewEditTodoListForTodoId info.edit
     in
@@ -833,7 +833,7 @@ viewTodoListContent kind model form todoList =
                         Maybe.map (\_ -> appendOne formHtml todoListHtml) info.add
                             |> MX.orElse maybeEditTodoListHtml
                     )
-                |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
+                |> Maybe.withDefault todoListHtmlWithAddBtn
 
         ProjectTodoList _ ->
             info.add
@@ -842,7 +842,7 @@ viewTodoListContent kind model form todoList =
                         insertAt projectSortIdx formHtml todoListHtml
                     )
                 |> MX.orElse maybeEditTodoListHtml
-                |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
+                |> Maybe.withDefault todoListHtmlWithAddBtn
 
 
 viewTodoListItem :
