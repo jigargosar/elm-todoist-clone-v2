@@ -3,11 +3,6 @@ module TodoForm exposing
     , Msg
     , System
     , TodoForm
-    , getProjectSortIdx
-    , initialDueDateEq
-    , isAdding
-    , isEditing
-    , isEditingFor
     , system
     , viewTodoForm
     )
@@ -76,66 +71,6 @@ unwrap (TodoForm model) =
     model
 
 
-isEditingFor : TodoId -> TodoForm -> Bool
-isEditingFor todoId =
-    unwrap >> MX.unwrap False (unwrapMeta_ >> (==) (Edit todoId))
-
-
-isEditing : TodoForm -> Bool
-isEditing =
-    unwrap >> MX.unwrap False (unwrapMeta_ >> isEdit)
-
-
-isAdding : TodoForm -> Bool
-isAdding =
-    unwrap >> MX.unwrap False (unwrapMeta_ >> isAdd)
-
-
-isEdit : Meta -> Bool
-isEdit meta =
-    case meta of
-        Edit _ ->
-            True
-
-        _ ->
-            False
-
-
-isAdd : Meta -> Bool
-isAdd meta =
-    case meta of
-        Add ->
-            True
-
-        _ ->
-            False
-
-
-getProjectSortIdx : TodoForm -> Maybe Int
-getProjectSortIdx =
-    unwrapCurrent >> Maybe.map .projectSortIdx
-
-
-initialDueDateEq : Date -> TodoForm -> Bool
-initialDueDateEq dueDate =
-    unwrapInitial >> MX.unwrap False (propEq .maybeDueDate (Just dueDate))
-
-
-unwrapCurrent : TodoForm -> Maybe Fields
-unwrapCurrent =
-    unwrap >> Maybe.map unwrapCurrent_
-
-
-unwrapInitial_ : Internal -> Fields
-unwrapInitial_ ( _, initial, _ ) =
-    initial
-
-
-unwrapInitial : TodoForm -> Maybe Fields
-unwrapInitial =
-    unwrap >> Maybe.map unwrapInitial_
-
-
 empty : Fields
 empty =
     Fields "" Nothing Nothing Random.maxInt
@@ -163,7 +98,6 @@ type alias Config msg =
 type alias System msg =
     { view : List Project -> TodoForm -> H.Html msg
     , viewEdit : List Project -> TodoForm -> Maybe (TodoId -> Maybe (H.Html msg))
-    , viewEditFor : TodoId -> List Project -> TodoForm -> Maybe (H.Html msg)
     , update : Msg -> TodoForm -> ( TodoForm, Cmd msg )
     , info : TodoForm -> Info
     , initAddForProject : Maybe ProjectId -> Int -> TodoForm
@@ -177,13 +111,52 @@ system : Config msg -> System msg
 system { onSave, onCancel, toMsg } =
     { view = viewTodoForm toMsg
     , viewEdit = viewEdit toMsg
-    , viewEditFor = \todoId lp -> ifElse (isEditingFor todoId) (viewTodoForm toMsg lp >> Just) (always Nothing)
     , update = update { onSave = \m p -> perform <| onSave m p, onCancel = perform onCancel }
     , info = info
     , initAddForProject = \maybeProjectId projectSortIdx -> initAdd (\d -> { d | maybeProjectId = maybeProjectId, projectSortIdx = projectSortIdx })
     , initAddForDueDate = \dueDate -> initAdd (\d -> { d | maybeDueDate = Just dueDate })
     , initEdit = initEdit
     , model = TodoForm Nothing
+    }
+
+
+type alias Info =
+    { edit : Maybe TodoId
+    , add : Maybe Int
+    , initialDueDate : Maybe Date
+    }
+
+
+info : TodoForm -> Info
+info model =
+    { edit =
+        unwrapMeta model
+            |> Maybe.andThen
+                (\m ->
+                    case m of
+                        Edit ti ->
+                            Just ti
+
+                        _ ->
+                            Nothing
+                )
+    , add =
+        unwrap model
+            |> Maybe.andThen
+                (\( m, i, c ) ->
+                    case m of
+                        Add ->
+                            Just c.projectSortIdx
+
+                        _ ->
+                            Nothing
+                )
+    , initialDueDate =
+        unwrap model
+            |> Maybe.andThen
+                (\( _, i, _ ) ->
+                    i.maybeDueDate
+                )
     }
 
 
@@ -248,46 +221,6 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
 
         Cancel ->
             mi |> MX.unwrap ( model, Cmd.none ) (always ( TodoForm Nothing, onCancel ))
-
-
-type alias Info =
-    { edit : Maybe TodoId
-    , add : Maybe Int
-    , initialDueDate : Maybe Date
-    }
-
-
-info : TodoForm -> Info
-info model =
-    { edit =
-        unwrapMeta model
-            |> Maybe.andThen
-                (\m ->
-                    case m of
-                        Edit ti ->
-                            Just ti
-
-                        _ ->
-                            Nothing
-                )
-    , add =
-        unwrap model
-            |> Maybe.andThen
-                (\( m, i, c ) ->
-                    case m of
-                        Add ->
-                            Just c.projectSortIdx
-
-                        _ ->
-                            Nothing
-                )
-    , initialDueDate =
-        unwrap model
-            |> Maybe.andThen
-                (\( _, i, _ ) ->
-                    i.maybeDueDate
-                )
-    }
 
 
 viewTodoForm : (Msg -> msg) -> List Project -> TodoForm -> H.Html msg
