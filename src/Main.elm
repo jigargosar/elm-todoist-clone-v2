@@ -862,15 +862,10 @@ viewTodoListItem kind model =
                 [ viewTodoCheckbox todo
                 , viewTodoTitle todo
                 , viewTodoProjectPill projectList todo
-                , viewCommonMoreMenu todo
+                , viewMoreTriggerWithMenu todo
                 ]
 
-        viewCommonMoreMenu todo =
-            viewTodoContextMenuWithTrigger kind
-                todo
-                model
-
-        viewProjectTodoItemMoreMenu todo =
+        viewMoreTriggerWithMenu todo =
             viewTodoContextMenuWithTrigger kind
                 todo
                 model
@@ -883,7 +878,7 @@ viewTodoListItem kind model =
             viewDueDateTodoItem model.projectList
 
         ProjectTodoList _ ->
-            viewProjectTodoItem model viewProjectTodoItemMoreMenu
+            viewProjectTodoItem model viewMoreTriggerWithMenu
 
         SearchResultTodoList _ ->
             let
@@ -894,7 +889,7 @@ viewTodoListItem kind model =
                         , viewTodoTitle todo
                         , viewTodoDueDate today todo
                         , viewTodoProjectPill projectList todo
-                        , viewCommonMoreMenu todo
+                        , viewMoreTriggerWithMenu todo
                         ]
             in
             viewSearchTodoItem model.today model.projectList
