@@ -759,7 +759,7 @@ todoListFor kind model =
             List.filter pred
 
 
-viewTodoListTitle : TodoListKind -> { a | today : Date, projectList : List Project } -> H.Html Msg
+viewTodoListTitle : TodoListKind -> Model -> H.Html Msg
 viewTodoListTitle kind model =
     case kind of
         OverDueTodoList ->
