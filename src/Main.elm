@@ -1,6 +1,16 @@
 port module Main exposing (main)
 
-import Basics.More exposing (HasId, allPass, appendOne, idEq, insertAt, propEq, uncurry, updateWhenIdEq)
+import Basics.More
+    exposing
+        ( HasId
+        , allPass
+        , appendOne
+        , idEq
+        , insertAt
+        , propEq
+        , uncurry
+        , updateWhenIdEq
+        )
 import Browser
 import Browser.Events
 import Date exposing (Date)
