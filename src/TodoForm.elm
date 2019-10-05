@@ -116,7 +116,7 @@ info model =
         unwrap model
             |> Maybe.andThen
                 (\( m, _, _ ) ->
-                    todoIdFromMeta m
+                    editTodoIdFromMeta m
                 )
     , add =
         unwrap model
@@ -181,7 +181,7 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
             mi
                 |> MX.unwrap ( model, Cmd.none )
                     (\( m, _, c ) ->
-                        ( TodoForm Nothing, onSave (todoIdFromMeta m) (toPatches c) )
+                        ( TodoForm Nothing, onSave (editTodoIdFromMeta m) (toPatches c) )
                     )
 
         Cancel ->
@@ -190,8 +190,8 @@ update { onSave, onCancel } message ((TodoForm mi) as model) =
                     (always ( TodoForm Nothing, onCancel ))
 
 
-todoIdFromMeta : Meta -> Maybe TodoId
-todoIdFromMeta meta =
+editTodoIdFromMeta : Meta -> Maybe TodoId
+editTodoIdFromMeta meta =
     case meta of
         Edit todoId ->
             Just todoId
