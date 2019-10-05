@@ -815,6 +815,12 @@ viewTodoListContent kind model form todoList =
 
         maybeEditTodoListHtml =
             Maybe.map viewEditTodoListForTodoId info.edit
+
+        todoListHtmlWithFormInsertedAt projectSortIdx =
+            insertAt projectSortIdx formHtml todoListHtml
+
+        todoListHtmlWithFormAtEnd =
+            appendOne formHtml todoListHtml
     in
     case kind of
         OverDueTodoList ->
@@ -830,17 +836,14 @@ viewTodoListContent kind model form todoList =
                 |> MX.filter ((==) dueDate)
                 |> Maybe.andThen
                     (\_ ->
-                        Maybe.map (\_ -> appendOne formHtml todoListHtml) info.add
+                        Maybe.map (always todoListHtmlWithFormAtEnd) info.add
                             |> MX.orElse maybeEditTodoListHtml
                     )
                 |> Maybe.withDefault todoListHtmlWithAddBtn
 
         ProjectTodoList _ ->
             info.add
-                |> Maybe.map
-                    (\projectSortIdx ->
-                        insertAt projectSortIdx formHtml todoListHtml
-                    )
+                |> Maybe.map todoListHtmlWithFormInsertedAt
                 |> MX.orElse maybeEditTodoListHtml
                 |> Maybe.withDefault todoListHtmlWithAddBtn
 
