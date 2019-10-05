@@ -38,7 +38,7 @@ system : { toMsg : Msg -> msg, onSave : Schedule -> msg } -> System msg
 system { toMsg, onSave } =
     { model = Model Nothing
     , update = update { saved = onSave >> perform }
-    , view = \viewTrigger model -> view viewTrigger model |> H.map toMsg
+    , view = view toMsg
     }
 
 
@@ -65,8 +65,8 @@ onClickStopPropagation msg =
     E.stopPropagationOn "click" (JD.succeed ( msg, True ))
 
 
-view : ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html Msg
-view viewTrigger (Model maybeSchedule) =
+view : (Msg -> msg) -> ((Schedule -> Msg) -> H.Html Msg) -> Model -> H.Html msg
+view toMsg viewTrigger (Model maybeSchedule) =
     col [ A.class " relative" ]
         [ maybeSchedule
             |> MX.unwrap (H.text "")
@@ -94,3 +94,4 @@ view viewTrigger (Model maybeSchedule) =
                 )
         , viewTrigger Open
         ]
+        |> H.map toMsg
