@@ -376,7 +376,7 @@ update message model =
             ( model, signOut () )
 
         PushAll ->
-            ( model, firePushTodoList <| JE.list Todo.encoder model.todoList )
+            ( model, pushTodoListCmd model.todoList )
 
         OnFireTodoList value ->
             case JD.decodeValue (JD.list Todo.decoder) value of
@@ -587,8 +587,13 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
     ( { model
         | todoList = List.foldl upsertById todoListWithoutOldTodo projectTodoList
       }
-    , Cmd.none
+    , pushTodoListCmd projectTodoList
     )
+
+
+pushTodoListCmd : List Todo -> Cmd msg
+pushTodoListCmd =
+    firePushTodoList << JE.list Todo.encoder
 
 
 insertTodo todo model =
