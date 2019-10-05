@@ -822,37 +822,40 @@ viewTodoListContent kind model form todoList =
                         viewTodoItem todo
                 )
                 todoList
+
+        todoListHtml =
+            List.map viewTodoItem todoList
+
+        maybeEditTodoListHtml =
+            Maybe.map viewEditTodoListForTodoId info.edit
     in
     case kind of
         OverDueTodoList ->
-            info.edit
-                |> Maybe.map viewEditTodoListForTodoId
-                |> Maybe.withDefault (List.map viewTodoItem todoList)
+            maybeEditTodoListHtml
+                |> Maybe.withDefault todoListHtml
 
         SearchResultTodoList _ ->
-            info.edit
-                |> Maybe.map viewEditTodoListForTodoId
-                |> Maybe.withDefault (List.map viewTodoItem todoList)
+            maybeEditTodoListHtml
+                |> Maybe.withDefault todoListHtml
 
         DueAtTodoList dueDate ->
             info.initialDueDate
                 |> MX.filter ((==) dueDate)
                 |> Maybe.andThen
                     (\_ ->
-                        info.add
-                            |> Maybe.map (\_ -> List.map viewTodoItem todoList ++ [ viewForm form ])
-                            |> MX.orElse (info.edit |> Maybe.map viewEditTodoListForTodoId)
+                        Maybe.map (\_ -> todoListHtml ++ [ viewForm form ]) info.add
+                            |> MX.orElse maybeEditTodoListHtml
                     )
-                |> Maybe.withDefault (List.map viewTodoItem todoList ++ viewAddBtn)
+                |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
 
         ProjectTodoList _ ->
             info.add
                 |> Maybe.map
                     (\projectSortIdx ->
-                        List.map viewTodoItem todoList |> insertAt projectSortIdx (viewForm form)
+                        todoListHtml |> insertAt projectSortIdx (viewForm form)
                     )
-                |> MX.orElse (info.edit |> Maybe.map viewEditTodoListForTodoId)
-                |> Maybe.withDefault (List.map viewTodoItem todoList ++ viewAddBtn)
+                |> MX.orElse maybeEditTodoListHtml
+                |> Maybe.withDefault (todoListHtml ++ viewAddBtn)
 
 
 viewTodoListItem :
