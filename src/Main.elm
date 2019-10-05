@@ -29,6 +29,23 @@ import TodoId exposing (TodoId)
 import UI exposing (btn2, checkbox3, col, ipt3, row)
 
 
+
+-- FIRE
+
+
+port onAuthStateChanged : (Value -> msg) -> Sub msg
+
+
+port signIn : () -> Cmd msg
+
+
+port signOut : () -> Cmd msg
+
+
+
+-- ROUTE
+
+
 type Route
     = RouteInbox
     | RouteToday
@@ -284,6 +301,7 @@ setTodoForm form model =
 
 type Msg
     = NoOp
+    | OnAuthStateChanged Value
     | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
@@ -318,6 +336,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         NoOp ->
+            ( model, Cmd.none )
+
+        OnAuthStateChanged value ->
+            let
+                _ =
+                    Debug.log "user" (JE.encode 2 value)
+            in
             ( model, Cmd.none )
 
         OpenTodoContextMenu todoId ->
@@ -529,6 +554,7 @@ subscriptions model =
                     Browser.Events.onClick <|
                         JD.succeed ClickOutsideDetected
                 )
+        , onAuthStateChanged OnAuthStateChanged
         ]
 
 
