@@ -870,7 +870,7 @@ viewTodoListItem kind model =
                 todo
                 model
 
-        viewProjectTodoMoreMenu todo =
+        viewProjectTodoItemMoreMenu todo =
             viewTodoContextMenuWithTrigger kind
                 todo
                 model
@@ -883,7 +883,7 @@ viewTodoListItem kind model =
             viewDueDateTodoItem model.projectList
 
         ProjectTodoList _ ->
-            viewProjectTodoItem model viewProjectTodoMoreMenu
+            viewProjectTodoItem model viewProjectTodoItemMoreMenu
 
         SearchResultTodoList _ ->
             let
