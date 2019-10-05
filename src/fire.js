@@ -18,4 +18,12 @@ const auth = firebase.auth()
 
 export default {
   onAuthStateChanged: auth.onAuthStateChanged.bind(auth),
+  signIn() {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    provider.setCustomParameters({})
+    return auth.signInWithPopup(provider)
+  },
+  signOut() {
+    return auth.signOut()
+  },
 }
