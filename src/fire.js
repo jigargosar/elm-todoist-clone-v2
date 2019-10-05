@@ -1,6 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import 'firebase/storage'
+import 'firebase/firestore'
+import { isEmpty } from 'ramda'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBVS1Tx23pScQz9w4ZDTGh307mqkCRy2Bw',
@@ -15,7 +16,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 
 const auth = firebase.auth()
-
+const db = firebase.firestore()
 export default {
   onAuthStateChanged: auth.onAuthStateChanged.bind(auth),
   signIn() {
@@ -26,4 +27,23 @@ export default {
   signOut() {
     return auth.signOut()
   },
+  setAll(name, docs) {
+    invariant(isEmpty(name.trim()))
+    invariant(docs instanceof Array)
+    const uid = auth.currentUser.uid
+    const cr = db.collection(
+      `/users/${uid}/elm-todoist-clone-v2/db/${name}`,
+    )
+    const b = db.batch()
+
+    docs.forEach(d => b.set(cr.doc(d.id), d))
+
+    return b.commit()
+  },
+}
+
+function invariant(bool, msg = 'inv failed') {
+  if (!bool) {
+    throw new Error(msg)
+  }
 }
