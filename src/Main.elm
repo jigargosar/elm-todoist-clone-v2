@@ -403,32 +403,40 @@ update message model =
 
                             else
                                 dict
+
+                combineResult result =
+                    case result of
+                        Ok v ->
+                            v
+
+                        Err v ->
+                            v
             in
-            case
-                JD.decodeValue (JD.list JD.value) todoListValue
-                    |> Result.map
-                        (List.foldr
-                            (\todoValue ( todoList, errorList ) ->
-                                case JD.decodeValue Todo.decoder todoValue of
-                                    Ok todo ->
-                                        ( todo :: todoList, errorList )
+            JD.decodeValue (JD.list JD.value) todoListValue
+                |> Result.map
+                    (List.foldr
+                        (\todoValue ( todoList, errorList ) ->
+                            case JD.decodeValue Todo.decoder todoValue of
+                                Ok todo ->
+                                    ( todo :: todoList, errorList )
 
-                                    Err error ->
-                                        ( todoList, error :: errorList )
-                            )
-                            ( [], [] )
+                                Err error ->
+                                    ( todoList, error :: errorList )
                         )
-            of
-                Err error ->
-                    ( model, logError (JD.errorToString error) )
-
-                Ok ( todoList, errorList ) ->
-                    ( { model
-                        | todoDict =
-                            List.foldl upsertIfNewer model.todoDict todoList
-                      }
-                    , List.map (JD.errorToString >> logError) errorList
-                        |> Cmd.batch
+                        ( [], [] )
+                    )
+                |> Result.mapError (\error -> ( [], [ error ] ))
+                |> combineResult
+                |> Tuple.mapBoth
+                    (\todoList ->
+                        { model
+                            | todoDict =
+                                List.foldl upsertIfNewer model.todoDict todoList
+                        }
+                    )
+                    (\errorList ->
+                        List.map (JD.errorToString >> logError) errorList
+                            |> Cmd.batch
                     )
 
         OnAuthStateChanged value ->
