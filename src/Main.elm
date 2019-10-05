@@ -637,6 +637,7 @@ view model =
                         row [ A.class "items-center" ]
                             [ col [] [ H.text displayName ]
                             , btn2 "SignOut" SignOutClicked
+                            , btn2 "PushAll" PushAll
                             ]
                 ]
             , row []
