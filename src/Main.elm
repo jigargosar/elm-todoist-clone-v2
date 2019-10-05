@@ -430,6 +430,7 @@ update message model =
                                     ( todoList
                                     , ("Error Decoding Todo: "
                                         ++ todoIdStr
+                                        ++ "\n"
                                         ++ JD.errorToString error
                                       )
                                         :: errorList
