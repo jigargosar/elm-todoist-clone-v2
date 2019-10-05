@@ -317,6 +317,7 @@ type Msg
     = NoOp
     | OnAuthStateChanged Value
     | SignInClicked
+    | SignOutClicked
     | ClickOutsideDetected
     | DnDListMsg DnDList.Msg
     | OpenTodoContextMenu TodoId
@@ -355,6 +356,9 @@ update message model =
 
         SignInClicked ->
             ( model, signIn () )
+
+        SignOutClicked ->
+            ( model, signOut () )
 
         OnAuthStateChanged value ->
             let
@@ -610,7 +614,19 @@ view model =
                         (ChangeRouteTo << RouteSearch)
                         [ A.placeholder "Search" ]
                     ]
-                , btn2 "SignIn" SignInClicked
+                , row [ A.class "flex-grow-1" ] []
+                , case model.auth of
+                    Unknown ->
+                        row [] [ btn2 "SignIn" SignInClicked ]
+
+                    SignedOut ->
+                        row [] [ btn2 "SignIn" SignInClicked ]
+
+                    SignedIn { displayName } ->
+                        row [ A.class "items-center" ]
+                            [ col [] [ H.text displayName ]
+                            , btn2 "SignOut" SignOutClicked
+                            ]
                 ]
             , row []
                 [ col [ A.class "pa2" ] (viewNav model)
