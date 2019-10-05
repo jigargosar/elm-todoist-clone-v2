@@ -852,6 +852,18 @@ viewTodoListContent kind model form todoList =
                 List.map viewTodoItem todoList ++ viewAddBtn
 
         ProjectTodoList _ ->
+            let
+                viewEditableTodo maybeViewFormFor todo =
+                    maybeViewFormFor todo.id
+                        |> MX.unpack (\_ -> viewTodoItem todo) identity
+
+                viewEditableTodoList maybeViewFormFor =
+                    List.map (viewEditableTodo maybeViewFormFor) todoList
+
+                _ =
+                    todoFormSys.viewEdit model.projectList form
+                        |> Maybe.map viewEditableTodoList
+            in
             if TodoForm.isAdding form then
                 List.map viewTodoItem todoList
                     ++ List.map viewTodoItem todoList
