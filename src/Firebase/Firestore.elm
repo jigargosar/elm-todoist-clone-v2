@@ -1,4 +1,4 @@
-module Store exposing (fireDeleteTodoId, firePushTodoList, onFireTodoList)
+port module Firebase.Firestore exposing (fireDeleteTodoId, firePushTodoList, onFireTodoList)
 
 import Json.Encode exposing (Value)
 

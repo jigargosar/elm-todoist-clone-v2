@@ -16,6 +16,7 @@ import Browser.Events
 import Date exposing (Date)
 import DnDList
 import Firebase.Auth as Auth exposing (AuthState)
+import Firebase.Firestore as Firestore
 import HasSeed
 import Html
 import Html.Attributes as HA
@@ -498,7 +499,7 @@ update message model =
 
         DeleteTodo todoId ->
             ( model |> mapTodoDict (TaggedDict.filter (\_ -> idEq todoId >> not))
-            , fireDeleteTodoId (TodoId.encoder todoId)
+            , Firestore.fireDeleteTodoId (TodoId.encoder todoId)
             )
 
         InsertTodoWithPatches patches now ->
@@ -608,7 +609,7 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
 
 firePushTodoListCmd : List Todo -> Cmd msg
 firePushTodoListCmd =
-    firePushTodoList << JE.list Todo.encoder
+    Firestore.firePushTodoList << JE.list Todo.encoder
 
 
 insertTodo todo model =
@@ -637,7 +638,7 @@ subscriptions model =
                         JD.succeed ClickOutsideDetected
                 )
         , Auth.onAuthStateChanged OnAuthStateChanged
-        , onFireTodoList OnFireTodoList
+        , Firestore.onFireTodoList OnFireTodoList
         ]
 
 
