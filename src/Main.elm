@@ -24,7 +24,6 @@ import Html.Styled as H
 import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
-import Json.Decode.More as JDM
 import Json.Decode.Pipeline exposing (optional)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
@@ -32,11 +31,10 @@ import Maybe.Extra as MX
 import Project exposing (Project)
 import ProjectId exposing (ProjectId)
 import Random
-import Result.Extra as RX
 import Return
 import SchedulePopup
-import Tagged exposing (Tagged)
 import Tagged.Dict as TaggedDict exposing (TaggedDict)
+import Tagged.Dict.More as TDM
 import Task
 import Time exposing (Posix)
 import Todo exposing (Todo)
@@ -228,18 +226,11 @@ type alias Model =
     }
 
 
-taggedDictFromListBy : (v -> Tagged tag comparable) -> List v -> TaggedDict tag comparable v
-taggedDictFromListBy func list =
-    List.map (\a -> ( func a, a )) list
-        |> TaggedDict.fromList
-
-
 defaultModel : Model
 defaultModel =
     { dnd = dndSystem.model
     , auth = Auth.Unknown
-    , todoDict =
-        defaultCacheValue.todoList |> taggedDictFromListBy .id
+    , todoDict = defaultCacheValue.todoList |> TDM.fromListBy .id
     , projectList = defaultCacheValue.projectList
     , todoForm = todoFormSys.model
     , maybeTodoContextMenu = Nothing
@@ -257,7 +248,10 @@ generateMockModel =
         gen =
             Random.map2
                 (\todoList projectList ->
-                    { defaultModel | todoDict = taggedDictFromListBy .id todoList, projectList = projectList }
+                    { defaultModel
+                        | todoDict = TDM.fromListBy .id todoList
+                        , projectList = projectList
+                    }
                 )
                 Todo.mockListGenerator
                 Project.mockListGenerator
@@ -277,8 +271,7 @@ init flags =
         model : Model
         model =
             { defaultModel
-                | todoDict =
-                    taggedDictFromListBy .id cache.todoList
+                | todoDict = TDM.fromListBy .id cache.todoList
                 , projectList = cache.projectList
                 , route = cache.route
                 , seed = Random.initialSeed flags.now
