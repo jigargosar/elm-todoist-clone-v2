@@ -38,6 +38,7 @@ import Tagged.Dict.More as TDM
 import Task
 import Time exposing (Posix)
 import Todo exposing (Todo)
+import TodoDict exposing (TodoDict)
 import TodoForm exposing (TodoForm)
 import TodoId exposing (TodoId, TodoIdDict)
 import UI exposing (btn2, btnDisabled, checkbox3, col, ipt3, row)
@@ -215,7 +216,7 @@ type alias TodoContextMenu =
 type alias Model =
     { dnd : DnDList.Model
     , auth : AuthState
-    , todoDict : TodoIdDict Todo
+    , todoDict : TodoDict
     , projectList : List Project
     , todoForm : TodoForm
     , maybeTodoContextMenu : Maybe TodoContextMenu
@@ -230,7 +231,7 @@ defaultModel : Model
 defaultModel =
     { dnd = dndSystem.model
     , auth = Auth.Unknown
-    , todoDict = defaultCache.todoList |> TDM.fromListBy .id
+    , todoDict = defaultCache.todoList |> TodoDict.fromList
     , projectList = defaultCache.projectList
     , todoForm = todoFormSys.model
     , maybeTodoContextMenu = Nothing
