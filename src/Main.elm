@@ -508,7 +508,7 @@ applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> ( Model
 applyTodoPatchesWithNow todoId now patches model =
     case
         TaggedDict.get todoId model.todoDict
-            |> Maybe.andThen (Todo.applyPatches now patches)
+            |> Maybe.andThen (Todo.update now patches)
     of
         Nothing ->
             ( model, Cmd.none )

@@ -1,12 +1,12 @@
 module Todo exposing
     ( Patch(..)
     , Todo
-    , applyPatches
     , decoder
     , encoder
     , generator
     , isNewerThan
     , mockListGenerator
+    , update
     )
 
 import Date exposing (Date)
@@ -162,9 +162,9 @@ isNewerThan t2 t1 =
     updatedAtMillis t1 > updatedAtMillis t2
 
 
-applyPatches : Posix -> List Patch -> Todo -> Maybe ( Todo, Todo )
-applyPatches now patches todo =
-    List.foldl applyPatch todo patches
+update : Posix -> List Patch -> Todo -> Maybe ( Todo, Todo )
+update now patches todo =
+    applyPatches patches todo
         |> setUpdatedAtIfChanged now todo
 
 
@@ -175,6 +175,11 @@ setUpdatedAtIfChanged now oldTodo newTodo =
 
     else
         Nothing
+
+
+applyPatches : List Patch -> Todo -> Todo
+applyPatches patches todo =
+    List.foldl applyPatch todo patches
 
 
 applyPatch : Patch -> Todo -> Todo
