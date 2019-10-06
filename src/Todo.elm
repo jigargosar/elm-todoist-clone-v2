@@ -136,12 +136,8 @@ generator : Posix -> List Patch -> Generator Todo
 generator now patches =
     TodoId.generator
         |> Random.map
-            (\id ->
-                let
-                    todo =
-                        Todo id "" False False Nothing Nothing 0 now now
-                in
-                List.foldl applyPatch todo patches
+            ((\id -> Todo id "" False False Nothing Nothing 0 now now)
+                >> applyPatches patches
             )
 
 
@@ -179,11 +175,11 @@ setUpdatedAtIfChanged now oldTodo newTodo =
 
 applyPatches : List Patch -> Todo -> Todo
 applyPatches patches todo =
-    List.foldl applyPatch todo patches
+    List.foldl applyPatchesHelp todo patches
 
 
-applyPatch : Patch -> Todo -> Todo
-applyPatch patch todo =
+applyPatchesHelp : Patch -> Todo -> Todo
+applyPatchesHelp patch todo =
     case patch of
         Title v ->
             { todo | title = v }
