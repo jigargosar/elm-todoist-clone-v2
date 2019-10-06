@@ -368,7 +368,7 @@ update message model =
             ( { model | todoDict = TaggedDict.empty }, Auth.signOut () )
 
         PushAll ->
-            ( model, firePushTodoListCmd (TaggedDict.values model.todoDict) )
+            ( model, Firestore.pushTodoList (TaggedDict.values model.todoDict) )
 
         OnFireTodoList value ->
             let
@@ -603,13 +603,8 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
     ( { model
         | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
       }
-    , firePushTodoListCmd projectTodoList
+    , Firestore.pushTodoList projectTodoList
     )
-
-
-firePushTodoListCmd : List Todo -> Cmd msg
-firePushTodoListCmd =
-    Firestore.firePushTodoList << JE.list Todo.encoder
 
 
 insertTodo todo model =
@@ -623,7 +618,7 @@ insertTodo todo model =
     ( { model
         | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) model.todoDict projectTodoList
       }
-    , firePushTodoListCmd projectTodoList
+    , Firestore.pushTodoList projectTodoList
     )
 
 
