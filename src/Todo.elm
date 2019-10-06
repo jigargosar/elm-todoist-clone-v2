@@ -47,8 +47,8 @@ mockTitles =
     ]
 
 
-defaultPosix : Posix
-defaultPosix =
+mockPosix : Posix
+mockPosix =
     Time.millisToPosix 0
 
 
@@ -58,7 +58,7 @@ mockListGenerator =
         gen : Random.Generator Todo
         gen =
             TodoId.generator
-                |> Random.map (\id -> Todo id "" False False Nothing Nothing 0 defaultPosix defaultPosix)
+                |> Random.map (fromNowAndId mockPosix)
     in
     Random.list (List.length mockTitles) gen
         |> Random.map (List.map2 setTitle mockTitles >> setSortIndices)
@@ -93,7 +93,7 @@ decoder : JD.Decoder Todo
 decoder =
     let
         optionalPosix field =
-            optional field posixDecoder defaultPosix
+            optional field posixDecoder mockPosix
     in
     JD.succeed Todo
         |> required "id" TodoId.decoder
@@ -136,9 +136,12 @@ generator : Posix -> List Patch -> Generator Todo
 generator now patches =
     TodoId.generator
         |> Random.map
-            ((\id -> Todo id "" False False Nothing Nothing 0 now now)
-                >> applyPatches patches
-            )
+            (fromNowAndId now >> applyPatches patches)
+
+
+fromNowAndId : Posix -> TodoId -> Todo
+fromNowAndId now id =
+    Todo id "" False False Nothing Nothing 0 now now
 
 
 type Patch
