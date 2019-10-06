@@ -338,7 +338,7 @@ update message model =
             ( model, Auth.signIn () )
 
         SignOutClicked ->
-            ( { model | todoDict = TaggedDict.empty }, Auth.signOut () )
+            ( mapTodoDict (always TaggedDict.empty) model, Auth.signOut () )
 
         PushAll ->
             ( model, Firestore.pushTodoList (TaggedDict.values model.todoDict) )
