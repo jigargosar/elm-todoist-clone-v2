@@ -1,6 +1,9 @@
-port module Firebase.Firestore exposing (deleteTodo, onTodoListReceived, pushTodoList)
+port module Firebase.Firestore exposing (decodeTodoList, deleteTodo, onTodoListReceived, pushTodoList)
 
+import Json.Decode as JD
+import Json.Decode.More as JDM
 import Json.Encode as JE exposing (Value)
+import Result.Extra as RX
 import Todo exposing (Todo)
 import TodoId exposing (TodoId)
 
@@ -27,3 +30,28 @@ deleteTodo =
 onTodoListReceived : (Value -> msg) -> Sub msg
 onTodoListReceived =
     onFireTodoList
+
+
+decodeTodoList : Value -> ( List Todo, List String )
+decodeTodoList value =
+    JD.decodeValue (JD.list (JDM.tuple JD.string JD.value)) value
+        |> Result.map
+            (List.foldr
+                (\( todoIdStr, todoValue ) ( todoList, errorList ) ->
+                    case JD.decodeValue Todo.decoder todoValue of
+                        Ok todo ->
+                            ( todo :: todoList, errorList )
+
+                        Err error ->
+                            ( todoList
+                            , ("Error Decoding Todo: "
+                                ++ todoIdStr
+                                ++ "\n"
+                                ++ JD.errorToString error
+                              )
+                                :: errorList
+                            )
+                )
+                ( [], [] )
+            )
+        |> RX.extract (\error -> ( [], [ JD.errorToString error ] ))

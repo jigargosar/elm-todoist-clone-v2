@@ -385,27 +385,7 @@ update message model =
                             else
                                 dict
             in
-            JD.decodeValue (JD.list (JDM.tuple JD.string JD.value)) value
-                |> Result.map
-                    (List.foldr
-                        (\( todoIdStr, todoValue ) ( todoList, errorList ) ->
-                            case JD.decodeValue Todo.decoder todoValue of
-                                Ok todo ->
-                                    ( todo :: todoList, errorList )
-
-                                Err error ->
-                                    ( todoList
-                                    , ("Error Decoding Todo: "
-                                        ++ todoIdStr
-                                        ++ "\n"
-                                        ++ JD.errorToString error
-                                      )
-                                        :: errorList
-                                    )
-                        )
-                        ( [], [] )
-                    )
-                |> RX.extract (\error -> ( [], [ JD.errorToString error ] ))
+            Firestore.decodeTodoList value
                 |> Tuple.mapBoth
                     (\todoList ->
                         { model
