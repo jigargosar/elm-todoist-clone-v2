@@ -517,29 +517,34 @@ applyTodoPatchesWithNowHelp now patches model oldTodo =
     let
         newTodo =
             Todo.applyPatches now patches oldTodo
-
-        projectTodoList =
-            if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
-                (newTodo
-                    :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId (TaggedDict.values model.todoDict)
-                )
-                    |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
-
-            else
-                TaggedDict.values model.todoDict
-                    |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
-                    |> updateWhenIdEq newTodo.id (always newTodo)
-                    |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
-                    |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
-
-        todoListWithoutOldTodo =
-            TaggedDict.remove oldTodo.id model.todoDict
     in
-    ( { model
-        | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
-      }
-    , Firestore.pushTodoList projectTodoList
-    )
+    if newTodo == oldTodo then
+        ( model, Cmd.none )
+
+    else
+        let
+            projectTodoList =
+                if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
+                    (newTodo
+                        :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId (TaggedDict.values model.todoDict)
+                    )
+                        |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+
+                else
+                    TaggedDict.values model.todoDict
+                        |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
+                        |> updateWhenIdEq newTodo.id (always newTodo)
+                        |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
+                        |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
+
+            todoListWithoutOldTodo =
+                TaggedDict.remove oldTodo.id model.todoDict
+        in
+        ( { model
+            | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
+          }
+        , Firestore.pushTodoList projectTodoList
+        )
 
 
 insertTodo todo model =
