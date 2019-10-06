@@ -34,7 +34,6 @@ import Random
 import Return
 import SchedulePopup
 import Tagged.Dict as TaggedDict exposing (TaggedDict)
-import Tagged.Dict.More as TDM
 import Task
 import Time exposing (Posix)
 import Todo exposing (Todo)
