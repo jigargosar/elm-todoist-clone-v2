@@ -52,19 +52,6 @@ port logError : String -> Cmd msg
 
 
 
--- FIRE
-
-
-port firePushTodoList : Value -> Cmd msg
-
-
-port fireDeleteTodoId : Value -> Cmd msg
-
-
-port onFireTodoList : (Value -> msg) -> Sub msg
-
-
-
 -- ROUTE
 
 
