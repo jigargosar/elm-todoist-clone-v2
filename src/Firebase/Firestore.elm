@@ -24,6 +24,6 @@ deleteTodo =
     fireDeleteTodoId << TodoId.encoder
 
 
-onTodoListReceived : (Value -> msg) -> Sub a
+onTodoListReceived : (Value -> msg) -> Sub msg
 onTodoListReceived =
     onFireTodoList
