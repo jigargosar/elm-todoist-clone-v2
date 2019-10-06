@@ -1,16 +1,6 @@
 port module Main exposing (main)
 
-import Basics.More
-    exposing
-        ( HasId
-        , allPass
-        , appendOne
-        , idEq
-        , insertAt
-        , propEq
-        , uncurry
-        , updateWhenIdEq
-        )
+import Basics.More exposing (HasId, allPass, appendOne, flip, idEq, insertAt, propEq, uncurry, updateWhenIdEq)
 import Browser
 import Browser.Events
 import Date exposing (Date)
@@ -356,11 +346,7 @@ update message model =
         OnFireTodoList value ->
             Firestore.decodeTodoList value
                 |> Tuple.mapBoth
-                    (\todoList ->
-                        { model
-                            | todoDict = TodoDict.upsertNewer todoList model.todoDict
-                        }
-                    )
+                    (TodoDict.upsertNewer >> flip mapTodoDict model)
                     (List.map logError >> Cmd.batch)
 
         OnAuthStateChanged value ->
