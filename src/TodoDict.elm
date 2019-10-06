@@ -15,8 +15,8 @@ fromList =
     TDM.fromListBy .id
 
 
-upsertIfNewer_ : Todo -> TodoDict -> TodoDict
-upsertIfNewer_ new dict =
+upsertIfNewerHelp : Todo -> TodoDict -> TodoDict
+upsertIfNewerHelp new dict =
     case TaggedDict.get new.id dict of
         Nothing ->
             TaggedDict.insert new.id new dict
@@ -31,4 +31,4 @@ upsertIfNewer_ new dict =
 
 upsertNewer : List Todo -> TodoDict -> TodoDict
 upsertNewer todoList todoDict =
-    List.foldl upsertIfNewer_ todoDict todoList
+    List.foldl upsertIfNewerHelp todoDict todoList
