@@ -250,7 +250,7 @@ generateMockModel =
             Random.map2
                 (\todoList projectList ->
                     { defaultModel
-                        | todoDict = TDM.fromListBy .id todoList
+                        | todoDict = TodoDict.fromList todoList
                         , projectList = projectList
                     }
                 )
