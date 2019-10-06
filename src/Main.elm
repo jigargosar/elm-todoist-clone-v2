@@ -128,8 +128,8 @@ type alias Cache =
     }
 
 
-defaultCacheValue : Cache
-defaultCacheValue =
+defaultCache : Cache
+defaultCache =
     { todoList = []
     , projectList = []
     , route = RouteInbox
@@ -139,9 +139,9 @@ defaultCacheValue =
 cacheDecoder : JD.Decoder Cache
 cacheDecoder =
     JD.succeed Cache
-        |> optional "todoList" (JD.list Todo.decoder) defaultCacheValue.todoList
-        |> optional "projectList" (JD.list Project.decoder) defaultCacheValue.projectList
-        |> optional "route" routeDecoder defaultCacheValue.route
+        |> optional "todoList" (JD.list Todo.decoder) defaultCache.todoList
+        |> optional "projectList" (JD.list Project.decoder) defaultCache.projectList
+        |> optional "route" routeDecoder defaultCache.route
 
 
 cacheModel_ : Model -> Cmd msg
@@ -230,11 +230,11 @@ defaultModel : Model
 defaultModel =
     { dnd = dndSystem.model
     , auth = Auth.Unknown
-    , todoDict = defaultCacheValue.todoList |> TDM.fromListBy .id
-    , projectList = defaultCacheValue.projectList
+    , todoDict = defaultCache.todoList |> TDM.fromListBy .id
+    , projectList = defaultCache.projectList
     , todoForm = todoFormSys.model
     , maybeTodoContextMenu = Nothing
-    , route = defaultCacheValue.route
+    , route = defaultCache.route
     , zone = Time.utc
     , today = Date.fromRataDie 0
     , seed = Random.initialSeed 0
@@ -266,7 +266,7 @@ init flags =
         cache =
             flags.cache
                 |> JD.decodeValue (stringOrValueDecoder cacheDecoder)
-                |> Result.withDefault defaultCacheValue
+                |> Result.withDefault defaultCache
 
         model : Model
         model =
