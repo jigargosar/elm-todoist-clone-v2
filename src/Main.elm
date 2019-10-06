@@ -633,7 +633,7 @@ subscriptions model =
                         JD.succeed ClickOutsideDetected
                 )
         , Auth.onAuthStateChanged OnAuthStateChanged
-        , Firestore.onFireTodoList OnFireTodoList
+        , Firestore.onTodoListReceived OnFireTodoList
         ]
 
 

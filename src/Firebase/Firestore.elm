@@ -1,4 +1,4 @@
-port module Firebase.Firestore exposing (deleteTodo, onFireTodoList, pushTodoList)
+port module Firebase.Firestore exposing (deleteTodo, onTodoListReceived, pushTodoList)
 
 import Json.Encode as JE exposing (Value)
 import Todo exposing (Todo)
@@ -22,3 +22,8 @@ pushTodoList =
 deleteTodo : TodoId -> Cmd msg
 deleteTodo =
     fireDeleteTodoId << TodoId.encoder
+
+
+onTodoListReceived : (Value -> msg) -> Sub a
+onTodoListReceived =
+    onFireTodoList
