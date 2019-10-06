@@ -513,24 +513,24 @@ applyTodoPatchesWithNow todoId now patches model =
         Nothing ->
             ( model, Cmd.none )
 
-        Just ( old, new ) ->
+        Just ( oldTodo, newTodo ) ->
             let
                 projectTodoList =
-                    if old.maybeProjectId /= new.maybeProjectId then
-                        (new
-                            :: sortedTodoListForMaybeProjectId new.maybeProjectId (TaggedDict.values model.todoDict)
+                    if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
+                        (newTodo
+                            :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId (TaggedDict.values model.todoDict)
                         )
                             |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
                     else
                         TaggedDict.values model.todoDict
-                            |> sortedTodoListForMaybeProjectId new.maybeProjectId
-                            |> updateWhenIdEq new.id (always new)
-                            |> LX.swapAt old.projectSortIdx new.projectSortIdx
+                            |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
+                            |> updateWhenIdEq newTodo.id (always newTodo)
+                            |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
                             |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
                 todoListWithoutOldTodo =
-                    TaggedDict.remove old.id model.todoDict
+                    TaggedDict.remove oldTodo.id model.todoDict
             in
             ( { model
                 | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
