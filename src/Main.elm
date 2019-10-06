@@ -354,25 +354,11 @@ update message model =
             ( model, Firestore.pushTodoList (TaggedDict.values model.todoDict) )
 
         OnFireTodoList value ->
-            let
-                upsertIfNewer : Todo -> TodoDict -> TodoDict
-                upsertIfNewer new dict =
-                    case TaggedDict.get new.id dict of
-                        Nothing ->
-                            TaggedDict.insert new.id new dict
-
-                        Just old ->
-                            if Todo.isNewerThan old new then
-                                TaggedDict.insert new.id new dict
-
-                            else
-                                dict
-            in
             Firestore.decodeTodoList value
                 |> Tuple.mapBoth
                     (\todoList ->
                         { model
-                            | todoDict = List.foldl upsertIfNewer model.todoDict todoList
+                            | todoDict = TodoDict.upsertNewer todoList model.todoDict
                         }
                     )
                     (List.map logError >> Cmd.batch)
