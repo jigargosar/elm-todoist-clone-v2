@@ -44,7 +44,7 @@ sub('signIn', fire.signIn, app)
 sub('signOut', fire.signOut, app)
 sub('logError', err => console.error('Elm:', err), app)
 sub('firestoreSetAll', ([name,docs]) => fire.setAll(name, docs), app)
-sub('fireDeleteTodoId', todoId => fire.delete('todos', todoId), app)
+sub('firestoreDelete', ([name,docId]) => fire.delete(name, docId), app)
 
 function sub(name, fn, app) {
   const subscribe = pathOr(null, ['ports', name, 'subscribe'])(app)

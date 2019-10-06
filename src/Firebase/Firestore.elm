@@ -11,7 +11,7 @@ import TodoId exposing (TodoId)
 port firestoreSetAll : ( String, Value ) -> Cmd msg
 
 
-port fireDeleteTodoId : Value -> Cmd msg
+port firestoreDelete : ( String, Value ) -> Cmd msg
 
 
 port onFireTodoList : (Value -> msg) -> Sub msg
@@ -24,7 +24,7 @@ pushTodoList =
 
 deleteTodo : TodoId -> Cmd msg
 deleteTodo =
-    fireDeleteTodoId << TodoId.encoder
+    firestoreDelete << Tuple.pair "todos" << TodoId.encoder
 
 
 onTodoListReceived : (Value -> msg) -> Sub msg
