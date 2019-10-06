@@ -137,8 +137,11 @@ generator now patches =
     TodoId.generator
         |> Random.map
             (\id ->
-                Todo id "" False False Nothing Nothing 0 now now
-                    |> applyPatches now patches
+                let
+                    todo =
+                        Todo id "" False False Nothing Nothing 0 now now
+                in
+                List.foldl applyPatch todo patches
             )
 
 
@@ -159,19 +162,19 @@ isNewerThan t2 t1 =
     updatedAtMillis t1 > updatedAtMillis t2
 
 
-applyPatches : Posix -> List Patch -> Todo -> Todo
+applyPatches : Posix -> List Patch -> Todo -> Maybe ( Todo, Todo )
 applyPatches now patches todo =
     List.foldl applyPatch todo patches
         |> setUpdatedAtIfChanged now todo
 
 
-setUpdatedAtIfChanged : Posix -> Todo -> Todo -> Todo
+setUpdatedAtIfChanged : Posix -> Todo -> Todo -> Maybe ( Todo, Todo )
 setUpdatedAtIfChanged now oldTodo newTodo =
     if oldTodo /= newTodo then
-        { newTodo | updatedAt = now }
+        Just ( oldTodo, { newTodo | updatedAt = now } )
 
     else
-        newTodo
+        Nothing
 
 
 applyPatch : Patch -> Todo -> Todo

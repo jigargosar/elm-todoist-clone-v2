@@ -506,45 +506,37 @@ sortedTodoListForMaybeProjectId maybeProjectId =
 
 applyTodoPatchesWithNow : TodoId -> Posix -> List Todo.Patch -> Model -> ( Model, Cmd Msg )
 applyTodoPatchesWithNow todoId now patches model =
-    TaggedDict.get todoId model.todoDict
-        |> Maybe.map
-            (applyTodoPatchesWithNowHelp now patches model)
-        |> Maybe.withDefault ( model, Cmd.none )
+    case
+        TaggedDict.get todoId model.todoDict
+            |> Maybe.andThen (Todo.applyPatches now patches)
+    of
+        Nothing ->
+            ( model, Cmd.none )
 
+        Just ( oldTodo, newTodo ) ->
+            let
+                projectTodoList =
+                    if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
+                        (newTodo
+                            :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId (TaggedDict.values model.todoDict)
+                        )
+                            |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
-applyTodoPatchesWithNowHelp : Posix -> List Todo.Patch -> Model -> Todo -> ( Model, Cmd Msg )
-applyTodoPatchesWithNowHelp now patches model oldTodo =
-    let
-        newTodo =
-            Todo.applyPatches now patches oldTodo
-    in
-    if newTodo == oldTodo then
-        ( model, Cmd.none )
+                    else
+                        TaggedDict.values model.todoDict
+                            |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
+                            |> updateWhenIdEq newTodo.id (always newTodo)
+                            |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
+                            |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
 
-    else
-        let
-            projectTodoList =
-                if oldTodo.maybeProjectId /= newTodo.maybeProjectId then
-                    (newTodo
-                        :: sortedTodoListForMaybeProjectId newTodo.maybeProjectId (TaggedDict.values model.todoDict)
-                    )
-                        |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
-
-                else
-                    TaggedDict.values model.todoDict
-                        |> sortedTodoListForMaybeProjectId newTodo.maybeProjectId
-                        |> updateWhenIdEq newTodo.id (always newTodo)
-                        |> LX.swapAt oldTodo.projectSortIdx newTodo.projectSortIdx
-                        |> List.indexedMap (\idx t -> { t | projectSortIdx = idx })
-
-            todoListWithoutOldTodo =
-                TaggedDict.remove oldTodo.id model.todoDict
-        in
-        ( { model
-            | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
-          }
-        , Firestore.pushTodoList projectTodoList
-        )
+                todoListWithoutOldTodo =
+                    TaggedDict.remove oldTodo.id model.todoDict
+            in
+            ( { model
+                | todoDict = List.foldl (\t -> TaggedDict.insert t.id t) todoListWithoutOldTodo projectTodoList
+              }
+            , Firestore.pushTodoList projectTodoList
+            )
 
 
 insertTodo todo model =
