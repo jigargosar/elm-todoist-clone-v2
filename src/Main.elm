@@ -272,7 +272,7 @@ init flags =
         model : Model
         model =
             { defaultModel
-                | todoDict = TDM.fromListBy .id cache.todoList
+                | todoDict = TodoDict.fromList cache.todoList
                 , projectList = cache.projectList
                 , route = cache.route
                 , seed = Random.initialSeed flags.now
