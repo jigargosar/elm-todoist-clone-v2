@@ -15,6 +15,7 @@ import Browser
 import Browser.Events
 import Date exposing (Date)
 import DnDList
+import Firebase.Auth as Auth exposing (AuthState)
 import HasSeed
 import Html
 import Html.Attributes as HA
@@ -23,7 +24,7 @@ import Html.Styled.Attributes as A exposing (style)
 import Html.Styled.Events as E
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.More as JDM
-import Json.Decode.Pipeline exposing (optional, required)
+import Json.Decode.Pipeline exposing (optional)
 import Json.Encode as JE exposing (Value, encode, object)
 import List.Extra as LX
 import Maybe.Extra as MX
@@ -54,15 +55,6 @@ port logError : String -> Cmd msg
 -- FIRE
 
 
-port onAuthStateChanged : (Value -> msg) -> Sub msg
-
-
-port signIn : () -> Cmd msg
-
-
-port signOut : () -> Cmd msg
-
-
 port firePushTodoList : Value -> Cmd msg
 
 
@@ -70,18 +62,6 @@ port fireDeleteTodoId : Value -> Cmd msg
 
 
 port onFireTodoList : (Value -> msg) -> Sub msg
-
-
-type alias AuthUser =
-    { uid : String
-    , displayName : String
-    }
-
-
-type AuthState
-    = Unknown
-    | SignedIn AuthUser
-    | SignedOut
 
 
 
@@ -269,7 +249,7 @@ taggedDictFromListBy func list =
 defaultModel : Model
 defaultModel =
     { dnd = dndSystem.model
-    , auth = Unknown
+    , auth = Auth.Unknown
     , todoDict =
         defaultCacheValue.todoList |> taggedDictFromListBy .id
     , projectList = defaultCacheValue.projectList
@@ -394,10 +374,10 @@ update message model =
             ( model, Cmd.none )
 
         SignInClicked ->
-            ( model, signIn () )
+            ( model, Auth.signIn () )
 
         SignOutClicked ->
-            ( { model | todoDict = TaggedDict.empty }, signOut () )
+            ( { model | todoDict = TaggedDict.empty }, Auth.signOut () )
 
         PushAll ->
             ( model, firePushTodoListCmd (TaggedDict.values model.todoDict) )
@@ -447,16 +427,7 @@ update message model =
                     (List.map logError >> Cmd.batch)
 
         OnAuthStateChanged value ->
-            let
-                userDecoder =
-                    JD.succeed AuthUser
-                        |> required "uid" JD.string
-                        |> required "displayName" JD.string
-
-                authStateDecoder =
-                    JD.oneOf [ JD.null SignedOut, userDecoder |> JD.map SignedIn ]
-            in
-            case JD.decodeValue authStateDecoder value of
+            case JD.decodeValue Auth.decoder value of
                 Err err ->
                     ( model, logError (JD.errorToString err) )
 
@@ -678,7 +649,7 @@ subscriptions model =
                     Browser.Events.onClick <|
                         JD.succeed ClickOutsideDetected
                 )
-        , onAuthStateChanged OnAuthStateChanged
+        , Auth.onAuthStateChanged OnAuthStateChanged
         , onFireTodoList OnFireTodoList
         ]
 
@@ -706,13 +677,13 @@ view model =
                     ]
                 , row [ A.class "flex-grow-1" ] []
                 , case model.auth of
-                    Unknown ->
+                    Auth.Unknown ->
                         row [] [ btnDisabled "SignIn" ]
 
-                    SignedOut ->
+                    Auth.SignedOut ->
                         row [] [ btn2 "SignIn" SignInClicked ]
 
-                    SignedIn { displayName } ->
+                    Auth.SignedIn { displayName } ->
                         row [ A.class "items-center" ]
                             [ col [] [ H.text displayName ]
                             , btn2 "SignOut" SignOutClicked
