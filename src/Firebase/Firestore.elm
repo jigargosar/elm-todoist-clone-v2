@@ -8,7 +8,7 @@ import Todo exposing (Todo)
 import TodoId exposing (TodoId)
 
 
-port firePushTodoList : Value -> Cmd msg
+port firestoreSetAll : ( String, Value ) -> Cmd msg
 
 
 port fireDeleteTodoId : Value -> Cmd msg
@@ -19,7 +19,7 @@ port onFireTodoList : (Value -> msg) -> Sub msg
 
 pushTodoList : List Todo -> Cmd msg
 pushTodoList =
-    firePushTodoList << JE.list Todo.encoder
+    firestoreSetAll << Tuple.pair "todos" << JE.list Todo.encoder
 
 
 deleteTodo : TodoId -> Cmd msg

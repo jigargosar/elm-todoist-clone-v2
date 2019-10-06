@@ -43,7 +43,7 @@ sub(
 sub('signIn', fire.signIn, app)
 sub('signOut', fire.signOut, app)
 sub('logError', err => console.error('Elm:', err), app)
-sub('firePushTodoList', todoList => fire.setAll('todos', todoList), app)
+sub('firestoreSetAll', ([name,docs]) => fire.setAll(name, docs), app)
 sub('fireDeleteTodoId', todoId => fire.delete('todos', todoId), app)
 
 function sub(name, fn, app) {
