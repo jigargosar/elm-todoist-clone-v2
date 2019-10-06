@@ -499,7 +499,7 @@ update message model =
 
         DeleteTodo todoId ->
             ( model |> mapTodoDict (TaggedDict.filter (\_ -> idEq todoId >> not))
-            , Firestore.fireDeleteTodoId (TodoId.encoder todoId)
+            , Firestore.deleteTodo todoId
             )
 
         InsertTodoWithPatches patches now ->
